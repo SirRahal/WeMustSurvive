@@ -1,0 +1,9 @@
+[
+  { "id": "coal",          "name": "Coal",          "color": "#2b2b2b", "fuelTicks": 1200 },
+  { "id": "iron_ore",      "name": "Iron Ore",      "color": "#7a8fa6" },
+  { "id": "iron_plate",    "name": "Iron Plate",    "color": "#c9d3dd" },
+  { "id": "copper_ore",    "name": "Copper Ore",    "color": "#c8743a" },
+  { "id": "silver_ore",    "name": "Silver Ore",    "color": "#d9dde3" },
+  { "id": "gold_ore",      "name": "Gold Ore",      "color": "#e6c13b" },
+  { "id": "ammo_magazine", "name": "Ammo Magazine", "color": "#d4a53c" }
+]

@@ -1,0 +1,25 @@
+{
+  "name": "The Funnel",
+  "width": 80,
+  "height": 72,
+  "spawnRows": 5,
+  "chokeTop": 5,
+  "chokeBottom": 8,
+  "chokeHalfWidth": 3,
+  "vTopHalfWidth": 36,
+  "vBottomHalfWidth": 9,
+  "nexus": { "x": 39, "y": 63 },
+  "startingItems": { "iron_plate": 110, "coal": 20, "ammo_magazine": 10 },
+  "patches": [
+    { "item": "coal",       "x": 31, "y": 57, "radius": 3.2, "amount": 600 },
+    { "item": "iron_ore",   "x": 48, "y": 57, "radius": 3.8, "amount": 600 },
+    // Two single-tile coal seams beside the iron field, used by the tutorial's starter base.
+    { "item": "coal",       "x": 44, "y": 60, "radius": 0.5, "amount": 400 },
+    { "item": "coal",       "x": 46, "y": 61, "radius": 0.5, "amount": 400 },
+    { "item": "iron_ore",   "x": 34, "y": 46, "radius": 2.8, "amount": 600 },
+    { "item": "coal",       "x": 47, "y": 44, "radius": 2.6, "amount": 600 },
+    { "item": "copper_ore", "x": 18, "y": 30, "radius": 3.0, "amount": 800 },
+    { "item": "copper_ore", "x": 61, "y": 30, "radius": 3.0, "amount": 800 },
+    { "item": "silver_ore", "x": 40, "y": 13, "radius": 2.6, "amount": 1000, "claimZone": true }
+  ]
+}

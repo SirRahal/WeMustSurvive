@@ -1,0 +1,143 @@
+{
+  // Guided tutorial for Map 1. Each step: camera focus (grid coords) + zoom, instruction text,
+  // optional command-card button to highlight, hint tiles to pulse, and a goal that advances the step.
+  // Goals: null (player clicks Next), "engineerAt", "hintsBuilt", "furnaceSmelting", "platesDelivered",
+  //        "nexusFilter", "turretArmed", "waveStarted".  Hint building "mark" = a plain marker ring.
+  "steps": [
+    {
+      "id": "welcome",
+      "title": "Welcome to The Funnel",
+      "body": "Aliens have overrun the surface. This glowing block is the Nexus: it stores everything you mine and pays for everything you build. If it's destroyed, it's game over.\n\nThis tutorial walks you through your first factory. The alien waves are on hold until you're ready.",
+      "focus": { "x": 40.5, "y": 64.5 }, "zoom": 1.3
+    },
+    {
+      "id": "choke",
+      "title": "Where they come from",
+      "body": "Every wave squeezes through this gap at the top of the map and heads straight for your Nexus.\n\nMove the camera with WASD, the arrow keys, or by pushing the mouse to the screen edge. Scroll to zoom. Press C at any time to jump back to your engineer.",
+      "focus": { "x": 40.5, "y": 9 }, "zoom": 0.9
+    },
+    {
+      "id": "move",
+      "title": "Your engineer",
+      "body": "The blue figure with the green ring is your engineer, your only builder.\n\nRight-click the marked spot to walk there.",
+      "focus": { "x": 42, "y": 60.5 }, "zoom": 1.6,
+      "goal": "engineerAt",
+      "hints": [ { "building": "mark", "x": 43, "y": 59 } ]
+    },
+    {
+      "id": "coal_drill",
+      "title": "Mine coal",
+      "body": "Coal fuels your drills and furnaces.\n\nClick Burner Drill on the command card (or press 3), then left-click the marked coal tile. The arrow shows where the drill drops what it mines; press R to rotate if needed. Your engineer walks over and builds it.",
+      "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
+      "goal": "hintsBuilt", "button": "drill",
+      "hints": [ { "building": "drill", "x": 44, "y": 60, "dir": "East" } ]
+    },
+    {
+      "id": "iron_drill",
+      "title": "Mine iron",
+      "body": "Iron is your main building material. Place another Burner Drill on the marked iron tile, facing west, toward the empty tile between the two drills. That's where the furnace will go.",
+      "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
+      "goal": "hintsBuilt", "button": "drill",
+      "hints": [ { "building": "drill", "x": 46, "y": 60, "dir": "West" } ]
+    },
+    {
+      "id": "fuel_drill",
+      "title": "Fuel the iron drill",
+      "body": "Drills that aren't sitting on coal need coal delivered. Place a drill on the little coal seam just below the iron drill, facing north. It will feed coal straight into the iron drill.",
+      "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
+      "goal": "hintsBuilt", "button": "drill",
+      "hints": [ { "building": "drill", "x": 46, "y": 61, "dir": "North" } ]
+    },
+    {
+      "id": "furnace",
+      "title": "Smelt iron",
+      "body": "A Furnace turns iron ore into iron plates. Build one (Furnace, or press 4) on the marked tile.\n\nThe iron drill feeds it ore and the coal drill feeds it fuel. You'll see it glow when it starts smelting.",
+      "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
+      "goal": "furnaceSmelting", "button": "furnace",
+      "hints": [ { "building": "furnace", "x": 45, "y": 60 } ]
+    },
+    {
+      "id": "belts",
+      "title": "Bring the plates home",
+      "body": "An Inserter (2) grabs items from the tile behind it and drops them in front. Place one below the furnace facing south, then lay Belts (1) along the marked path into the Nexus.\n\nTip: hold the left mouse button and drag to lay a line of belts. Hold Shift to keep the blueprint selected.",
+      "focus": { "x": 43.5, "y": 62 }, "zoom": 1.7,
+      "goal": "platesDelivered", "count": 3, "button": "inserter",
+      "hints": [
+        { "building": "inserter", "x": 45, "y": 61, "dir": "South" },
+        { "building": "belt", "x": 45, "y": 62, "dir": "South" },
+        { "building": "belt", "x": 45, "y": 63, "dir": "West" },
+        { "building": "belt", "x": 44, "y": 63, "dir": "West" },
+        { "building": "belt", "x": 43, "y": 63, "dir": "West" },
+        { "building": "belt", "x": 42, "y": 63, "dir": "West" }
+      ]
+    },
+    {
+      "id": "factory_info",
+      "title": "Your first factory",
+      "body": "Iron plates are flowing into the Nexus. Watch the Iron Plate count in the top right. Everything you build is paid from that storage, so a growing factory means more defenses.\n\nLeft-click any building to select it. Its actions (rotate, repair, deconstruct) appear on the command card.",
+      "focus": { "x": 43, "y": 62 }, "zoom": 1.4
+    },
+    {
+      "id": "turret",
+      "title": "Build a turret",
+      "body": "Gun Turrets shoot aliens automatically, but only while they have ammo. Build one (Gun Turret, or press 7) on the marked tile beside the Nexus.",
+      "focus": { "x": 38, "y": 63.5 }, "zoom": 1.7,
+      "goal": "hintsBuilt", "button": "gun_turret",
+      "hints": [ { "building": "gun_turret", "x": 37, "y": 63 } ]
+    },
+    {
+      "id": "walls",
+      "title": "Put up walls",
+      "body": "Walls soak up damage and force aliens to walk around them, or chew through. Select Basic Wall (6) and drag across the marked tiles north of your turret.",
+      "focus": { "x": 37, "y": 61 }, "zoom": 1.5,
+      "goal": "hintsBuilt", "button": "wall",
+      "hints": [
+        { "building": "wall", "x": 34, "y": 59 },
+        { "building": "wall", "x": 35, "y": 59 },
+        { "building": "wall", "x": 36, "y": 59 },
+        { "building": "wall", "x": 37, "y": 59 },
+        { "building": "wall", "x": 38, "y": 59 }
+      ]
+    },
+    {
+      "id": "workshop",
+      "title": "Make ammo",
+      "body": "An Ammo Workshop turns 2 iron plates into an ammo magazine. Build one (5) on the marked tile below the turret, then an Inserter between the Nexus and the workshop, facing west, to carry plates into it.",
+      "focus": { "x": 38, "y": 64.5 }, "zoom": 1.8,
+      "goal": "hintsBuilt", "button": "workshop",
+      "hints": [
+        { "building": "workshop", "x": 37, "y": 65 },
+        { "building": "inserter", "x": 38, "y": 65, "dir": "West" }
+      ]
+    },
+    {
+      "id": "filter",
+      "title": "Tell the inserter what to take",
+      "body": "The Nexus holds many kinds of items, so an inserter pulling from it needs a filter.\n\nLeft-click the new inserter to select it, then click Iron Plate on the command card. (Or hover over it and press F until it shows iron plate.)",
+      "focus": { "x": 38, "y": 64.5 }, "zoom": 1.8,
+      "goal": "nexusFilter", "item": "iron_plate", "button": "filter:iron_plate",
+      "hints": [ { "building": "mark", "x": 38, "y": 65 } ]
+    },
+    {
+      "id": "arm_turret",
+      "title": "Arm the turret",
+      "body": "Last link: place an Inserter between the workshop and the turret, facing north, to move fresh ammo into the turret.",
+      "focus": { "x": 38, "y": 64.5 }, "zoom": 1.8,
+      "goal": "turretArmed", "button": "inserter",
+      "hints": [ { "building": "inserter", "x": 37, "y": 64, "dir": "North" } ]
+    },
+    {
+      "id": "release",
+      "title": "Here they come",
+      "body": "That's the basics! The wave timer is now running (top left). Press Space to call the first wave now, or use the time to keep building.\n\nDuring a fight, right-click damaged buildings to repair them.",
+      "focus": { "x": 40.5, "y": 58 }, "zoom": 1.0,
+      "goal": "waveStarted", "releaseWaves": true
+    },
+    {
+      "id": "good_luck",
+      "title": "Hold the Funnel",
+      "body": "Survive all 4 waves to win. The larger coal and iron fields nearby can feed more furnaces, and turrets and walls at the choke point stop aliens before they reach your base.\n\nGood luck, Engineer.",
+      "focus": { "x": 40.5, "y": 58 }, "zoom": 1.0
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+[
+  {
+    "id": "belt", "name": "Belt", "kind": "Belt", "hotkey": 1,
+    "cost": { "iron_plate": 1 }, "maxHp": 50, "blocksEnemies": false,
+    "beltSpeed": 8, "buildTicks": 12, "color": "#e0b43a"
+  },
+  {
+    "id": "inserter", "name": "Inserter", "kind": "Inserter", "hotkey": 2,
+    "cost": { "iron_plate": 2 }, "maxHp": 50, "blocksEnemies": false,
+    "swingTicks": 26, "buildTicks": 30, "color": "#d9a23a"
+  },
+  {
+    "id": "drill", "name": "Burner Drill", "kind": "Drill", "hotkey": 3,
+    "cost": { "iron_plate": 10 }, "maxHp": 150, "blocksEnemies": true,
+    "mineTicks": 120, "usesFuel": true, "buildTicks": 90, "color": "#8a6b4a"
+  },
+  {
+    "id": "furnace", "name": "Furnace", "kind": "Crafter", "hotkey": 4,
+    "cost": { "iron_plate": 8 }, "maxHp": 150, "blocksEnemies": true,
+    "recipes": [ "smelt_iron" ], "usesFuel": true, "buildTicks": 90, "color": "#9c5b3c"
+  },
+  {
+    "id": "workshop", "name": "Ammo Workshop", "kind": "Crafter", "hotkey": 5,
+    "cost": { "iron_plate": 15 }, "maxHp": 150, "blocksEnemies": true,
+    "recipes": [ "ammo" ], "usesFuel": false, "buildTicks": 120, "color": "#6f7d4a"
+  },
+  {
+    "id": "wall", "name": "Basic Wall", "kind": "Wall", "hotkey": 6,
+    "cost": { "iron_plate": 4 }, "maxHp": 400, "blocksEnemies": true,
+    "buildTicks": 45, "color": "#8d939a"
+  },
+  {
+    "id": "gun_turret", "name": "Gun Turret", "kind": "Turret", "hotkey": 7,
+    "cost": { "iron_plate": 20 }, "maxHp": 300, "blocksEnemies": true,
+    "range": 9, "damage": 6, "cooldownTicks": 10, "ammoItem": "ammo_magazine",
+    "roundsPerAmmo": 10, "ammoCapacity": 10, "buildTicks": 150, "color": "#4f6f8f"
+  },
+  {
+    "id": "nexus", "name": "Nexus", "kind": "Nexus", "hotkey": 0,
+    "cost": {}, "maxHp": 2000, "blocksEnemies": true, "size": 3,
+    "range": 6, "damage": 3, "cooldownTicks": 20, "color": "#3fb6c9"
+  }
+]

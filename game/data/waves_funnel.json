@@ -1,0 +1,10 @@
+{
+  "firstWaveTicks": 10800,
+  "betweenWaveTicks": 9000,
+  "waves": [
+    { "groups": [ { "enemy": "grunt", "count": 6, "intervalTicks": 60 } ] },
+    { "groups": [ { "enemy": "grunt", "count": 10, "intervalTicks": 45 }, { "enemy": "runner", "count": 4, "intervalTicks": 90 } ] },
+    { "groups": [ { "enemy": "grunt", "count": 16, "intervalTicks": 30 }, { "enemy": "runner", "count": 8, "intervalTicks": 60 } ] },
+    { "groups": [ { "enemy": "grunt", "count": 24, "intervalTicks": 24 }, { "enemy": "runner", "count": 12, "intervalTicks": 40 } ] }
+  ]
+}

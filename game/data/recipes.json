@@ -1,0 +1,4 @@
+[
+  { "id": "smelt_iron", "inputs": { "iron_ore": 1 },   "outputs": { "iron_plate": 1 },    "ticks": 120 },
+  { "id": "ammo",       "inputs": { "iron_plate": 2 }, "outputs": { "ammo_magazine": 1 }, "ticks": 90 }
+]

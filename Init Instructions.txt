@@ -1,0 +1,208 @@
+**Game Design Document – Working Title: Belt & Barricade**  
+*(Post-Apocalyptic Factory Defense – 2-Player Co-op + Solo)*
+
+---
+
+### 1. High Concept
+
+A 2-player cooperative (and solo) factory-defense game set on a post-apocalyptic Earth under alien invasion. Players control mobile engineer avatars who must gather resources, build automated production lines, and construct layered defenses to protect a central Nexus from increasingly intense waves of aliens.
+
+The game blends Factorio-style logistics and progression with wave-based tower defense. Every wall, turret, and piece of ammunition is produced by the factory the players themselves design and maintain.
+
+**Target session length**  
+- Training map: ~25 minutes  
+- Standard maps: 45–60 minutes
+
+---
+
+### 2. Core Gameplay Loop
+
+1. Mine resources using drills.
+2. Transport materials with belts and inserters.
+3. Refine and process resources.
+4. Research new technologies.
+5. Build and upgrade walls, turrets, and power infrastructure.
+6. Defend the Nexus against timed alien waves.
+7. Expand outward to claim richer resource zones.
+8. Eventually construct late-game super weapon buildings.
+
+Between waves, players have a preparation window to expand, repair, and re-optimize their factory.
+
+---
+
+### 3. Player Characters
+
+Players control mobile **Engineer** avatars.
+
+**Capabilities**
+- Move freely around the map.
+- Build any structure (as long as the required resources exist in the shared network).
+- Repair buildings and walls.
+- Carry a basic personal weapon for self-defense.
+- Issue orders that show a visible path line and highlight the target structure for the other player.
+
+Both players have identical capabilities and full access to the shared factory. There are no rigid roles.
+
+---
+
+### 4. Resources & Progression
+
+Five resources form a clear tier ladder:
+
+| Tier | Resource | Primary Role |
+|------|----------|--------------|
+| 0    | Coal     | Early power generation |
+| 1    | Iron     | Basic structures, belts, walls, gun turrets |
+| 2    | Copper   | Power grid, electronics, laser turrets, better logistics |
+| 3    | Silver   | Advanced mining, heavy defenses, mid-tier research |
+| 4    | Gold     | End-game turrets, super weapons, highest-tier efficiency |
+
+- Richer and deeper veins appear farther from the starting area.
+- **Claim Zones** are pre-marked on the map. Simply building a drill inside a claim zone grants higher yield and faster mining speed. Aliens can still destroy these mining facilities.
+
+---
+
+### 5. Buildings & Tiered Defenses
+
+**Walls & Towers scale with resource tiers**
+
+| Resource | Wall Tier       | Tower Examples              |
+|----------|-----------------|-----------------------------|
+| Iron     | Basic Wall      | Gun Turret                  |
+| Copper   | Reinforced Wall | Laser Turret                |
+| Silver   | Heavy Wall      | Rocket Turret / Flame Turret|
+| Gold     | Fortress Wall   | Heavy / Advanced Turret     |
+
+**Key Building Categories**
+- Mining Drills (tiered)
+- Belts, Underground Belts, Splitters, Inserters (multiple speed tiers)
+- Power generators and power poles
+- Refineries / Furnaces
+- Laboratories
+- Storage (Nexus acts as primary storage)
+- Walls and Turrets
+- Super Weapon buildings (Nuclear Silo, Satellite Uplink, etc.)
+
+Players can place buildings as long as the required materials exist anywhere in the shared logistics network.
+
+---
+
+### 6. Power System
+
+Full Factorio-style power grid.  
+Players must generate power and distribute it via power poles. Insufficient power causes brownouts that disable production buildings and turrets.
+
+---
+
+### 7. Research
+
+Research is fully shared.  
+Each technology requires a mix of resources from current and previous tiers. Higher technologies demand Silver and eventually Gold, forcing territorial expansion.
+
+---
+
+### 8. Combat & Waves
+
+**Wave System**
+- Waves arrive on a strict timer.
+- A short preparation phase exists between waves (players may end it early).
+- Enemies target the Nexus as their primary objective but will attack resource nodes, belts, drills, power poles, and turrets when convenient.
+
+**Enemy Types (Map 1 Roster)**
+- **Grunt** – Basic swarm unit
+- **Runner** – Fast, low health
+- **Brute** – Slow, high health tank
+- **Spitter** – Ranged acid attacker (targets structures)
+- **Sapper** – Prioritizes logistics and power infrastructure
+
+**Loss Condition**  
+The Nexus is destroyed.
+
+**Nexus**  
+Serves as the main storage, provides starting power, and has a small amount of passive defense.
+
+---
+
+### 9. Map 1 – “The Funnel” (Training Map)
+
+**Layout**  
+V-shaped map. Nexus sits at the bottom of the V. Unbuildable terrain forms the arms, forcing all enemies through a single choke point at the top.
+
+**Resource Placement**
+- Coal and Iron near the Nexus
+- Copper halfway up the arms
+- One Silver claim zone just behind the main choke
+
+**Duration**  
+Approximately 25 minutes across 10 waves.
+
+**Progression Teaching Goals**
+- Waves 1–4: Iron-tier mining, belts, basic walls, and gun turrets
+- Waves 5–6: Copper, power grid, and laser turrets
+- Waves 7–10: Claiming the Silver zone and mixing higher-tier defenses
+
+---
+
+### 10. Super Weapons
+
+Late-game strategic weapons that require dedicated buildings:
+
+- **Nuclear Silo** → Enables Nuke
+- **Satellite Uplink / Launch Tower** → Enables Orbital Strike
+
+These buildings are expensive (heavy Silver + Gold) and produce powerful but high-cooldown abilities that any player can activate once constructed.
+
+---
+
+### 11. Meta Progression (Between Maps)
+
+Completing maps awards **Meta Points** spent on a large Path of Exile 2-style skill tree.
+
+**Major Clusters**
+- Extraction
+- Logistics & Belts
+- Power & Efficiency
+- Defense
+- Research Speed
+- Super Weapons
+
+Nodes are deliberately interleaved so players cannot pure-focus a single area. Progressing deep into Defense requires taking some Logistics or Power nodes, and vice versa. Most bonuses are small incremental improvements (+4% to +8%), with stronger Notable nodes inside clusters.
+
+---
+
+### 12. Solo Mode
+
+- Enemy health, damage, and spawn counts are reduced so threats are approximately **55% weaker** than in co-op.
+- All other systems (timers, building costs, research) remain identical.
+- Designed so a single skilled player experiences similar tension to a co-op pair.
+
+---
+
+### 13. Co-op Communication
+
+- **Alt + Command Wheel** (League of Legends style) for quick pings (“Defend”, “Need Copper”, “Danger”, “On my way”, etc.).
+- **Freehand drawing** on the map (Beyond All Reason style) for more detailed communication.
+- When an engineer receives a move/build/repair order, a clear path line appears on the ground and the target structure is highlighted for both players.
+
+---
+
+### 14. Theme & Visual Style
+
+**Setting**: Post-apocalyptic Earth under alien invasion.  
+**Art Direction**: Clean, modern, readable Factorio-like aesthetic. Clear silhouettes, strong contrast between player structures and alien threats, and easily distinguishable resource types and belt contents.
+
+---
+
+### 15. Design Pillars (Summary)
+
+1. **Factory is the weapon** – Everything used in defense is produced by the players’ logistics network.
+2. **Meaningful expansion** – Stronger resources and claim zones sit behind increasing risk.
+3. **Clear progression** – Each resource tier visibly upgrades both production and defensive capabilities.
+4. **Co-op clarity** – Strong communication tools and shared ownership keep both players equally engaged.
+5. **Readable tension** – Wave timers and the V-shaped funnel create understandable, fair pressure.
+
+---
+
+This document represents the complete current design.  
+
+Would you like me to export this as a properly formatted document (for example a clean Markdown file or a more formal PDF-style layout), or shall we begin refining specific numbers, adding more enemy types for future maps, or moving into implementation planning?

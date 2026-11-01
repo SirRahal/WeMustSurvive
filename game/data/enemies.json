@@ -1,0 +1,4 @@
+[
+  { "id": "grunt",  "name": "Grunt",  "maxHp": 30, "speed": 1.2, "damage": 8, "attackTicks": 60, "radius": 0.3,  "color": "#9b3fd1" },
+  { "id": "runner", "name": "Runner", "maxHp": 15, "speed": 2.8, "damage": 4, "attackTicks": 30, "radius": 0.22, "color": "#d13f7a" }
+]
