@@ -3,7 +3,12 @@
   { "id": "iron_ore",      "name": "Iron Ore",      "color": "#7a8fa6" },
   { "id": "iron_plate",    "name": "Iron Plate",    "color": "#c9d3dd" },
   { "id": "copper_ore",    "name": "Copper Ore",    "color": "#c8743a" },
-  { "id": "silver_ore",    "name": "Silver Ore",    "color": "#d9dde3" },
-  { "id": "gold_ore",      "name": "Gold Ore",      "color": "#e6c13b" },
-  { "id": "ammo_magazine", "name": "Ammo Magazine", "color": "#d4a53c" }
+  { "id": "copper_plate",  "name": "Copper Plate",  "color": "#e8955a" },
+  { "id": "silver_ore",    "name": "Silver Ore",    "color": "#aab4c0" },
+  { "id": "silver_bar",    "name": "Silver Bar",    "color": "#eef2f7" },
+  { "id": "gold_ore",      "name": "Gold Ore",      "color": "#c9a227" },
+  { "id": "gold_bar",      "name": "Gold Bar",      "color": "#ffd84a" },
+  { "id": "ammo_magazine", "name": "Ammo Magazine", "color": "#d4a53c" },
+  { "id": "rocket",        "name": "Rocket",        "color": "#d9534f" },
+  { "id": "heavy_shell",   "name": "Heavy Shell",   "color": "#8e6bd6" }
 ]

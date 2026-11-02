@@ -1,4 +1,9 @@
 [
-  { "id": "smelt_iron", "inputs": { "iron_ore": 1 },   "outputs": { "iron_plate": 1 },    "ticks": 120 },
-  { "id": "ammo",       "inputs": { "iron_plate": 2 }, "outputs": { "ammo_magazine": 1 }, "ticks": 90 }
+  { "id": "smelt_iron",   "inputs": { "iron_ore": 1 },   "outputs": { "iron_plate": 1 },   "ticks": 120 },
+  { "id": "smelt_copper", "inputs": { "copper_ore": 1 }, "outputs": { "copper_plate": 1 }, "ticks": 120 },
+  { "id": "smelt_silver", "inputs": { "silver_ore": 1 }, "outputs": { "silver_bar": 1 },   "ticks": 160 },
+  { "id": "smelt_gold",   "inputs": { "gold_ore": 1 },   "outputs": { "gold_bar": 1 },     "ticks": 200 },
+  { "id": "heavy_shells", "inputs": { "gold_bar": 1, "silver_bar": 2 }, "outputs": { "heavy_shell": 2 }, "ticks": 240, "stockLimit": 40 },
+  { "id": "rockets",      "inputs": { "silver_bar": 1, "iron_plate": 2 }, "outputs": { "rocket": 2 },    "ticks": 150, "stockLimit": 50 },
+  { "id": "ammo",         "inputs": { "iron_plate": 2 }, "outputs": { "ammo_magazine": 1 }, "ticks": 90, "stockLimit": 50 }
 ]

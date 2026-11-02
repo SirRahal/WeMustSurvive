@@ -60,12 +60,25 @@ public class LogisticsTests
     }
 
     [Fact]
-    public void Iron_drill_without_fuel_does_nothing()
+    public void Iron_drill_draws_coal_from_storage_automatically()
     {
         var w = TestWorld.Create();
+        int coal = w.Storage.Count("coal");
+        var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
+        var depot = (Depot)w.PlaceDirect("depot", TestWorld.IronTile + new Int2(1, 0));
+        w.Run(600);
+        Assert.Equal(5, depot.Storage.Count("iron_ore"));
+        Assert.Equal(coal - 1, w.Storage.Count("coal")); // one coal lasts 20 s
+    }
+
+    [Fact]
+    public void Iron_drill_with_no_coal_anywhere_says_so()
+    {
+        var w = TestWorld.Create();
+        w.Storage.Remove("coal", w.Storage.Count("coal"));
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
         w.Run(600);
-        Assert.Equal("No fuel", drill.Status);
+        Assert.Equal(FuelTank.StarvedText, drill.Status);
     }
 
     [Fact]
@@ -89,19 +102,25 @@ public class LogisticsTests
     }
 
     [Fact]
-    public void Inserter_from_nexus_requires_filter()
+    public void Inserter_from_nexus_with_any_item_feeds_a_machine_but_not_a_belt()
     {
         var w = TestWorld.Create();
-        // Inserter directly above the Nexus, facing north, feeding a turret.
+        // Inserter directly above the Nexus, facing north, feeding a turret: "any item" takes only the ammo it uses.
         var ins = (Inserter)w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(0, -1), Direction.North);
         var turret = (Turret)w.PlaceDirect("gun_turret", TestWorld.NexusOrigin + new Int2(0, -2));
-
         w.Run(120);
-        Assert.Equal(0, turret.Ammo);
-
-        w.Enqueue(new SetInserterFilterCommand(0, ins.Origin, "ammo_magazine"));
-        w.Run(120);
+        Assert.Null(ins.Filter);
         Assert.True(turret.Ammo >= 2);
+        Assert.Equal(20, w.Storage.Count("coal")); // nothing else was taken
+
+        // Onto a belt, "any item" would drain storage, so it waits for a filter.
+        var toBelt = (Inserter)w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(1, -1), Direction.North);
+        var belt = (Belt)w.PlaceDirect("belt", TestWorld.NexusOrigin + new Int2(1, -2), Direction.North);
+        w.Run(120);
+        Assert.Empty(belt.Items);
+        w.Enqueue(new SetInserterFilterCommand(0, toBelt.Origin, "iron_plate"));
+        w.Run(120);
+        Assert.NotEmpty(belt.Items);
     }
 
     [Fact]

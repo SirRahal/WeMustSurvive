@@ -1,5 +1,10 @@
 {
+  "id": "funnel",
   "name": "The Funnel",
+  "description": "Training map. A V-shaped valley funnels every wave through one choke point. 10 waves, about 25 minutes.",
+  "layout": "funnel",
+  "minutes": 25,
+  "metaPoints": 3,
   "width": 80,
   "height": 72,
   "spawnRows": 5,

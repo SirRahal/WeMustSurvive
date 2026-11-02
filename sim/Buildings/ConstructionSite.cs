@@ -9,18 +9,19 @@ public sealed class ConstructionSite : Building
 {
     public const float StartHpFraction = 0.1f;
 
-    public int Progress { get; private set; }
+    public float Progress { get; private set; }
     public bool Started => Progress > 0;
     public int BuildTicks => Math.Max(1, Def.BuildTicks);
-    public float Fraction => Progress / (float)BuildTicks;
+    public float Fraction => Math.Min(1f, Progress / BuildTicks);
 
     public override bool BlocksEnemies => Started && Def.BlocksEnemies;
+    protected override bool IsBusy => false;
 
-    /// <summary>Advances construction by one tick. Returns true when complete.</summary>
-    public bool Advance()
+    /// <summary>Advances construction by <paramref name="rate"/> ticks of work. Returns true when complete.</summary>
+    public bool Advance(float rate = 1f)
     {
-        Progress++;
-        Hp = MathF.Min(Def.MaxHp, Hp + Def.MaxHp * (1 - StartHpFraction) / BuildTicks);
+        Progress += rate;
+        Hp = MathF.Min(MaxHp, Hp + MaxHp * (1 - StartHpFraction) * rate / BuildTicks);
         return Progress >= BuildTicks;
     }
 

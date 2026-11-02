@@ -49,7 +49,7 @@ public class ConstructionTests
         var a = new Int2(36, 59);
         var b = new Int2(44, 59);
         w.Enqueue(new PlaceBuildingCommand(0, "wall", a, Direction.North));
-        w.Enqueue(new PlaceBuildingCommand(0, "wall", b, Direction.North));
+        w.Enqueue(new PlaceBuildingCommand(0, "wall", b, Direction.North, Queue: true));
         w.Step();
         Assert.Equal(2, Eng(w).Orders.Count);
 
@@ -60,38 +60,56 @@ public class ConstructionTests
     }
 
     [Fact]
-    public void Placing_more_blueprints_never_abandons_earlier_ones()
-    {
-        var w = TestWorld.Create();
-        var first = new Int2(36, 59);
-        var second = new Int2(44, 59);
-        w.Enqueue(new PlaceBuildingCommand(0, "wall", first, Direction.North));
-        w.Run(30); // first wall is under way
-        w.Enqueue(new PlaceBuildingCommand(0, "wall", second, Direction.North));
-
-        w.Run(10 * World.TicksPerSecond);
-
-        Assert.IsType<Wall>(w.BuildingAt(first));
-        Assert.IsType<Wall>(w.BuildingAt(second));
-    }
-
-    [Fact]
-    public void Unqueued_move_interrupts_then_build_queue_resumes()
+    public void Shift_chains_orders_in_sequence()
     {
         var w = TestWorld.Create();
         var wall = new Int2(36, 59);
-        w.Enqueue(new PlaceBuildingCommand(0, "wall", wall, Direction.North));
-        w.Step();
         var detour = new Vector2(45.5f, 61.5f);
-        w.Enqueue(new MoveCommand(0, detour));
+        var turret = new Int2(44, 59);
+        w.Enqueue(new PlaceBuildingCommand(0, "wall", wall, Direction.North));
+        w.Enqueue(new MoveCommand(0, detour, Queue: true));
+        w.Enqueue(new PlaceBuildingCommand(0, "gun_turret", turret, Direction.North, Queue: true));
         w.Step();
 
-        Assert.IsType<MoveOrder>(Eng(w).Orders[0]);
-        Assert.IsType<BuildOrder>(Eng(w).Orders[1]);
+        Assert.Collection(Eng(w).Orders,
+            o => Assert.IsType<BuildOrder>(o),
+            o => Assert.IsType<MoveOrder>(o),
+            o => Assert.IsType<BuildOrder>(o));
 
-        w.Run(10 * World.TicksPerSecond);
+        w.Run(15 * World.TicksPerSecond);
         Assert.IsType<Wall>(w.BuildingAt(wall));
+        Assert.IsType<Turret>(w.BuildingAt(turret));
         Assert.Empty(Eng(w).Orders);
+    }
+
+    [Fact]
+    public void Unqueued_order_replaces_the_plan_and_refunds_unstarted_blueprints()
+    {
+        var w = TestWorld.Create();
+        int plates = w.Storage.Count("iron_plate");
+        var far = new Int2(40, 20);
+        w.Enqueue(new PlaceBuildingCommand(0, "gun_turret", far, Direction.North));
+        w.Step();
+        w.Enqueue(new MoveCommand(0, new Vector2(45.5f, 61.5f)));
+        w.Step();
+
+        Assert.Null(w.BuildingAt(far));
+        Assert.Equal(plates, w.Storage.Count("iron_plate"));
+        Assert.IsType<MoveOrder>(Assert.Single(Eng(w).Orders));
+        Assert.Contains(w.Events.OfType<MessageEvent>(), m => m.Text.Contains("hold Shift"));
+    }
+
+    [Fact]
+    public void Unqueued_order_keeps_half_built_sites()
+    {
+        var w = TestWorld.Create();
+        var near = new Int2(40, 59);
+        w.Enqueue(new PlaceBuildingCommand(0, "gun_turret", near, Direction.North));
+        w.Run(30); // construction under way
+        w.Enqueue(new PlaceBuildingCommand(0, "wall", new Int2(36, 59), Direction.North));
+        w.Step();
+
+        Assert.IsType<ConstructionSite>(w.BuildingAt(near));
     }
 
     [Fact]
@@ -116,7 +134,7 @@ public class ConstructionTests
         var near = new Int2(40, 59);
         var far = new Int2(40, 20);
         w.Enqueue(new PlaceBuildingCommand(0, "gun_turret", near, Direction.North));
-        w.Enqueue(new PlaceBuildingCommand(0, "gun_turret", far, Direction.North));
+        w.Enqueue(new PlaceBuildingCommand(0, "gun_turret", far, Direction.North, Queue: true));
         w.Run(20);
         w.Enqueue(new StopCommand(0));
         w.Step();
@@ -160,7 +178,7 @@ public class ConstructionTests
     {
         var w = TestWorld.Create();
         foreach (int x in new[] { 37, 38, 39, 40, 41, 42 })
-            w.Enqueue(new PlaceBuildingCommand(0, "wall", new Int2(x, 7), Direction.North));
+            w.Enqueue(new PlaceBuildingCommand(0, "wall", new Int2(x, 7), Direction.North, Queue: true));
         w.Step();
 
         var site = Assert.IsType<ConstructionSite>(w.BuildingAt(new Int2(40, 7)));

@@ -47,6 +47,14 @@ public sealed class WaveDirector
         }
     }
 
+    /// <summary>Enemy counts (after solo/co-op scaling) of the next wave to start, or empty if none remain.</summary>
+    public IEnumerable<(EnemyDef Enemy, int Count)> PreviewNext(World w)
+    {
+        if (!HasMoreWaves) yield break;
+        foreach (var g in _schedule.Waves[WavesStarted].Groups)
+            yield return (w.Data.Enemies[g.Enemy], Math.Max(1, (int)MathF.Round(g.Count * w.ThreatAxis)));
+    }
+
     /// <summary>Skips the rest of the preparation window.</summary>
     public bool EndPrepEarly()
     {

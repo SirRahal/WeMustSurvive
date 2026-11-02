@@ -89,6 +89,13 @@ public sealed class Tutorial
 
     public void Skip(World w) => Finish(w);
 
+    /// <summary>
+    /// Command-card button to highlight right now: the building of the first hint not yet placed, so multi-part
+    /// steps move the glow along (workshop, then inserter). Falls back to the step's fixed button.
+    /// </summary>
+    public string? CurrentButton(World w) =>
+        Current.Hints.FirstOrDefault(h => !h.IsMarker && !IsHintDone(w, h))?.Building ?? Current.Button;
+
     /// <summary>Whether a hint has been satisfied (a site or building of the right type and facing is there).</summary>
     public static bool IsHintDone(World w, TutorialHint hint)
     {

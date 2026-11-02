@@ -1,4 +1,7 @@
 [
-  { "id": "grunt",  "name": "Grunt",  "maxHp": 30, "speed": 1.2, "damage": 8, "attackTicks": 60, "radius": 0.3,  "color": "#9b3fd1" },
-  { "id": "runner", "name": "Runner", "maxHp": 15, "speed": 2.8, "damage": 4, "attackTicks": 30, "radius": 0.22, "color": "#d13f7a" }
+  { "id": "grunt",   "name": "Grunt",   "behavior": "Melee",  "maxHp": 30,  "speed": 1.2, "damage": 8,  "attackTicks": 60, "radius": 0.3,  "distractible": true,  "color": "#9b3fd1" },
+  { "id": "runner",  "name": "Runner",  "behavior": "Melee",  "maxHp": 15,  "speed": 2.8, "damage": 4,  "attackTicks": 30, "radius": 0.22, "color": "#d13f7a" },
+  { "id": "brute",   "name": "Brute",   "behavior": "Melee",  "maxHp": 220, "speed": 0.7, "damage": 35, "attackTicks": 90, "radius": 0.45, "distractible": true,  "color": "#6a2fa0" },
+  { "id": "spitter", "name": "Spitter", "behavior": "Ranged", "maxHp": 45,  "speed": 1.0, "damage": 10, "attackTicks": 90, "radius": 0.3,  "range": 5,  "color": "#58c23a" },
+  { "id": "sapper",  "name": "Sapper",  "behavior": "Sapper", "maxHp": 40,  "speed": 1.9, "damage": 90, "attackTicks": 0,  "radius": 0.28, "range": 1.8, "color": "#ff8a1f" }
 ]

@@ -14,18 +14,23 @@ public sealed class World
     /// <summary>Solo threat relative to co-op (the design calls for ~55% weaker).</summary>
     public const float SoloThreat = 0.45f;
 
+    private sealed record Strike(long Tick, Vector2 Pos, float Radius, float Damage, string Kind);
+
     private readonly List<Building> _buildings = new();
     private readonly Dictionary<int, Building> _byId = new();
     private readonly List<Enemy> _enemies = new();
     private readonly List<Engineer> _engineers = new();
     private readonly List<ICommand> _pending = new();
+    private readonly List<Strike> _strikes = new();
     private readonly int[] _occupancy;
     private int _nextId = 1;
     private bool _flowDirty = true;
 
     public GameData Data { get; }
+    public MapDef MapDef { get; }
     public GameMap Map { get; }
     public Rng Rng { get; }
+    public Modifiers Mods { get; }
     public long Tick { get; private set; }
     public Outcome Outcome { get; private set; }
     /// <summary>True if the game was lost by surrendering rather than by losing the Nexus.</summary>
@@ -36,7 +41,11 @@ public sealed class World
     /// </summary>
     public float ThreatAxis { get; }
     public Nexus Nexus { get; }
+    /// <summary>The Nexus' own storage. Use <see cref="Network"/> for anything that pays costs.</summary>
     public Inventory Storage => Nexus.Storage;
+    public StorageNetwork Network { get; }
+    public PowerSystem Power { get; }
+    public ResearchState Research { get; } = new();
     public Vector2 EngineerSpawn { get; }
     public WaveDirector Waves { get; }
     public FlowField Flow { get; }
@@ -46,17 +55,22 @@ public sealed class World
     /// <summary>Events from the most recent <see cref="Step"/>. Cleared at the start of each step.</summary>
     public List<SimEvent> Events { get; } = new();
 
-    public World(GameData data, Scenario scenario, ulong seed, int playerCount = 1)
+    public World(GameData data, Scenario scenario, ulong seed, int playerCount = 1, Modifiers? mods = null)
     {
         Data = data;
+        MapDef = scenario.Map;
         Map = MapGenerator.Generate(scenario.Map);
         Rng = new Rng(seed);
+        Mods = mods ?? Modifiers.None;
         ThreatAxis = playerCount <= 1 ? MathF.Cbrt(SoloThreat) : 1f;
         _occupancy = new int[Map.Width * Map.Height];
+        Network = new StorageNetwork(this);
+        Power = new PowerSystem(this);
 
         var nexusOrigin = new Int2(scenario.Map.Nexus.X, scenario.Map.Nexus.Y);
         Nexus = (Nexus)AddBuilding(data.Buildings["nexus"], nexusOrigin, Direction.North);
         Storage.AddAll(scenario.Map.StartingItems);
+        Storage.Add("iron_plate", (int)Mods.Raw(Stat.StartingIron));
 
         EngineerSpawn = new Vector2(Nexus.Center.X, Nexus.Origin.Y - 1.5f);
         for (int p = 0; p < playerCount; p++)
@@ -87,11 +101,14 @@ public sealed class World
             _flowDirty = false;
         }
 
+        Power.Tick();
         foreach (var e in _engineers) e.Tick(this);
         for (int i = 0; i < _buildings.Count; i++)
             if (!_buildings[i].Dead) _buildings[i].Tick(this);
+        Research.Tick(this);
         foreach (var e in _enemies)
             if (!e.Dead) e.Tick(this);
+        TickStrikes();
         Waves.Tick(this);
 
         _buildings.RemoveAll(b => b.Dead);
@@ -126,10 +143,13 @@ public sealed class World
         return best;
     }
 
+    public float MaxHpFor(BuildingDef def) => def.MaxHp * (def.Kind == BuildingKind.Wall ? Mods.Mult(Stat.WallHp) : 1f);
+
     /// <summary>Why <paramref name="def"/> can't be placed here, or null if it can (ignoring cost).</summary>
     public string? CheckPlacement(int playerId, BuildingDef def, Int2 origin)
     {
-        if (def.Kind == BuildingKind.Nexus) return "Can't build another Nexus";
+        if (def.Category == "") return $"{def.Name} can't be built";
+        if (!Research.IsUnlocked(def)) return $"Research {Data.Techs[def.Tech!].Name} first";
         var eng = _engineers[playerId];
         if (!eng.Alive) return "Engineer is down";
 
@@ -149,37 +169,46 @@ public sealed class World
     // ---------------------------------------------------------------- mutations (called by commands / sim)
 
     /// <summary>
-    /// Pays for a construction site at <paramref name="origin"/> and adds it to the end of the engineer's
-    /// build queue. Blueprints always queue, so nothing you place is silently abandoned.
+    /// Pays for a construction site at <paramref name="origin"/> and orders the engineer to build it. With
+    /// <paramref name="queue"/> (Shift) it is chained after current orders; otherwise it replaces them.
     /// </summary>
-    public string? TryPlace(int playerId, string defId, Int2 origin, Direction dir)
+    public string? TryPlace(int playerId, string defId, Int2 origin, Direction dir, bool queue = false)
     {
         if (!Data.Buildings.TryGetValue(defId, out var def)) return $"Unknown building '{defId}'";
         string? error = CheckPlacement(playerId, def, origin);
         if (error != null) return error;
 
         var eng = _engineers[playerId];
-        string? missing = Storage.FirstMissing(def.Cost);
+        if (!queue)
+        {
+            // Replace the plan first: it may refund unstarted blueprints that help pay for this one.
+            int cancelled = eng.ClearOrders(this);
+            if (cancelled > 0)
+                Message(playerId, $"{cancelled} queued blueprint{(cancelled == 1 ? "" : "s")} cancelled and refunded (hold Shift to chain orders)");
+        }
+        string? missing = Network.FirstMissing(def.Cost);
         if (missing != null) return $"Not enough {Data.Items[missing].Name}";
 
-        Storage.RemoveAll(def.Cost);
-        var site = Building.CreateSite(Data, def, _nextId++, origin, dir);
+        Network.Remove(def.Cost);
+        var site = Building.CreateSite(Data, def, _nextId++, origin, dir, MaxHpFor(def));
         Register(site);
         eng.Order(this, new BuildOrder(site.Id), queue: true);
         return null;
     }
 
-    /// <summary>One tick of engineer work on <paramref name="site"/>. Returns true when it completes.</summary>
-    public bool AdvanceConstruction(ConstructionSite site)
+    /// <summary>
+    /// <paramref name="rate"/> ticks of engineer work on <paramref name="site"/>. Returns true when it completes.
+    /// </summary>
+    public bool AdvanceConstruction(ConstructionSite site, float rate = 1f)
     {
         bool wasStarted = site.Started;
-        bool done = site.Advance();
+        bool done = site.Advance(rate);
         if (!wasStarted && site.BlocksEnemies) _flowDirty = true;
         if (!done) return false;
 
         RemoveBuilding(site);
         var b = AddBuilding(site.Def, site.Origin, site.Dir);
-        b.Hp = site.Hp;
+        b.Hp = MathF.Min(b.MaxHp, site.Hp);
         return true;
     }
 
@@ -216,15 +245,60 @@ public sealed class World
         RemoveBuilding(b);
     }
 
+    public void DamageBuildingsInRadius(Vector2 pos, float radius, float dmg)
+    {
+        foreach (var b in _buildings.ToList())
+            if (!b.Dead && b.DistanceTo(pos) <= radius) DamageBuilding(b, dmg);
+    }
+
+    public void DamageEnemy(Enemy e, float dmg)
+    {
+        if (e.Dead) return;
+        e.Hp -= dmg;
+        if (e.Hp <= 0) e.Dead = true;
+    }
+
+    public void DamageEnemiesInRadius(Vector2 pos, float radius, float dmg)
+    {
+        float r2 = radius * radius;
+        foreach (var e in _enemies)
+            if (!e.Dead && Vector2.DistanceSquared(e.Pos, pos) <= r2) DamageEnemy(e, dmg);
+    }
+
     /// <summary>Damages the nearest enemy in range. Returns true if a shot was fired.</summary>
     public bool FireAtNearestEnemy(Vector2 from, float range, float damage)
     {
         var target = NearestEnemy(from, range);
         if (target == null) return false;
         Events.Add(new ShotEvent(from, target.Pos));
-        target.Hp -= damage;
-        if (target.Hp <= 0) target.Dead = true;
+        DamageEnemy(target, damage);
         return true;
+    }
+
+    /// <summary>Fires a charged super weapon at <paramref name="target"/>; the strike lands after its delay.</summary>
+    public string? FireSuperWeapon(int playerId, int buildingId, Vector2 target)
+    {
+        if (BuildingById(buildingId) is not SuperWeapon sw) return "That's not a super weapon";
+        if (!sw.IsReady(this)) return $"{sw.Def.AbilityName} is still charging";
+        if (!Map.InBounds(Int2.Floor(target))) return "Target is off the map";
+        sw.Fire();
+        string kind = sw.Def.Id == "nuclear_silo" ? "nuke" : "orbital";
+        _strikes.Add(new Strike(Tick + sw.Def.StrikeDelayTicks, target, sw.Def.StrikeRadius,
+            sw.Def.StrikeDamage * Mods.Mult(Stat.SuperWeaponDamage), kind));
+        Events.Add(new StrikeIncomingEvent(playerId, target, sw.Def.StrikeRadius, sw.Def.StrikeDelayTicks, kind));
+        return null;
+    }
+
+    private void TickStrikes()
+    {
+        for (int i = _strikes.Count - 1; i >= 0; i--)
+        {
+            var s = _strikes[i];
+            if (Tick < s.Tick) continue;
+            DamageEnemiesInRadius(s.Pos, s.Radius, s.Damage);
+            Events.Add(new ExplosionEvent(s.Pos, s.Radius, s.Kind));
+            _strikes.RemoveAt(i);
+        }
     }
 
     public Enemy SpawnEnemy(EnemyDef def) => SpawnEnemy(def, Map.SpawnTiles[Rng.Next(Map.SpawnTiles.Count)].Center);
@@ -251,7 +325,7 @@ public sealed class World
     }
 
     private Building AddBuilding(BuildingDef def, Int2 origin, Direction dir) =>
-        Register(Building.Create(Data, def, _nextId++, origin, dir));
+        Register(Building.Create(Data, def, _nextId++, origin, dir, MaxHpFor(def)));
 
     private Building Register(Building b)
     {
@@ -259,6 +333,7 @@ public sealed class World
         _byId[b.Id] = b;
         foreach (var t in b.Tiles) _occupancy[Map.Index(t)] = b.Id;
         if (b.BlocksEnemies) _flowDirty = true;
+        Power.MarkDirty();
         return b;
     }
 
@@ -268,6 +343,7 @@ public sealed class World
         _byId.Remove(b.Id);
         foreach (var t in b.Tiles) _occupancy[Map.Index(t)] = 0;
         if (b.BlocksEnemies) _flowDirty = true;
+        Power.MarkDirty();
     }
 
     // ---------------------------------------------------------------- determinism
@@ -277,6 +353,7 @@ public sealed class World
         var h = new StateHash();
         h.Add(Tick);
         h.Add((long)Rng.State);
+        Mods.HashInto(h);
         Map.HashInto(h);
         foreach (var b in _buildings)
         {
@@ -286,11 +363,14 @@ public sealed class World
             h.Add(b.Origin.Y);
             h.Add((int)b.Dir);
             h.Add(b.Hp);
+            h.Add(b.Power);
             b.HashInto(h);
         }
         foreach (var e in _enemies) e.HashInto(h);
         foreach (var e in _engineers) e.HashInto(h);
         Waves.HashInto(h);
+        Research.HashInto(h);
+        Power.HashInto(h);
         return h.Value;
     }
 }

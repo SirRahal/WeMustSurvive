@@ -3,35 +3,31 @@ using Godot;
 namespace BeltAndBarricade.UI;
 
 /// <summary>
-/// The Esc menu. Built from real Godot controls so it works with mouse and keyboard (arrow keys + Enter)
-/// while the rest of the game is paused. Destructive choices ask for confirmation first.
+/// The Esc menu. Built from real Godot controls so it works with mouse and keyboard (arrow keys + Enter).
+/// In single player the game pauses underneath; in co-op it keeps running. Destructive choices ask first.
 /// </summary>
 public partial class PauseMenu : Control
 {
-    private static readonly Color Dim = new(0, 0, 0, 0.6f);
-    private static readonly Color PanelBg = new(0.06f, 0.07f, 0.09f, 0.97f);
-    private static readonly Color Edge = new(0.35f, 0.8f, 1f, 0.8f);
-    private static readonly Color ButtonBg = new(0.12f, 0.14f, 0.18f);
-    private static readonly Color ButtonHover = new(0.18f, 0.24f, 0.32f);
-    private static readonly Color Danger = new(0.55f, 0.16f, 0.14f);
-
-    private static readonly (string Keys, string Action)[] ControlsList =
+    public static readonly (string Keys, string Action)[] ControlsList =
     {
-        ("WASD / arrows / screen edge", "Pan the camera"),
-        ("Middle mouse drag", "Pan the camera"),
+        ("WASD / arrows / screen edge", "Pan the camera (also middle-mouse drag)"),
         ("Mouse wheel", "Zoom"),
         ("C", "Jump to your engineer"),
-        ("1-7 or command card", "Pick a blueprint"),
-        ("Left click / drag", "Place blueprint(s); they join the build queue"),
+        ("Command card / 1-9", "Open a category, then pick a blueprint"),
+        ("Left click / drag", "Place blueprint(s); replaces the engineer's plan"),
         ("R", "Rotate blueprint or selected building"),
         ("Right click", "Move engineer, or repair / resume a building"),
-        ("Shift + right click", "Do it after the current jobs"),
-        ("Shift + left click", "Keep placing the same blueprint"),
+        ("Shift + any order", "Chain it after the current jobs (numbers show the order)"),
+        ("Shift + left click", "Also keeps the blueprint selected"),
         ("Left click a building", "Select it (actions on the command card)"),
-        ("F", "Cycle inserter filter"),
+        ("T", "Research panel"),
+        ("F", "Cycle inserter filter (Auto first)"),
+        ("E", "Inserter input side: Auto / Back / Left / Right (90° moves)"),
         ("X", "Stop: clear orders, refund unstarted sites"),
         ("Delete", "Deconstruct (full refund)"),
         ("Space", "Call the next wave early"),
+        ("Hold Alt + move + release", "Ping wheel (Alt+click: quick ping)"),
+        ("Ctrl + left drag", "Draw on the map (Ctrl + right click: erase)"),
         ("H", "Show / hide the help panel"),
         ("Esc", "Cancel, deselect, or open this menu"),
     };
@@ -40,17 +36,18 @@ public partial class PauseMenu : Control
     private Label _title = null!;
     private Action? _back;
 
-    /// <summary>Settings shown on the Settings page; changes are applied through <see cref="SettingsChanged"/>.</summary>
     public Settings Settings { get; set; } = new();
-    /// <summary>Whether Surrender is offered (false once the game is already over).</summary>
     public bool CanSurrender { get; set; } = true;
+    public bool CanRestart { get; set; } = true;
     public bool TutorialActive { get; set; }
+    public bool IsCoop { get; set; }
 
     public event Action? ResumeRequested;
     public event Action? RestartRequested;
     public event Action? ReplayTutorialRequested;
     public event Action? SkipTutorialRequested;
     public event Action? SurrenderRequested;
+    public event Action? QuitToMenuRequested;
     public event Action? QuitRequested;
     public event Action? SettingsChanged;
 
@@ -60,30 +57,17 @@ public partial class PauseMenu : Control
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         Visible = false;
 
-        var dim = new ColorRect { Color = Dim, MouseFilter = MouseFilterEnum.Stop };
+        var dim = new ColorRect { Color = new Color(0, 0, 0, 0.6f), MouseFilter = MouseFilterEnum.Stop };
         AddChild(dim);
         dim.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
 
-        var center = new CenterContainer();
-        AddChild(center);
-        center.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(420, 0) };
-        panel.AddThemeStyleboxOverride("panel", Box(PanelBg, Edge, 2, 22));
-        center.AddChild(panel);
-
-        var column = new VBoxContainer();
-        column.AddThemeConstantOverride("separation", 14);
-        panel.AddChild(column);
-
-        _title = new Label { HorizontalAlignment = HorizontalAlignment.Center };
-        _title.AddThemeFontSizeOverride("font_size", 28);
-        _title.AddThemeColorOverride("font_color", Edge);
+        var column = UiKit.Column(14);
+        _title = UiKit.Label("", 28, UiKit.Accent);
+        _title.HorizontalAlignment = HorizontalAlignment.Center;
         column.AddChild(_title);
-
-        _content = new VBoxContainer();
-        _content.AddThemeConstantOverride("separation", 8);
+        _content = UiKit.Column(8);
         column.AddChild(_content);
+        AddChild(UiKit.Centered(UiKit.Panel(column)));
     }
 
     public void Open()
@@ -106,88 +90,63 @@ public partial class PauseMenu : Control
 
     private void ShowMain()
     {
-        Page("Paused", back: null);
-        var resume = AddButton("Resume", () => ResumeRequested?.Invoke());
-        AddButton("Restart", () => Confirm("Restart this map? Your progress will be lost.", "Restart", () => RestartRequested?.Invoke()));
+        Page(IsCoop ? "Menu (game keeps running)" : "Paused", back: null);
+        var resume = Add(UiKit.Button("Resume", () => ResumeRequested?.Invoke()));
+        if (CanRestart)
+            Add(UiKit.Button("Restart", () => Confirm("Restart this map? Progress will be lost.", "Restart", () => RestartRequested?.Invoke())));
         if (TutorialActive)
-            AddButton("Skip tutorial", () => SkipTutorialRequested?.Invoke());
-        else
-            AddButton("Replay tutorial", () => Confirm("Restart the map with the tutorial?", "Replay tutorial", () => ReplayTutorialRequested?.Invoke()));
-        AddButton("Controls", ShowControls);
-        AddButton("Settings", ShowSettings);
+            Add(UiKit.Button("Skip tutorial", () => SkipTutorialRequested?.Invoke()));
+        else if (!IsCoop)
+            Add(UiKit.Button("Replay tutorial", () => Confirm("Restart The Funnel with the tutorial?", "Replay tutorial", () => ReplayTutorialRequested?.Invoke())));
+        Add(UiKit.Button("Controls", ShowControls));
+        Add(UiKit.Button("Settings", ShowSettings));
         if (CanSurrender)
-            AddButton("Surrender", () => Confirm("Surrender? This counts as a defeat.", "Surrender", () => SurrenderRequested?.Invoke()), danger: true);
-        AddButton("Quit to desktop", () => Confirm("Quit the game? Unsaved progress will be lost.", "Quit", () => QuitRequested?.Invoke()), danger: true);
+            Add(UiKit.Button("Surrender", () => Confirm("Surrender? This counts as a defeat.", "Surrender", () => SurrenderRequested?.Invoke()), danger: true));
+        Add(UiKit.Button("Quit to main menu", () => Confirm("Leave this game?", "Quit to menu", () => QuitToMenuRequested?.Invoke()), danger: true));
+        Add(UiKit.Button("Quit to desktop", () => Confirm("Quit the game? Unsaved progress will be lost.", "Quit", () => QuitRequested?.Invoke()), danger: true));
         resume.GrabFocus();
     }
 
     private void Confirm(string question, string yesLabel, Action yes)
     {
         Page("Are you sure?", back: ShowMain);
-        var label = new Label { Text = question, HorizontalAlignment = HorizontalAlignment.Center, AutowrapMode = TextServer.AutowrapMode.WordSmart };
-        label.AddThemeFontSizeOverride("font_size", 17);
+        var label = UiKit.Label(question, 17, wrap: true);
+        label.HorizontalAlignment = HorizontalAlignment.Center;
         _content.AddChild(label);
         var row = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         row.AddThemeConstantOverride("separation", 12);
         _content.AddChild(row);
-        var no = MakeButton("Cancel", ShowMain);
+        var no = UiKit.Button("Cancel", ShowMain, width: 160);
         row.AddChild(no);
-        row.AddChild(MakeButton(yesLabel, yes, danger: true));
+        row.AddChild(UiKit.Button(yesLabel, yes, danger: true, width: 160));
         no.GrabFocus();
     }
 
     private void ShowControls()
     {
         Page("Controls", back: ShowMain);
+        _content.AddChild(ControlsGrid());
+        Add(UiKit.Button("Back", ShowMain)).GrabFocus();
+    }
+
+    public static GridContainer ControlsGrid()
+    {
         var grid = new GridContainer { Columns = 2 };
         grid.AddThemeConstantOverride("h_separation", 24);
-        grid.AddThemeConstantOverride("v_separation", 4);
+        grid.AddThemeConstantOverride("v_separation", 3);
         foreach (var (keys, action) in ControlsList)
         {
-            var k = new Label { Text = keys };
-            k.AddThemeColorOverride("font_color", Edge);
-            grid.AddChild(k);
-            grid.AddChild(new Label { Text = action });
+            grid.AddChild(UiKit.Label(keys, 15, UiKit.Accent));
+            grid.AddChild(UiKit.Label(action, 15));
         }
-        _content.AddChild(grid);
-        AddButton("Back", ShowMain).GrabFocus();
+        return grid;
     }
 
     private void ShowSettings()
     {
         Page("Settings", back: ShowMain);
-
-        var speedRow = new HBoxContainer();
-        speedRow.AddChild(new Label { Text = "Game speed", SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        var speed = new OptionButton();
-        foreach (float s in Settings.Speeds) speed.AddItem($"{s:0.#}x");
-        speed.Selected = Array.IndexOf(Settings.Speeds, Settings.GameSpeed);
-        speed.ItemSelected += i =>
-        {
-            Settings.GameSpeed = Settings.Speeds[(int)i];
-            SettingsChanged?.Invoke();
-        };
-        speedRow.AddChild(speed);
-        _content.AddChild(speedRow);
-
-        var edge = new CheckButton { Text = "Screen-edge scrolling", ButtonPressed = Settings.EdgePan };
-        edge.Toggled += on =>
-        {
-            Settings.EdgePan = on;
-            SettingsChanged?.Invoke();
-        };
-        _content.AddChild(edge);
-
-        var full = new CheckButton { Text = "Fullscreen", ButtonPressed = Settings.Fullscreen };
-        full.Toggled += on =>
-        {
-            Settings.Fullscreen = on;
-            SettingsChanged?.Invoke();
-        };
-        _content.AddChild(full);
-
-        AddButton("Back", ShowMain);
-        speed.GrabFocus();
+        SettingsPanel.Build(_content, Settings, IsCoop, () => SettingsChanged?.Invoke());
+        Add(UiKit.Button("Back", ShowMain));
     }
 
     // ------------------------------------------------------------------ helpers
@@ -196,35 +155,47 @@ public partial class PauseMenu : Control
     {
         _title.Text = title;
         _back = back;
-        foreach (var child in _content.GetChildren()) child.QueueFree();
+        UiKit.Clear(_content);
     }
 
-    private Button AddButton(string text, Action onPressed, bool danger = false)
+    private Button Add(Button b)
     {
-        var b = MakeButton(text, onPressed, danger);
         _content.AddChild(b);
         return b;
     }
+}
 
-    private static Button MakeButton(string text, Action onPressed, bool danger = false)
+/// <summary>Settings controls, shared by the pause menu and the main menu.</summary>
+public static class SettingsPanel
+{
+    public static void Build(Container into, Settings settings, bool coop, Action changed)
     {
-        var b = new Button { Text = text, CustomMinimumSize = new Vector2(160, 42), FocusMode = FocusModeEnum.All };
-        var bg = danger ? Danger : ButtonBg;
-        b.AddThemeStyleboxOverride("normal", Box(bg, bg.Lightened(0.15f), 1, 8));
-        b.AddThemeStyleboxOverride("hover", Box(danger ? Danger.Lightened(0.15f) : ButtonHover, Edge, 1, 8));
-        b.AddThemeStyleboxOverride("pressed", Box(bg.Darkened(0.2f), Edge, 1, 8));
-        b.AddThemeStyleboxOverride("focus", Box(new Color(0, 0, 0, 0), Edge, 2, 8));
-        b.AddThemeFontSizeOverride("font_size", 18);
-        b.Pressed += onPressed;
-        return b;
+        var speedRow = new HBoxContainer();
+        var speedLabel = UiKit.Label(coop ? "Game speed (host only)" : "Game speed");
+        speedLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        speedRow.AddChild(speedLabel);
+        var speed = new OptionButton { Disabled = coop };
+        foreach (float s in Settings.Speeds) speed.AddItem($"{s:0.#}x");
+        speed.Selected = Array.IndexOf(Settings.Speeds, settings.GameSpeed);
+        speed.ItemSelected += i =>
+        {
+            settings.GameSpeed = Settings.Speeds[(int)i];
+            changed();
+        };
+        speedRow.AddChild(speed);
+        into.AddChild(speedRow);
+
+        AddToggle(into, "Screen-edge scrolling", settings.EdgePan, on => { settings.EdgePan = on; changed(); });
+        AddToggle(into, "Fullscreen", settings.Fullscreen, on => { settings.Fullscreen = on; changed(); });
+        AddToggle(into, "Show help panel", settings.ShowHelp, on => { settings.ShowHelp = on; changed(); });
+        AddToggle(into, "Show minimap", settings.ShowMinimap, on => { settings.ShowMinimap = on; changed(); });
+        speed.GrabFocus();
     }
 
-    private static StyleBoxFlat Box(Color bg, Color border, int borderWidth, int margin)
+    private static void AddToggle(Container into, string text, bool value, Action<bool> onToggle)
     {
-        var s = new StyleBoxFlat { BgColor = bg, BorderColor = border };
-        s.SetBorderWidthAll(borderWidth);
-        s.SetCornerRadiusAll(4);
-        s.SetContentMarginAll(margin);
-        return s;
+        var t = new CheckButton { Text = text, ButtonPressed = value };
+        t.Toggled += on => onToggle(on);
+        into.AddChild(t);
     }
 }

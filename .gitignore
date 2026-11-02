@@ -2,7 +2,6 @@
 .godot/
 *.import
 export/
-export_presets.cfg
 
 # .NET
 bin/

@@ -54,30 +54,34 @@ public sealed class Engineer
     }
 
     /// <summary>
-    /// Queued orders go to the back. Unqueued orders interrupt: they run first (replacing any pending
-    /// move), and the rest of the queue (e.g. blueprints still to build) resumes afterwards.
+    /// StarCraft-style: a queued order (Shift held) is chained onto the end; an unqueued order replaces the whole
+    /// plan. Replaced blueprints that were never started are cancelled and refunded; half-built ones stay put.
     /// </summary>
     public void Order(World w, EngineerOrder order, bool queue)
     {
-        if (queue)
+        if (!queue)
         {
-            _orders.Add(order);
-            return;
+            int cancelled = ClearOrders(w);
+            if (cancelled > 0)
+                w.Message(PlayerId, $"{cancelled} queued blueprint{(cancelled == 1 ? "" : "s")} cancelled and refunded (hold Shift to chain orders)");
         }
-        _orders.RemoveAll(o => o is MoveOrder || o == order);
-        _orders.Insert(0, order);
-        ResetPath();
+        _orders.Add(order);
     }
 
-    /// <summary>Drops all orders. Sites that were never started are cancelled and refunded.</summary>
-    public void ClearOrders(World w)
+    /// <summary>Drops all orders. Sites that were never started are cancelled and refunded. Returns how many.</summary>
+    public int ClearOrders(World w)
     {
+        int cancelled = 0;
         foreach (var o in _orders)
             if (o is BuildOrder b && w.BuildingById(b.SiteId) is ConstructionSite { Started: false } site)
+            {
                 w.CancelSite(site);
+                cancelled++;
+            }
         _orders.Clear();
         ResetPath();
         WorkingOn = null;
+        return cancelled;
     }
 
     public void Tick(World w)
@@ -137,19 +141,19 @@ public sealed class Engineer
 
         ResetPath();
         WorkingOn = site.Id;
-        return w.AdvanceConstruction(site);
+        return w.AdvanceConstruction(site, w.Mods.Mult(Stat.BuildSpeed));
     }
 
     private bool StepRepair(World w, RepairOrder order)
     {
         var b = w.BuildingById(order.BuildingId);
-        if (b == null || b is ConstructionSite || b.Hp >= b.Def.MaxHp) return true;
+        if (b == null || b is ConstructionSite || b.Hp >= b.MaxHp) return true;
         if (!InReach(b)) return !Approach(w, b);
 
         ResetPath();
         if (_repairCredit < RepairPerTick)
         {
-            if (!w.Storage.Remove("iron_plate"))
+            if (!w.Network.Remove("iron_plate"))
             {
                 w.Message(PlayerId, "Repair needs iron plates in the Nexus");
                 return true;
@@ -157,10 +161,10 @@ public sealed class Engineer
             _repairCredit += RepairHpPerPlate;
         }
         WorkingOn = b.Id;
-        float amount = MathF.Min(RepairPerTick, b.Def.MaxHp - b.Hp);
+        float amount = MathF.Min(RepairPerTick * w.Mods.Mult(Stat.RepairSpeed), b.MaxHp - b.Hp);
         b.Hp += amount;
         _repairCredit -= amount;
-        return b.Hp >= b.Def.MaxHp;
+        return b.Hp >= b.MaxHp;
     }
 
     // ------------------------------------------------------------------ movement
@@ -176,6 +180,9 @@ public sealed class Engineer
                 w.Message(PlayerId, $"Can't reach {b.Def.Name}");
                 return false;
             }
+            // The pathfinder judges reach from tile centres. If our own tile qualifies but we're standing at its
+            // edge (out of reach), step to its centre rather than "arriving" forever without being in reach.
+            if (tiles.Count == 0) tiles.Add(Int2.Floor(Pos));
             SetPath(tiles, null);
         }
         FollowPath(w);
@@ -228,7 +235,7 @@ public sealed class Engineer
             return false;
         }
 
-        float step = Speed / World.TicksPerSecond;
+        float step = Speed * w.Mods.Mult(Stat.EngineerSpeed) / World.TicksPerSecond;
         var delta = _path[0] - Pos;
         float len = delta.Length();
         if (len <= step)

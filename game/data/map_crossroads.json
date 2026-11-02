@@ -1,0 +1,54 @@
+{
+  "id": "crossroads",
+  "name": "The Crossroads",
+  "description": "Standard map. Two alien lanes converge on an open plain around your Nexus. Gold claim zones sit in side pockets near the lanes. 15 waves, about 50 minutes.",
+  "layout": "shapes",
+  "minutes": 50,
+  "metaPoints": 6,
+  "width": 110,
+  "height": 96,
+  // Shapes are painted in order over an all-rock map.
+  "shapes": [
+    { "type": "rect",   "terrain": "Ground", "x": 28, "y": 52, "w": 54, "h": 40 },
+    { "type": "circle", "terrain": "Ground", "x": 55, "y": 58, "r": 22 },
+
+    // West lane (spawn -> plain), narrowing to a choke in the middle segment
+    { "type": "circle", "terrain": "Ground", "x": 12, "y": 12, "r": 6 },
+    { "type": "line", "terrain": "Ground", "x": 12, "y": 12, "x2": 24, "y2": 29, "r": 4.5 },
+    { "type": "line", "terrain": "Ground", "x": 24, "y": 29, "x2": 30, "y2": 37, "r": 2.5 },
+    { "type": "line", "terrain": "Ground", "x": 30, "y": 37, "x2": 38, "y2": 50, "r": 4.5 },
+    // East lane
+    { "type": "circle", "terrain": "Ground", "x": 98, "y": 12, "r": 6 },
+    { "type": "line", "terrain": "Ground", "x": 98, "y": 12, "x2": 86, "y2": 29, "r": 4.5 },
+    { "type": "line", "terrain": "Ground", "x": 86, "y": 29, "x2": 80, "y2": 37, "r": 2.5 },
+    { "type": "line", "terrain": "Ground", "x": 80, "y": 37, "x2": 72, "y2": 50, "r": 4.5 },
+
+    // Gold pockets off each lane (high risk, high reward)
+    { "type": "circle", "terrain": "Ground", "x": 14, "y": 40, "r": 6 },
+    { "type": "line", "terrain": "Ground", "x": 14, "y": 40, "x2": 27, "y2": 34, "r": 2.5 },
+    { "type": "circle", "terrain": "Ground", "x": 96, "y": 40, "r": 6 },
+    { "type": "line", "terrain": "Ground", "x": 96, "y": 40, "x2": 83, "y2": 34, "r": 2.5 },
+    // Rock outcrops breaking up the plain
+    { "type": "circle", "terrain": "Blocked", "x": 45, "y": 63, "r": 3 },
+    { "type": "circle", "terrain": "Blocked", "x": 67, "y": 65, "r": 2.5 },
+    { "type": "circle", "terrain": "Blocked", "x": 55, "y": 47, "r": 2 }
+  ],
+  "spawnZones": [
+    { "type": "rect", "x": 7, "y": 7, "w": 10, "h": 8 },
+    { "type": "rect", "x": 93, "y": 7, "w": 10, "h": 8 }
+  ],
+  "nexus": { "x": 53, "y": 84 },
+  "startingItems": { "iron_plate": 140, "coal": 30, "ammo_magazine": 10 },
+  "patches": [
+    { "item": "coal",       "x": 44, "y": 80, "radius": 3.5, "amount": 800 },
+    { "item": "iron_ore",   "x": 63, "y": 80, "radius": 4.2, "amount": 800 },
+    { "item": "coal",       "x": 61, "y": 88, "radius": 2.2, "amount": 600 },
+    { "item": "iron_ore",   "x": 40, "y": 71, "radius": 3.2, "amount": 800 },
+    { "item": "copper_ore", "x": 36, "y": 58, "radius": 3.6, "amount": 900 },
+    { "item": "copper_ore", "x": 74, "y": 58, "radius": 3.6, "amount": 900 },
+    { "item": "silver_ore", "x": 31, "y": 44, "radius": 2.6, "amount": 1000 },
+    { "item": "silver_ore", "x": 55, "y": 40, "radius": 2.8, "amount": 1200, "claimZone": true },
+    { "item": "gold_ore",   "x": 13, "y": 41, "radius": 3.2, "amount": 1200, "claimZone": true },
+    { "item": "gold_ore",   "x": 97, "y": 41, "radius": 3.2, "amount": 1200, "claimZone": true }
+  ]
+}

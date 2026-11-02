@@ -1,10 +1,11 @@
 namespace BeltAndBarricade.Sim;
 
 /// <summary>
-/// The core the players defend. Acts as shared storage (building costs are paid from it),
-/// accepts anything belts or inserters deliver, and has a weak built-in gun with unlimited ammo.
+/// The core the players defend. Main storage (building costs are paid from it first), accepts anything belts or
+/// inserters deliver, supplies a little starting power (it acts as a power pole too), and has a weak
+/// built-in gun with unlimited ammo.
 /// </summary>
-public sealed class Nexus : Building, IItemAcceptor, IItemSource
+public sealed class Nexus : Building, IBeltInput, IItemSource
 {
     private int _cooldown;
 

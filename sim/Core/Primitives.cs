@@ -8,6 +8,7 @@ public readonly record struct Int2(int X, int Y)
     public static Int2 operator +(Int2 a, Int2 b) => new(a.X + b.X, a.Y + b.Y);
     public static Int2 operator -(Int2 a, Int2 b) => new(a.X - b.X, a.Y - b.Y);
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public Vector2 Center => new(X + 0.5f, Y + 0.5f);
 
     public static Int2 Floor(Vector2 p) => new((int)MathF.Floor(p.X), (int)MathF.Floor(p.Y));

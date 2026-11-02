@@ -44,25 +44,44 @@ public class WaveAndReplayTests
         Assert.InRange(threat, 0.449f, 0.451f);
     }
 
-    [Fact]
-    public void Surviving_all_waves_wins()
+    /// <summary>Runs every wave back to back, topping turrets up with ammo as a working factory would.</summary>
+    private static World RunAllWaves(World w, List<Turret> turrets)
     {
-        var w = TestWorld.Create();
-        // Ring the Nexus with well-stocked turrets and fast-forward through every wave.
-        foreach (var t in new[] { new Int2(37, 60), new Int2(43, 60), new Int2(40, 58) })
-        {
-            var turret = (Turret)w.PlaceDirect("gun_turret", t);
-            for (int i = 0; i < 10; i++) turret.TryInsert("ammo_magazine");
-        }
-
-        for (int i = 0; i < 60 * 60 * World.TicksPerSecond && w.Outcome == Outcome.Playing; i++)
+        for (int i = 0; i < 90 * 60 * World.TicksPerSecond && w.Outcome == Outcome.Playing; i++)
         {
             if (!w.Waves.IsSpawning && w.Enemies.Count == 0) w.Enqueue(new EndPrepCommand(0));
+            if (i % 30 == 0)
+                foreach (var t in turrets.Where(t => !t.Dead && t.UsesAmmo))
+                    while (t.TryInsert(t.Def.AmmoItem!)) { }
             w.Step();
         }
+        return w;
+    }
+
+    [Fact]
+    public void A_fortified_choke_holds_all_ten_waves()
+    {
+        var w = TestWorld.Create();
+        w.Research.Grant("reinforced_walls");
+        w.Research.Grant("heavy_walls");
+        w.Research.Grant("rocket_turrets");
+        // Seal the choke (x 37..42, rows 5..8) with heavy walls and line the valley behind it with guns and rockets.
+        foreach (int x in new[] { 37, 38, 39, 40, 41, 42 }) w.PlaceDirect("heavy_wall", new Int2(x, 8));
+        var turrets = new List<Turret>();
+        foreach (int x in new[] { 35, 37, 39, 41, 43, 45 }) turrets.Add((Turret)w.PlaceDirect("gun_turret", new Int2(x, 11)));
+        foreach (int x in new[] { 36, 40, 44 }) turrets.Add((Turret)w.PlaceDirect("rocket_turret", new Int2(x, 13)));
+
+        RunAllWaves(w, turrets);
 
         Assert.Equal(Outcome.Won, w.Outcome);
-        Assert.Equal(w.Waves.TotalWaves, w.Waves.WavesStarted);
+        Assert.Equal(10, w.Waves.WavesStarted);
+    }
+
+    [Fact]
+    public void An_undefended_nexus_falls()
+    {
+        var w = RunAllWaves(TestWorld.Create(), new List<Turret>());
+        Assert.Equal(Outcome.Lost, w.Outcome);
     }
 
     [Fact]
@@ -84,8 +103,8 @@ public class WaveAndReplayTests
     private static readonly ICommand[] Script =
     {
         new PlaceBuildingCommand(0, "drill", TestWorld.CoalTile, Direction.East),
-        new PlaceBuildingCommand(0, "furnace", TestWorld.CoalTile + new Int2(1, 0), Direction.North),
-        new PlaceBuildingCommand(0, "gun_turret", new Int2(40, 58), Direction.North),
+        new PlaceBuildingCommand(0, "furnace", TestWorld.CoalTile + new Int2(1, 0), Direction.North, Queue: true),
+        new PlaceBuildingCommand(0, "gun_turret", new Int2(40, 58), Direction.North, Queue: true),
         new MoveCommand(0, new Vector2(45.5f, 52.5f), Queue: true),
         new EndPrepCommand(0),
     };

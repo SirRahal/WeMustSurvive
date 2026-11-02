@@ -39,11 +39,16 @@ public sealed class Belt : Building, IItemSource
         return true;
     }
 
+    // Fractional speed from belt_speed bonuses, carried between ticks so +4% actually adds up.
+    private float _speedCarry;
+
     public override void Tick(World w)
     {
         if (Items.Count == 0) return;
 
-        int speed = Def.BeltSpeed;
+        float exact = Def.BeltSpeed * w.Mods.Mult(Stat.BeltSpeed) + _speedCarry;
+        int speed = (int)exact;
+        _speedCarry = exact - speed;
 
         // Hand the front item to whatever we face once it would run off the end.
         int overflow = Items[0].Pos + speed - Length;
@@ -63,7 +68,7 @@ public sealed class Belt : Building, IItemSource
     private bool TryHandOff(World w, string item, int entryPos) => w.BuildingAt(Front) switch
     {
         Belt next when next.Dir != Dir.Opposite() => next.TryInsertAt(item, entryPos, w.Tick),
-        Nexus nexus => nexus.TryInsert(item),
+        IBeltInput target => target.TryInsert(item),
         _ => false,
     };
 
