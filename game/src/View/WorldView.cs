@@ -391,6 +391,9 @@ public partial class WorldView : Node2D
                     DrawLine(top + new Vector2(-6, -3), top + new Vector2(6, 3).Rotated(t * 8), Colors.White with { A = 0.6f }, 2);
                 DrawOreGauge(d, top);
                 break;
+            case Drill d:
+                DrawOreGauge(d, top); // live overlay: ore left under the drill, shown over its sprite too
+                break;
             case Crafter { Active: not null } c when !sprite:
                 DrawColoredPolygon(Iso.Diamond(b.Origin.X, b.Origin.Y, 1, height, 0.32f), c.Def.Id == "workshop" ? new Color(0.9f, 0.85f, 0.3f) : new Color(1f, 0.55f, 0.15f));
                 break;
