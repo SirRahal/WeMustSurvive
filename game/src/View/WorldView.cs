@@ -465,10 +465,23 @@ public partial class WorldView : Node2D
         return null;
     }
 
-    /// <summary>Belt sprite id: the corner piece named for the side it's fed from (looking the way it runs), or the straight one.</summary>
-    private string BeltSpriteId(Belt belt) => CornerSide(belt) is { } side
-        ? belt.Def.Id + (side == belt.Dir.RotateCw() ? "_turn_right" : "_turn_left")
-        : belt.Def.Id;
+    /// <summary>
+    /// Belt sprite id: the corner piece named for the side it's fed from (looking the way it runs); a junction piece
+    /// with a gap in the side rail(s) a belt feeds in through ("_side_left", "_side_right", "_side_both") when it is also
+    /// fed from behind, or from both sides; else the straight one. Callers fall back to straight without the sprite.
+    /// </summary>
+    private string BeltSpriteId(Belt belt)
+    {
+        if (CornerSide(belt) is { } side)
+            return belt.Def.Id + (side == belt.Dir.RotateCw() ? "_turn_right" : "_turn_left");
+        var w = _world!;
+        bool Feeds(Direction from) => w.BuildingAt(belt.Origin + from.Offset()) is Belt n && n.Front == belt.Origin;
+        bool right = Feeds(belt.Dir.RotateCw()), left = Feeds(belt.Dir.RotateCw().Opposite());
+        return left && right ? belt.Def.Id + "_side_both"
+            : left ? belt.Def.Id + "_side_left"
+            : right ? belt.Def.Id + "_side_right"
+            : belt.Def.Id;
+    }
 
     /// <summary>
     /// Grid point at <paramref name="t"/> (0 = where items enter, 1 = the front edge) along a belt: a straight line
