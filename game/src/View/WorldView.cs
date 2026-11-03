@@ -206,11 +206,20 @@ public partial class WorldView : Node2D
         if (Props.Frames("buildings", id) is not { } frames) return null;
         string d = PropSprites.DirName(dir);
         if (state != null)
-            foreach (var n in new[] { $"{main}_{state}", $"{d}_{state}", $"s_{state}", state })
+        {
+            // A variant piece ("mask_5_b") shares its base piece's state frames ("mask_5_damaged").
+            string baseMain = main.EndsWith("_b") ? main[..^2] : main;
+            foreach (var n in new[] { $"{main}_{state}", $"{baseMain}_{state}", $"{d}_{state}", $"s_{state}", state })
                 if (frames.TryGetValue(n, out var sf)) return sf;
+        }
         foreach (var n in new[] { main, d, "default", "s", $"{d}_0" })
             if (frames.TryGetValue(n, out var f)) return f;
-        return frames.Values.First();
+        // Animated-only frames (a drill's "coal_east_1..4", the nexus "north_1..8"): the strip's first frame.
+        foreach (var n in new[] { main, d })
+            if (Props.Strip("buildings", id, n) is { Length: > 0 } strip) return strip[0];
+        return frames.FirstOrDefault(kv => !kv.Key.EndsWith("_construction") && !kv.Key.EndsWith("_damaged")
+                                           && !kv.Key.EndsWith("_wrecked") && kv.Key is not ("construction" or "damaged" or "wrecked")).Value
+               ?? frames.Values.First();
     }
 
     /// <summary>The frame name for a live building: turret aim, drill ore and lamp, inserter swing, wall joins, or its facing.</summary>
@@ -283,13 +292,17 @@ public partial class WorldView : Node2D
                 }
                 break;
             }
+            case SuperWeapon sw when Props.Strip("buildings", id, "open") is { Length: > 0 } open:
+                // The silo's hatches: shut while charging, open once it can fire.
+                return sw.Charge >= sw.ChargeNeeded(_world!) ? open[^1] : open[0];
             case Turret:
             {
                 // Just after a shot: the "<aim>_fire_N" strip played through once, or a single "<aim>_fire" frame.
                 double since = Now - _firedAt.GetValueOrDefault(b.Id, double.NegativeInfinity);
-                if (since >= 0.12) break;
                 var fires = Props.Strip("buildings", id, main + "_fire");
-                var fire = fires.Length > 0 ? fires[Math.Min(fires.Length - 1, (int)(since / 0.12 * fires.Length))] : Props.Get("buildings", id, main + "_fire");
+                double length = fires.Length > 0 ? fires.Length / Props.Fps("buildings", id, main + "_fire", 15) : 0.12;
+                if (since >= length) break;
+                var fire = fires.Length > 0 ? fires[Math.Min(fires.Length - 1, (int)(since / length * fires.Length))] : Props.Get("buildings", id, main + "_fire");
                 if (fire != null)
                 {
                     animated = true;
@@ -311,7 +324,7 @@ public partial class WorldView : Node2D
                         }
                 }
                 // Idle: the cold/stopped frame where there is one (a furnace or generator "off").
-                else if (Props.Get("buildings", id, "off") is { } off) return off;
+                else if (Props.First("buildings", id, "off", "idle") is { } off) return off;
                 break;
         }
         return BuildingFrame(id, dir, main, null);
@@ -342,7 +355,9 @@ public partial class WorldView : Node2D
             if (n is Wall || n is ConstructionSite { Def.Kind: BuildingKind.Wall })
                 mask |= PropSprites.ViewTurn(dir) switch { Direction.North => 1, Direction.East => 2, Direction.South => 4, _ => 8 };
         }
-        if (Props.Get("buildings", id, $"mask_{mask}") != null) return $"mask_{mask}";
+        // Alternate tiles use the "_b" piece (other rust and patches) so a long run doesn't repeat.
+        if (Props.Get("buildings", id, $"mask_{mask}") != null)
+            return (o.X + o.Y) % 2 != 0 && Props.Get("buildings", id, $"mask_{mask}_b") != null ? $"mask_{mask}_b" : $"mask_{mask}";
         string s = ((mask & 1) != 0 ? "n" : "") + ((mask & 2) != 0 ? "e" : "") + ((mask & 4) != 0 ? "s" : "") + ((mask & 8) != 0 ? "w" : "");
         return s == "" || Props.Get("buildings", id, s) == null ? "default" : s;
     }
