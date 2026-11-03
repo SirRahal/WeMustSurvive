@@ -178,6 +178,9 @@ public partial class PlayerInput : Node2D
 
     public void Deselect() => _selectedId = null;
 
+    /// <summary>Selects a building as if it had been clicked (debug --hud=select:ID).</summary>
+    public void Select(Building b) => _selectedId = b.Id;
+
     public void Stop() => Submit(new StopCommand(Me));
 
     public void RotateSelected()
