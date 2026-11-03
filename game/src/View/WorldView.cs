@@ -66,6 +66,7 @@ public partial class WorldView : Node2D
         _pings.Clear();
         _drawings.Clear();
         _incoming.Clear();
+        _transfers.Clear();
     }
 
     /// <summary>Called after each sim step to pick up one-shot visual events.</summary>
@@ -96,6 +97,12 @@ public partial class WorldView : Node2D
                 case ClearDrawingsEvent c:
                     _drawings.RemoveAll(d => d.Player == c.PlayerId);
                     break;
+                case ItemStoredEvent st:
+                    _transfers.Add(new Transfer(st.From, st.Storage, st.Item, true, Now));
+                    break;
+                case ItemTakenEvent tk:
+                    _transfers.Add(new Transfer(tk.To, tk.Storage, tk.Item, false, Now));
+                    break;
             }
         }
     }
@@ -123,29 +130,30 @@ public partial class WorldView : Node2D
         DrawOrders();
         DrawDrawings(now);
 
-        // Depth-sorted layer: everything with height. Sort key = screen depth (grid x + y).
+        // Depth-sorted layer: everything with height. Sort key = screen depth at the current view angle.
         var drawables = new List<(float Depth, Action Draw)>();
         foreach (var b in _world.Buildings)
         {
             if (b is ConstructionSite site)
             {
-                if (site.Started) drawables.Add((b.Center.X + b.Center.Y, () => DrawSite(site)));
+                if (site.Started) drawables.Add((Iso.Depth(b.Center), () => DrawSite(site)));
             }
             else if (b is not (Belt or Splitter or TunnelEntrance or TunnelExit))
             {
-                drawables.Add((b.Center.X + b.Center.Y, () => DrawBuilding(b)));
+                drawables.Add((Iso.Depth(b.Center), () => DrawBuilding(b)));
             }
         }
         foreach (var e in _world.Enemies)
-            drawables.Add((e.Pos.X + e.Pos.Y, () => DrawEnemy(e)));
+            drawables.Add((Iso.Depth(e.Pos), () => DrawEnemy(e)));
         foreach (var eng in _world.Engineers)
-            if (eng.Alive) drawables.Add((eng.Pos.X + eng.Pos.Y, () => DrawEngineer(eng)));
+            if (eng.Alive) drawables.Add((Iso.Depth(eng.Pos), () => DrawEngineer(eng)));
         drawables.Sort((a, b) => a.Depth.CompareTo(b.Depth));
         foreach (var d in drawables) d.Draw();
 
         DrawPowerWires();
         DrawLogisticsIssues();
         DrawShots();
+        DrawTransfers(now);
         DrawBlasts(now);
         DrawIncoming(now);
         DrawPings(now);
@@ -154,6 +162,9 @@ public partial class WorldView : Node2D
     }
 
     // ------------------------------------------------------------------ buildings
+
+    /// <summary>Prop Studio sprites; buildings without one fall back to boxes.</summary>
+    private static BuildingSprites Sprites => BuildingSprites.Shared;
 
     private static float HeightOf(BuildingDef def) => def.Kind switch
     {
@@ -176,23 +187,121 @@ public partial class WorldView : Node2D
     {
         var o = belt.Origin;
         var color = Iso.ParseColor(belt.Def.Color);
-        DrawColoredPolygon(Iso.Diamond(o.X, o.Y, 1, 0, 0.12f), color.Darkened(0.55f));
-        DrawArrow(belt.Origin, belt.Dir, color.Darkened(0.2f), 0);
+        if (!Sprites.Draw(this, BeltSpriteId(belt), Iso.ToScreen(belt.Center), belt.Dir))
+        {
+            DrawColoredPolygon(Iso.Diamond(o.X, o.Y, 1, 0, 0.12f), color.Darkened(0.55f));
+            DrawArrow(belt.Origin, belt.Dir, color.Darkened(0.2f), 0);
+        }
 
-        var dir = belt.Dir.Offset();
+        // Items ride the belt's own path: straight through, or curving in from the side on a corner piece.
+        var side = CornerSide(belt);
         foreach (var it in belt.Items)
         {
-            float t = it.Pos / (float)Belt.Length - 0.5f;
-            var p = Iso.ToScreen(o.X + 0.5f + dir.X * t, o.Y + 0.5f + dir.Y * t) + new Vector2(0, -3);
+            var p = Iso.ToScreen(BeltPoint(belt, side, it.Pos / (float)Belt.Length)) + new Vector2(0, -ItemLift);
             DrawItem(p, it.Item, 5f);
         }
         if (belt.Hp < belt.MaxHp) DrawHpBar(Iso.ToScreen(belt.Center) + new Vector2(0, -10), 30, belt.Hp / belt.MaxHp);
     }
 
-    private void DrawItem(Vector2 p, string item, float r)
+    /// <summary>Height of items above the belt surface, in screen pixels.</summary>
+    private const float ItemLift = 4;
+
+    /// <summary>
+    /// The side a corner belt is fed from (only one side feeds it, nothing from behind), or null for a straight run.
+    /// </summary>
+    private Direction? CornerSide(Belt belt)
     {
-        DrawCircle(p, r, Iso.ParseColor(_world!.Data.Items[item].Color));
-        DrawArc(p, r, 0, Mathf.Tau, 12, Colors.Black, 1f);
+        var w = _world!;
+        bool Feeds(Direction side) => w.BuildingAt(belt.Origin + side.Offset()) is Belt n && n.Front == belt.Origin;
+        var right = belt.Dir.RotateCw();
+        var left = right.Opposite();
+        if (Feeds(belt.Dir.Opposite())) return null;
+        if (Feeds(left) && !Feeds(right)) return left;
+        if (Feeds(right) && !Feeds(left)) return right;
+        return null;
+    }
+
+    /// <summary>Belt sprite id: the corner piece named for the side it's fed from (looking the way it runs), or the straight one.</summary>
+    private string BeltSpriteId(Belt belt) => CornerSide(belt) is { } side
+        ? belt.Def.Id + (side == belt.Dir.RotateCw() ? "_turn_right" : "_turn_left")
+        : belt.Def.Id;
+
+    /// <summary>
+    /// Grid point at <paramref name="t"/> (0 = where items enter, 1 = the front edge) along a belt: a straight line
+    /// from the back edge, or for a corner a quarter curve from the side edge through the tile centre's pull.
+    /// </summary>
+    private static SVec BeltPoint(Belt belt, Direction? side, float t)
+    {
+        var c = belt.Center;
+        var d = belt.Dir.Offset();
+        var front = c + new SVec(d.X, d.Y) * 0.5f;
+        if (side is not { } s) return SVec.Lerp(c - new SVec(d.X, d.Y) * 0.5f, front, t);
+        var so = s.Offset();
+        var entry = c + new SVec(so.X, so.Y) * 0.5f;
+        float u = 1 - t;
+        return entry * (u * u) + c * (2 * u * t) + front * (t * t);
+    }
+
+    /// <summary>An item: its Prop Studio sprite (sized by <paramref name="r"/>; 5 = normal), or a coloured dot without one.</summary>
+    private void DrawItem(Vector2 p, string item, float r, float alpha = 1)
+    {
+        if (Sprites.DrawItem(this, item, p, r / 5f * 1.15f, Colors.White with { A = alpha })) return;
+        DrawCircle(p, r, Iso.ParseColor(_world!.Data.Items[item].Color) with { A = alpha });
+        DrawArc(p, r, 0, Mathf.Tau, 12, Colors.Black with { A = alpha }, 1f);
+    }
+
+    // ------------------------------------------------------------------ storage animations
+
+    /// <summary>An item going into (or coming out of) the Nexus or a depot; <paramref name="Point"/> is the belt edge or inserter.</summary>
+    private sealed record Transfer(SVec Point, Int2 Storage, string Item, bool In, double Start);
+
+    private readonly List<Transfer> _transfers = new();
+    private const double InSeconds = 0.5, OutSeconds = 0.4, RingSeconds = 0.35;
+    private static readonly Color Core = new("#3BD4F0");
+
+    /// <summary>Where items vanish into / appear from: high up in the storage building.</summary>
+    private static Vector2 CorePoint(Building storage) =>
+        Iso.ToScreen(storage.Center) + new Vector2(0, storage is Nexus ? -62 : -22);
+
+    /// <summary>
+    /// Items arc up into the Nexus core, shrinking with a cyan trail, and the core answers with a ring pulse; items an
+    /// inserter takes out pop from the core with a small burst and arc down to the inserter's hand.
+    /// </summary>
+    private void DrawTransfers(double now)
+    {
+        _transfers.RemoveAll(t => now - t.Start > (t.In ? InSeconds + RingSeconds : OutSeconds) || _world!.BuildingAt(t.Storage) == null);
+        foreach (var t in _transfers)
+        {
+            var storage = _world!.BuildingAt(t.Storage)!;
+            var core = CorePoint(storage);
+            var ground = Iso.ToScreen(t.Point) + new Vector2(0, t.In ? -ItemLift : -14);
+            double age = now - t.Start, dur = t.In ? InSeconds : OutSeconds;
+            if (age < dur)
+            {
+                float k = (float)(age / dur);
+                float e = t.In ? k * k : 1 - (1 - k) * (1 - k); // in: accelerates into the core; out: pops then settles
+                var (a, b) = t.In ? (ground, core) : (core, ground);
+                var ctrl = (a + b) / 2 + new Vector2(0, -36);
+                Vector2 At(float x) => a * ((1 - x) * (1 - x)) + ctrl * (2 * (1 - x) * x) + b * (x * x);
+                float scale = t.In ? Mathf.Lerp(1f, 0.35f, e) : Mathf.Lerp(0.35f, 1f, e);
+                for (int i = 3; i >= 1; i--)
+                    DrawCircle(At(Math.Max(0, e - 0.07f * i)), 4 * scale, Core with { A = 0.18f / i });
+                DrawCircle(At(e), 9 * scale, Core with { A = 0.22f });
+                DrawItem(At(e), t.Item, 5 * scale, t.In ? 1 - 0.5f * e : 0.5f + 0.5f * e);
+                if (!t.In && age < 0.2) Ring(core, (float)(age / 0.2), 4, 16);
+            }
+            else if (t.In) Ring(core, (float)((age - dur) / RingSeconds), 6, 26);
+        }
+    }
+
+    /// <summary>A flat cyan ring expanding from <paramref name="from"/> to <paramref name="to"/> pixels as <paramref name="k"/> goes 0..1, fading out.</summary>
+    private void Ring(Vector2 c, float k, float from, float to)
+    {
+        DrawSetTransform(c, 0, new Vector2(1, 0.5f));
+        float r = Mathf.Lerp(from, to, k);
+        DrawArc(Vector2.Zero, r, 0, Mathf.Tau, 32, Core with { A = 0.9f * (1 - k) }, 2, true);
+        DrawCircle(Vector2.Zero, r * 0.6f, Core with { A = 0.18f * (1 - k) });
+        DrawSetTransform(Vector2.Zero, 0, Vector2.One);
     }
 
     /// <summary>Splitters and tunnel ends sit flat on the ground like belts.</summary>
@@ -200,23 +309,29 @@ public partial class WorldView : Node2D
     {
         var o = b.Origin;
         var color = Iso.ParseColor(b.Def.Color);
-        DrawColoredPolygon(Iso.Diamond(o.X, o.Y, 1, 0, 0.08f), color.Darkened(0.35f));
-        var top = Iso.Diamond(o.X, o.Y, 1, 4, 0.18f);
-        DrawColoredPolygon(top, color.Darkened(b is TunnelEntrance or TunnelExit ? 0.6f : 0.1f));
+        bool sprite = Sprites.Draw(this, b.Def.Id, Iso.ToScreen(b.Center), b.Dir);
+        if (!sprite)
+        {
+            DrawColoredPolygon(Iso.Diamond(o.X, o.Y, 1, 0, 0.08f), color.Darkened(0.35f));
+            var top = Iso.Diamond(o.X, o.Y, 1, 4, 0.18f);
+            DrawColoredPolygon(top, color.Darkened(b is TunnelEntrance or TunnelExit ? 0.6f : 0.1f));
+        }
         switch (b)
         {
+            case Splitter when sprite:
+                break;
             case Splitter:
                 DrawArrow(o, b.Dir, Colors.White with { A = 0.8f }, 5);
                 DrawArrow(o, b.Dir.RotateCw(), Colors.White with { A = 0.5f }, 5);
                 DrawArrow(o, b.Dir.RotateCw().Opposite(), Colors.White with { A = 0.5f }, 5);
                 break;
             case TunnelEntrance tin:
-                DrawArrow(o, b.Dir, Colors.White with { A = 0.8f }, 5);
+                if (!sprite) DrawArrow(o, b.Dir, Colors.White with { A = 0.8f }, 5);
                 if (tin.FindExit(_world!) is { } exit)
                     DrawDashedLine(Iso.ToScreen(tin.Center), Iso.ToScreen(exit.Center), color with { A = 0.6f }, 2f, 6f);
                 break;
             default:
-                DrawArrow(o, b.Dir, Colors.White with { A = 0.8f }, 5);
+                if (!sprite) DrawArrow(o, b.Dir, Colors.White with { A = 0.8f }, 5);
                 break;
         }
         if (b.Hp < b.MaxHp) DrawHpBar(Iso.ToScreen(b.Center) + new Vector2(0, -12), 30, b.Hp / b.MaxHp);
@@ -257,47 +372,51 @@ public partial class WorldView : Node2D
         var color = Iso.ParseColor(b.Def.Color);
         float height = HeightOf(b.Def);
         float inset = b is Inserter ? 0.3f : b is PowerPole ? 0.4f : 0.08f;
-        if (b is not PowerPole) Iso.DrawBox(this, b.Origin.X, b.Origin.Y, b.Size, height, color, inset);
+        // Prop Studio sprite if there is one (the Nexus sprite's facing is its dock, at the back); otherwise a box.
+        var turretAim = b is Turret aimer && _world!.NearestEnemy(aimer.Center, aimer.Range(_world)) is { } foe ? foe.Pos - aimer.Center : (SVec?)null;
+        bool sprite = Sprites.Draw(this, b.Def.Id, Iso.ToScreen(b.Center), b is Nexus ? Direction.North : b.Dir, turretAim);
+        if (!sprite && b is not PowerPole) Iso.DrawBox(this, b.Origin.X, b.Origin.Y, b.Size, height, color, inset);
         var top = Iso.ToScreen(b.Center) + new Vector2(0, -height);
         float t = (float)Time.GetTicksMsec() / 1000f;
 
+        // With a sprite, only live overlays are drawn (ammo, smoke, fill); the sprite already shows the rest.
         switch (b)
         {
-            case Inserter ins:
+            case Inserter ins when !sprite:
                 DrawInserterArm(ins, height);
                 break;
-            case Drill d:
+            case Drill d when !sprite:
                 DrawArrow(b.Origin, b.Dir, Colors.White with { A = 0.7f }, height);
                 if (d.Status.StartsWith("Mining"))
                     DrawLine(top + new Vector2(-6, -3), top + new Vector2(6, 3).Rotated(t * 8), Colors.White with { A = 0.6f }, 2);
                 break;
-            case Crafter { Active: not null } c:
+            case Crafter { Active: not null } c when !sprite:
                 DrawColoredPolygon(Iso.Diamond(b.Origin.X, b.Origin.Y, 1, height, 0.32f), c.Def.Id == "workshop" ? new Color(0.9f, 0.85f, 0.3f) : new Color(1f, 0.55f, 0.15f));
                 break;
             case Turret tu:
-                DrawTurretHead(tu, top, color);
+                DrawTurretHead(tu, top, color, barrel: !sprite);
                 break;
-            case Nexus:
+            case Nexus when !sprite:
                 float pulse = 0.6f + 0.4f * MathF.Sin(t * 3.3f);
                 DrawCircle(top + new Vector2(0, -14), 12f, color.Lightened(0.4f) with { A = pulse });
                 break;
             case Generator g:
-                DrawRect(new Rect2(top + new Vector2(6, -16), new Vector2(6, 16)), color.Darkened(0.4f));
+                if (!sprite) DrawRect(new Rect2(top + new Vector2(6, -16), new Vector2(6, 16)), color.Darkened(0.4f));
                 if (g.HasFuel && g.Load > 0)
                     for (int i = 0; i < 3; i++)
                         DrawCircle(top + new Vector2(9 + i * 2, -20 - ((t * 20 + i * 7) % 18)), 3 + i, new Color(0.6f, 0.6f, 0.65f, 0.4f));
                 break;
-            case PowerPole:
+            case PowerPole when !sprite:
                 var foot = Iso.ToScreen(b.Center);
                 DrawLine(foot, foot + new Vector2(0, -34), color.Darkened(0.3f), 3);
                 DrawLine(foot + new Vector2(-8, -30), foot + new Vector2(8, -30), color, 2);
                 break;
-            case Lab lab:
+            case Lab lab when !sprite:
                 var glow = lab.Working ? new Color(0.5f, 0.8f, 1f, 0.6f + 0.4f * MathF.Sin(t * 4)) : new Color(0.4f, 0.45f, 0.5f);
                 DrawCircle(top + new Vector2(0, -6), 7, glow);
                 break;
             case Depot dep:
-                DrawLine(top + new Vector2(-14, 0), top + new Vector2(14, 0), color.Lightened(0.3f), 2);
+                if (!sprite) DrawLine(top + new Vector2(-14, 0), top + new Vector2(14, 0), color.Lightened(0.3f), 2);
                 DrawProgressBar(top + new Vector2(0, -6), 26, dep.Storage.Total / (float)dep.Def.Capacity, new Color(0.8f, 0.8f, 0.5f));
                 break;
             case SuperWeapon sw:
@@ -317,16 +436,20 @@ public partial class WorldView : Node2D
             DrawHpBar(Iso.ToScreen(b.Center) + new Vector2(0, -height - 10), 34 * b.Size, b.Hp / b.MaxHp);
     }
 
-    private void DrawTurretHead(Turret tu, Vector2 top, Color color)
+    /// <param name="barrel">False when a sprite already shows the head (it picks the frame nearest the aim).</param>
+    private void DrawTurretHead(Turret tu, Vector2 top, Color color, bool barrel = true)
     {
         var head = top + new Vector2(0, -6);
-        var target = _world!.NearestEnemy(tu.Center, tu.Range(_world));
-        var aim = target != null ? (Iso.ToScreen(target.Pos) - head).Normalized() : new Vector2(1, 0.5f).Normalized();
-        float len = tu.Def.Id switch { "heavy_turret" => 22, "rocket_turret" => 16, "flame_turret" => 12, _ => 14 };
-        float width = tu.Def.Id switch { "heavy_turret" => 6, "rocket_turret" => 5, "laser_turret" => 3, _ => 4 };
-        DrawCircle(head, 9f, color.Lightened(0.2f));
-        DrawLine(head, head + aim * len, color.Darkened(0.5f), width);
-        if (tu.Def.Id == "laser_turret") DrawCircle(head, 4f, new Color(1f, 0.3f, 0.5f, tu.PowerFactor > 0 ? 1f : 0.3f));
+        if (barrel)
+        {
+            var target = _world!.NearestEnemy(tu.Center, tu.Range(_world));
+            var aim = target != null ? (Iso.ToScreen(target.Pos) - head).Normalized() : new Vector2(1, 0.5f).Normalized();
+            float len = tu.Def.Id switch { "heavy_turret" => 22, "rocket_turret" => 16, "flame_turret" => 12, _ => 14 };
+            float width = tu.Def.Id switch { "heavy_turret" => 6, "rocket_turret" => 5, "laser_turret" => 3, _ => 4 };
+            DrawCircle(head, 9f, color.Lightened(0.2f));
+            DrawLine(head, head + aim * len, color.Darkened(0.5f), width);
+            if (tu.Def.Id == "laser_turret") DrawCircle(head, 4f, new Color(1f, 0.3f, 0.5f, tu.PowerFactor > 0 ? 1f : 0.3f));
+        }
         if (tu.UsesAmmo && tu.Ammo == 0 && tu.Rounds == 0)
             DrawString(_font, head + new Vector2(-20, -14), "NO AMMO", HorizontalAlignment.Center, 40, 10, HpBad);
         if (tu.UsesAmmo)
@@ -335,7 +458,7 @@ public partial class WorldView : Node2D
             int cap = tu.Def.AmmoCapacity;
             float pip = Math.Min(6f, 30f / cap), gap = 1.5f;
             var start = head + new Vector2(-(cap * (pip + gap) - gap) / 2, 14);
-            var ammoColor = Iso.ParseColor(_world.Data.Items[tu.Def.AmmoItem!].Color);
+            var ammoColor = Iso.ParseColor(_world!.Data.Items[tu.Def.AmmoItem!].Color);
             for (int i = 0; i < cap; i++)
                 DrawRect(new Rect2(start + new Vector2(i * (pip + gap), 0), new Vector2(pip, 3)),
                     i < tu.Ammo ? ammoColor : new Color(0, 0, 0, 0.5f));
@@ -443,9 +566,11 @@ public partial class WorldView : Node2D
         var badge = new Color(1f, 0.6f, 0.15f);
         var endColor = new Color(1f, 0.25f, 0.2f);
 
-        foreach (var (id, _) in Issues)
+        // Per-building rings only for the chain under the mouse; the end marker below is always shown.
+        var hoveredEnd = w.BuildingAt(_input!.HoverTile) is { } over && Issues.TryGetValue(over.Id, out var overIssue) ? overIssue.End : null;
+        foreach (var (id, chain) in Issues)
         {
-            if (w.BuildingById(id) is not { } b) continue;
+            if (chain.End != hoveredEnd || w.BuildingById(id) is not { } b) continue;
             var p = Iso.ToScreen(b.Center) + new Vector2(10, -HeightOf(b.Def) - 12);
             // Broken chain link: two rings with a gap.
             DrawArc(p + new Vector2(-4, 0), 4, 0.6f, Mathf.Tau - 0.6f, 12, badge, 2, true);
@@ -794,13 +919,22 @@ public partial class WorldView : Node2D
         var def = _input.BuildTool;
         if (def == null) return;
 
-        // Belt waiting for the drag to reveal its direction: show it pointing toward the mouse.
-        if (_input.PendingBelt is Int2 pending)
+        // A belt route being dragged: every tile of the L, with its arrow; red where it can't go.
+        if (_input.BeltRoute.Count > 0)
         {
-            var dirToMouse = pending == t ? _input.GhostDir : DirOf(t - pending);
-            DrawColoredPolygon(Iso.Diamond(pending.X, pending.Y, 1, 0, 0.05f), GhostOk);
-            DrawArrow(pending, dirToMouse, GhostOk with { A = 0.9f }, 1);
-            if (pending == t) return;
+            int placed = 0;
+            int affordable = def.Cost.Count == 0 ? int.MaxValue : def.Cost.Min(c => world.Network.Count(c.Key) / Math.Max(1, c.Value));
+            foreach (var (tile, dir) in _input.BeltRoute)
+            {
+                bool fits = world.CheckPlacement(GameSession.LocalPlayer, def, tile) == null && placed < affordable;
+                if (fits) placed++;
+                var tileTint = fits ? GhostOk : GhostBad;
+                DrawColoredPolygon(Iso.Diamond(tile.X, tile.Y, 1, 0, 0.05f), tileTint);
+                DrawArrow(tile, dir, tileTint with { A = 0.95f }, 1);
+            }
+            var count = _input.BeltRoute.Count;
+            DrawString(_font, Iso.ToScreen(t.X + 0.5f, t.Y + 0.5f) + new Vector2(14, -14), $"{count}", HorizontalAlignment.Left, -1, 14, Colors.White);
+            return;
         }
 
         bool ok = world.CheckPlacement(GameSession.LocalPlayer, def, t) == null && world.Network.Has(def.Cost);

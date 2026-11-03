@@ -35,11 +35,9 @@ if errorlevel 1 (
     exit /b 1
 )
 
-rem First run: import the project's assets so the game can load them.
-if not exist "game\.godot\imported" (
-    echo Importing assets ^(first run only^)...
-    "%GODOT_EXE%" --headless --path game --import >nul 2>&1
-)
+rem Import new or changed assets (fonts, etc.) so the game can load them. Quick when nothing changed.
+echo Importing assets...
+"%GODOT_EXE%" --headless --path game --import >nul 2>&1
 
 start "" "%GODOT_EXE%" --path game -- %*
 exit /b 0

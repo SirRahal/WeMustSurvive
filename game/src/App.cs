@@ -1,3 +1,4 @@
+using BeltAndBarricade.Input;
 using BeltAndBarricade.Net;
 using BeltAndBarricade.Sim;
 using BeltAndBarricade.UI;
@@ -37,6 +38,7 @@ public partial class App : Node
         Tree = SkillTree.Load(ReadData);
         Tutorial = TutorialDef.Load(ReadData, "funnel");
         AddChild(Net = new NetSession { Name = "Net" });
+        Bindings.Register();
         if (OS.IsDebugBuild()) AddChild(new IssueReporter { Name = "IssueReporter", Context = DescribeScreen });
         ApplyDisplaySettings();
         ShowMainMenu();
@@ -48,13 +50,27 @@ public partial class App : Node
     /// <summary>--showcase (debug): sandbox with one of every building pre-built.</summary>
     public bool ShowcaseMode { get; private set; }
 
+    /// <summary>--hud=storage,controls,research (debug): HUD panels to open when a game starts, for screenshots.</summary>
+    public string HudPanels { get; private set; } = "";
+
     /// <summary>
     /// Automation switches (after "--" on the Godot command line):
-    /// --autostart=MAP (solo), --autohost=MAP, --autojoin=ADDRESS, --smoke=SECONDS (play itself, print a summary, quit).
+    /// --autostart=MAP (solo; add --tutorial for the tutorial), --autohost=MAP, --autojoin=ADDRESS,
+    /// --smoke=SECONDS (play itself, print a summary, quit), --screenshot=PATH (save a PNG after 3 s and quit).
     /// </summary>
     private void RunCommandLine()
     {
         var args = OS.GetCmdlineUserArgs().Select(a => a.Split('=', 2)).ToDictionary(a => a[0], a => a.Length > 1 ? a[1] : "");
+        HudPanels = args.GetValueOrDefault("--hud", "");
+        if (args.TryGetValue("--screenshot", out var shotPath))
+        {
+            GetTree().CreateTimer(3, processAlways: true).Timeout += () =>
+            {
+                GetViewport().GetTexture().GetImage().SavePng(shotPath);
+                GD.Print($"SCREENSHOT {shotPath} {GetViewport().GetVisibleRect().Size}");
+                GetTree().Quit();
+            };
+        }
         if (args.TryGetValue("--smoke", out var secs))
         {
             SmokeMode = true;
@@ -64,7 +80,7 @@ public partial class App : Node
                 GetTree().Quit();
             };
         }
-        if (args.TryGetValue("--autostart", out var map)) StartSolo(map, tutorial: false);
+        if (args.TryGetValue("--autostart", out var map)) StartSolo(map, tutorial: args.ContainsKey("--tutorial"));
         else if (args.TryGetValue("--sandbox", out var sandboxMap)) StartSandbox(sandboxMap == "" ? "funnel" : sandboxMap);
         else if (args.ContainsKey("--showcase"))
         {

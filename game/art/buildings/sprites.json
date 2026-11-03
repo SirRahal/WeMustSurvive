@@ -1,0 +1,7239 @@
+{
+	"buildings": {
+		"advanced_drill": {
+			"frames": {
+				"coal_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_coal_east.png",
+					"file@2x": "advanced_drill_coal_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"coal_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_coal_north.png",
+					"file@2x": "advanced_drill_coal_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"coal_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_coal_south.png",
+					"file@2x": "advanced_drill_coal_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"coal_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_coal_west.png",
+					"file@2x": "advanced_drill_coal_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"copper_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_copper_east.png",
+					"file@2x": "advanced_drill_copper_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"copper_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_copper_north.png",
+					"file@2x": "advanced_drill_copper_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"copper_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_copper_south.png",
+					"file@2x": "advanced_drill_copper_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"copper_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_copper_west.png",
+					"file@2x": "advanced_drill_copper_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"gold_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_gold_east.png",
+					"file@2x": "advanced_drill_gold_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"gold_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_gold_north.png",
+					"file@2x": "advanced_drill_gold_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"gold_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_gold_south.png",
+					"file@2x": "advanced_drill_gold_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"gold_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_gold_west.png",
+					"file@2x": "advanced_drill_gold_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"iron_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_iron_east.png",
+					"file@2x": "advanced_drill_iron_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"iron_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_iron_north.png",
+					"file@2x": "advanced_drill_iron_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"iron_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_iron_south.png",
+					"file@2x": "advanced_drill_iron_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"iron_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_iron_west.png",
+					"file@2x": "advanced_drill_iron_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"silver_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_silver_east.png",
+					"file@2x": "advanced_drill_silver_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"silver_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_silver_north.png",
+					"file@2x": "advanced_drill_silver_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"silver_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "advanced_drill_silver_south.png",
+					"file@2x": "advanced_drill_silver_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				},
+				"silver_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "advanced_drill_silver_west.png",
+					"file@2x": "advanced_drill_silver_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Advanced"
+					}
+				}
+			},
+			"generator": "bb_drill",
+			"size": 1
+		},
+		"belt": {
+			"frames": {
+				"east": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "belt_east.png",
+					"file@2x": "belt_east@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Basic"
+					}
+				},
+				"north": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "belt_north.png",
+					"file@2x": "belt_north@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Basic"
+					}
+				},
+				"south": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "belt_south.png",
+					"file@2x": "belt_south@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Basic"
+					}
+				},
+				"west": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "belt_west.png",
+					"file@2x": "belt_west@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Basic"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"belt_turn_left": {
+			"frames": {
+				"east": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "belt_turn_left_east.png",
+					"file@2x": "belt_turn_left_east@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Basic"
+					}
+				},
+				"north": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "belt_turn_left_north.png",
+					"file@2x": "belt_turn_left_north@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Basic"
+					}
+				},
+				"south": {
+					"anchor": [
+						34,
+						15
+					],
+					"anchor@2x": [
+						65,
+						27
+					],
+					"file": "belt_turn_left_south.png",
+					"file@2x": "belt_turn_left_south@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Basic"
+					}
+				},
+				"west": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "belt_turn_left_west.png",
+					"file@2x": "belt_turn_left_west@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Basic"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"belt_turn_right": {
+			"frames": {
+				"east": {
+					"anchor": [
+						34,
+						15
+					],
+					"anchor@2x": [
+						65,
+						27
+					],
+					"file": "belt_turn_right_east.png",
+					"file@2x": "belt_turn_right_east@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Basic"
+					}
+				},
+				"north": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "belt_turn_right_north.png",
+					"file@2x": "belt_turn_right_north@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Basic"
+					}
+				},
+				"south": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "belt_turn_right_south.png",
+					"file@2x": "belt_turn_right_south@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Basic"
+					}
+				},
+				"west": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "belt_turn_right_west.png",
+					"file@2x": "belt_turn_right_west@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Basic"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"depot": {
+			"frames": {
+				"default": {
+					"anchor": [
+						31,
+						41
+					],
+					"anchor@2x": [
+						59,
+						79
+					],
+					"file": "depot.png",
+					"file@2x": "depot@2x.png",
+					"size": [
+						62,
+						58
+					],
+					"size@2x": [
+						118,
+						110
+					],
+					"values": {
+						"crates": 2.0,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_depot",
+			"size": 1
+		},
+		"drill": {
+			"frames": {
+				"coal_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_coal_east.png",
+					"file@2x": "drill_coal_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"coal_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_coal_north.png",
+					"file@2x": "drill_coal_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"coal_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_coal_south.png",
+					"file@2x": "drill_coal_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"coal_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_coal_west.png",
+					"file@2x": "drill_coal_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"copper_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_copper_east.png",
+					"file@2x": "drill_copper_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"copper_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_copper_north.png",
+					"file@2x": "drill_copper_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"copper_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_copper_south.png",
+					"file@2x": "drill_copper_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"copper_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_copper_west.png",
+					"file@2x": "drill_copper_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"gold_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_gold_east.png",
+					"file@2x": "drill_gold_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"gold_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_gold_north.png",
+					"file@2x": "drill_gold_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"gold_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_gold_south.png",
+					"file@2x": "drill_gold_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"gold_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_gold_west.png",
+					"file@2x": "drill_gold_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"iron_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_iron_east.png",
+					"file@2x": "drill_iron_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"iron_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_iron_north.png",
+					"file@2x": "drill_iron_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"iron_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_iron_south.png",
+					"file@2x": "drill_iron_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"iron_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_iron_west.png",
+					"file@2x": "drill_iron_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"silver_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_silver_east.png",
+					"file@2x": "drill_silver_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"silver_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_silver_north.png",
+					"file@2x": "drill_silver_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"silver_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "drill_silver_south.png",
+					"file@2x": "drill_silver_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				},
+				"silver_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "drill_silver_west.png",
+					"file@2x": "drill_silver_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Burner"
+					}
+				}
+			},
+			"generator": "bb_drill",
+			"size": 1
+		},
+		"electric_drill": {
+			"frames": {
+				"coal_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_coal_east.png",
+					"file@2x": "electric_drill_coal_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"coal_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_coal_north.png",
+					"file@2x": "electric_drill_coal_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"coal_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_coal_south.png",
+					"file@2x": "electric_drill_coal_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"coal_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_coal_west.png",
+					"file@2x": "electric_drill_coal_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Coal",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"copper_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_copper_east.png",
+					"file@2x": "electric_drill_copper_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"copper_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_copper_north.png",
+					"file@2x": "electric_drill_copper_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"copper_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_copper_south.png",
+					"file@2x": "electric_drill_copper_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"copper_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_copper_west.png",
+					"file@2x": "electric_drill_copper_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Copper",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"gold_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_gold_east.png",
+					"file@2x": "electric_drill_gold_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"gold_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_gold_north.png",
+					"file@2x": "electric_drill_gold_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"gold_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_gold_south.png",
+					"file@2x": "electric_drill_gold_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"gold_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_gold_west.png",
+					"file@2x": "electric_drill_gold_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Gold",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"iron_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_iron_east.png",
+					"file@2x": "electric_drill_iron_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"iron_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_iron_north.png",
+					"file@2x": "electric_drill_iron_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"iron_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_iron_south.png",
+					"file@2x": "electric_drill_iron_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"iron_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_iron_west.png",
+					"file@2x": "electric_drill_iron_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Iron",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"silver_east": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_silver_east.png",
+					"file@2x": "electric_drill_silver_east@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "East",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"silver_north": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_silver_north.png",
+					"file@2x": "electric_drill_silver_north@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "North",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"silver_south": {
+					"anchor": [
+						32,
+						57
+					],
+					"anchor@2x": [
+						62,
+						111
+					],
+					"file": "electric_drill_silver_south.png",
+					"file@2x": "electric_drill_silver_south@2x.png",
+					"size": [
+						64,
+						74
+					],
+					"size@2x": [
+						124,
+						143
+					],
+					"values": {
+						"dir": "South",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				},
+				"silver_west": {
+					"anchor": [
+						32,
+						59
+					],
+					"anchor@2x": [
+						62,
+						115
+					],
+					"file": "electric_drill_silver_west.png",
+					"file@2x": "electric_drill_silver_west@2x.png",
+					"size": [
+						64,
+						76
+					],
+					"size@2x": [
+						124,
+						147
+					],
+					"values": {
+						"dir": "West",
+						"ore": "Silver",
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				}
+			},
+			"generator": "bb_drill",
+			"size": 1
+		},
+		"electric_furnace": {
+			"frames": {
+				"default": {
+					"anchor": [
+						31,
+						42
+					],
+					"anchor@2x": [
+						59,
+						82
+					],
+					"file": "electric_furnace.png",
+					"file@2x": "electric_furnace@2x.png",
+					"size": [
+						62,
+						59
+					],
+					"size@2x": [
+						118,
+						113
+					],
+					"values": {
+						"lit": true,
+						"rust": 0.5,
+						"tier": "Electric"
+					}
+				}
+			},
+			"generator": "bb_furnace",
+			"size": 1
+		},
+		"express_belt": {
+			"frames": {
+				"east": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "express_belt_east.png",
+					"file@2x": "express_belt_east@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Express"
+					}
+				},
+				"north": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "express_belt_north.png",
+					"file@2x": "express_belt_north@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Express"
+					}
+				},
+				"south": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "express_belt_south.png",
+					"file@2x": "express_belt_south@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Express"
+					}
+				},
+				"west": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "express_belt_west.png",
+					"file@2x": "express_belt_west@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Express"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"express_belt_turn_left": {
+			"frames": {
+				"east": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "express_belt_turn_left_east.png",
+					"file@2x": "express_belt_turn_left_east@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Express"
+					}
+				},
+				"north": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "express_belt_turn_left_north.png",
+					"file@2x": "express_belt_turn_left_north@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Express"
+					}
+				},
+				"south": {
+					"anchor": [
+						34,
+						15
+					],
+					"anchor@2x": [
+						65,
+						27
+					],
+					"file": "express_belt_turn_left_south.png",
+					"file@2x": "express_belt_turn_left_south@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Express"
+					}
+				},
+				"west": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "express_belt_turn_left_west.png",
+					"file@2x": "express_belt_turn_left_west@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Express"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"express_belt_turn_right": {
+			"frames": {
+				"east": {
+					"anchor": [
+						34,
+						15
+					],
+					"anchor@2x": [
+						65,
+						27
+					],
+					"file": "express_belt_turn_right_east.png",
+					"file@2x": "express_belt_turn_right_east@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Express"
+					}
+				},
+				"north": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "express_belt_turn_right_north.png",
+					"file@2x": "express_belt_turn_right_north@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Express"
+					}
+				},
+				"south": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "express_belt_turn_right_south.png",
+					"file@2x": "express_belt_turn_right_south@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Express"
+					}
+				},
+				"west": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "express_belt_turn_right_west.png",
+					"file@2x": "express_belt_turn_right_west@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Express"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"fast_belt": {
+			"frames": {
+				"east": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "fast_belt_east.png",
+					"file@2x": "fast_belt_east@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Fast"
+					}
+				},
+				"north": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "fast_belt_north.png",
+					"file@2x": "fast_belt_north@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Fast"
+					}
+				},
+				"south": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "fast_belt_south.png",
+					"file@2x": "fast_belt_south@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Fast"
+					}
+				},
+				"west": {
+					"anchor": [
+						33,
+						24
+					],
+					"anchor@2x": [
+						64,
+						46
+					],
+					"file": "fast_belt_west.png",
+					"file@2x": "fast_belt_west@2x.png",
+					"size": [
+						66,
+						42
+					],
+					"size@2x": [
+						128,
+						79
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "Straight",
+						"tier": "Fast"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"fast_belt_turn_left": {
+			"frames": {
+				"east": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "fast_belt_turn_left_east.png",
+					"file@2x": "fast_belt_turn_left_east@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Fast"
+					}
+				},
+				"north": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "fast_belt_turn_left_north.png",
+					"file@2x": "fast_belt_turn_left_north@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Fast"
+					}
+				},
+				"south": {
+					"anchor": [
+						34,
+						15
+					],
+					"anchor@2x": [
+						65,
+						27
+					],
+					"file": "fast_belt_turn_left_south.png",
+					"file@2x": "fast_belt_turn_left_south@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Fast"
+					}
+				},
+				"west": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "fast_belt_turn_left_west.png",
+					"file@2x": "fast_belt_turn_left_west@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "From left",
+						"tier": "Fast"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"fast_belt_turn_right": {
+			"frames": {
+				"east": {
+					"anchor": [
+						34,
+						15
+					],
+					"anchor@2x": [
+						65,
+						27
+					],
+					"file": "fast_belt_turn_right_east.png",
+					"file@2x": "fast_belt_turn_right_east@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Fast"
+					}
+				},
+				"north": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "fast_belt_turn_right_north.png",
+					"file@2x": "fast_belt_turn_right_north@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Fast"
+					}
+				},
+				"south": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "fast_belt_turn_right_south.png",
+					"file@2x": "fast_belt_turn_right_south@2x.png",
+					"size": [
+						49,
+						42
+					],
+					"size@2x": [
+						92,
+						80
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Fast"
+					}
+				},
+				"west": {
+					"anchor": [
+						34,
+						24
+					],
+					"anchor@2x": [
+						65,
+						46
+					],
+					"file": "fast_belt_turn_right_west.png",
+					"file@2x": "fast_belt_turn_right_west@2x.png",
+					"size": [
+						68,
+						33
+					],
+					"size@2x": [
+						130,
+						61
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"shape": "From right",
+						"tier": "Fast"
+					}
+				}
+			},
+			"generator": "bb_belt",
+			"size": 1
+		},
+		"fast_inserter": {
+			"frames": {
+				"east": {
+					"anchor": [
+						15,
+						24
+					],
+					"anchor@2x": [
+						27,
+						46
+					],
+					"file": "fast_inserter_east.png",
+					"file@2x": "fast_inserter_east@2x.png",
+					"size": [
+						33,
+						32
+					],
+					"size@2x": [
+						61,
+						60
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Fast"
+					}
+				},
+				"north": {
+					"anchor": [
+						14,
+						31
+					],
+					"anchor@2x": [
+						26,
+						59
+					],
+					"file": "fast_inserter_north.png",
+					"file@2x": "fast_inserter_north@2x.png",
+					"size": [
+						32,
+						39
+					],
+					"size@2x": [
+						60,
+						73
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Fast"
+					}
+				},
+				"south": {
+					"anchor": [
+						18,
+						24
+					],
+					"anchor@2x": [
+						34,
+						46
+					],
+					"file": "fast_inserter_south.png",
+					"file@2x": "fast_inserter_south@2x.png",
+					"size": [
+						32,
+						32
+					],
+					"size@2x": [
+						60,
+						60
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Fast"
+					}
+				},
+				"west": {
+					"anchor": [
+						18,
+						31
+					],
+					"anchor@2x": [
+						34,
+						59
+					],
+					"file": "fast_inserter_west.png",
+					"file@2x": "fast_inserter_west@2x.png",
+					"size": [
+						33,
+						39
+					],
+					"size@2x": [
+						61,
+						73
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Fast"
+					}
+				}
+			},
+			"generator": "bb_inserter",
+			"size": 1
+		},
+		"flame_turret": {
+			"frames": {
+				"e": {
+					"anchor": [
+						23,
+						38
+					],
+					"anchor@2x": [
+						44,
+						73
+					],
+					"file": "flame_turret_e.png",
+					"file@2x": "flame_turret_e@2x.png",
+					"size": [
+						47,
+						51
+					],
+					"size@2x": [
+						89,
+						96
+					],
+					"values": {
+						"aim": 90.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"n": {
+					"anchor": [
+						23,
+						40
+					],
+					"anchor@2x": [
+						44,
+						77
+					],
+					"file": "flame_turret_n.png",
+					"file@2x": "flame_turret_n@2x.png",
+					"size": [
+						47,
+						53
+					],
+					"size@2x": [
+						89,
+						100
+					],
+					"values": {
+						"aim": 180.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"ne": {
+					"anchor": [
+						23,
+						36
+					],
+					"anchor@2x": [
+						44,
+						70
+					],
+					"file": "flame_turret_ne.png",
+					"file@2x": "flame_turret_ne@2x.png",
+					"size": [
+						54,
+						49
+					],
+					"size@2x": [
+						103,
+						93
+					],
+					"values": {
+						"aim": 135.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"nw": {
+					"anchor": [
+						23,
+						44
+					],
+					"anchor@2x": [
+						44,
+						85
+					],
+					"file": "flame_turret_nw.png",
+					"file@2x": "flame_turret_nw@2x.png",
+					"size": [
+						46,
+						57
+					],
+					"size@2x": [
+						88,
+						108
+					],
+					"values": {
+						"aim": -135.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"s": {
+					"anchor": [
+						24,
+						38
+					],
+					"anchor@2x": [
+						45,
+						73
+					],
+					"file": "flame_turret_s.png",
+					"file@2x": "flame_turret_s@2x.png",
+					"size": [
+						47,
+						51
+					],
+					"size@2x": [
+						89,
+						96
+					],
+					"values": {
+						"aim": 0.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"se": {
+					"anchor": [
+						23,
+						36
+					],
+					"anchor@2x": [
+						44,
+						70
+					],
+					"file": "flame_turret_se.png",
+					"file@2x": "flame_turret_se@2x.png",
+					"size": [
+						46,
+						49
+					],
+					"size@2x": [
+						88,
+						93
+					],
+					"values": {
+						"aim": 45.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"sw": {
+					"anchor": [
+						31,
+						36
+					],
+					"anchor@2x": [
+						59,
+						70
+					],
+					"file": "flame_turret_sw.png",
+					"file@2x": "flame_turret_sw@2x.png",
+					"size": [
+						54,
+						49
+					],
+					"size@2x": [
+						103,
+						93
+					],
+					"values": {
+						"aim": -45.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				},
+				"w": {
+					"anchor": [
+						24,
+						40
+					],
+					"anchor@2x": [
+						45,
+						77
+					],
+					"file": "flame_turret_w.png",
+					"file@2x": "flame_turret_w@2x.png",
+					"size": [
+						47,
+						53
+					],
+					"size@2x": [
+						89,
+						100
+					],
+					"values": {
+						"aim": -90.0,
+						"rust": 0.5,
+						"weapon": "Flame"
+					}
+				}
+			},
+			"generator": "bb_turret",
+			"size": 1
+		},
+		"fortress_wall": {
+			"frames": {
+				"default": {
+					"anchor": [
+						34,
+						61
+					],
+					"anchor@2x": [
+						66,
+						119
+					],
+					"file": "fortress_wall.png",
+					"file@2x": "fortress_wall@2x.png",
+					"size": [
+						68,
+						79
+					],
+					"size@2x": [
+						132,
+						153
+					],
+					"values": {
+						"rust": 0.5,
+						"tier": "Fortress"
+					}
+				}
+			},
+			"generator": "bb_wall",
+			"size": 1
+		},
+		"furnace": {
+			"frames": {
+				"default": {
+					"anchor": [
+						31,
+						59
+					],
+					"anchor@2x": [
+						59,
+						116
+					],
+					"file": "furnace.png",
+					"file@2x": "furnace@2x.png",
+					"size": [
+						62,
+						76
+					],
+					"size@2x": [
+						118,
+						147
+					],
+					"values": {
+						"lit": true,
+						"rust": 0.5,
+						"tier": "Stone"
+					}
+				}
+			},
+			"generator": "bb_furnace",
+			"size": 1
+		},
+		"generator": {
+			"frames": {
+				"default": {
+					"anchor": [
+						31,
+						49
+					],
+					"anchor@2x": [
+						59,
+						95
+					],
+					"file": "generator.png",
+					"file@2x": "generator@2x.png",
+					"size": [
+						62,
+						66
+					],
+					"size@2x": [
+						118,
+						126
+					],
+					"values": {
+						"running": true,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_generator",
+			"size": 1
+		},
+		"gun_turret": {
+			"frames": {
+				"e": {
+					"anchor": [
+						23,
+						36
+					],
+					"anchor@2x": [
+						44,
+						69
+					],
+					"file": "gun_turret_e.png",
+					"file@2x": "gun_turret_e@2x.png",
+					"size": [
+						50,
+						49
+					],
+					"size@2x": [
+						96,
+						92
+					],
+					"values": {
+						"aim": 90.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"n": {
+					"anchor": [
+						23,
+						39
+					],
+					"anchor@2x": [
+						44,
+						76
+					],
+					"file": "gun_turret_n.png",
+					"file@2x": "gun_turret_n@2x.png",
+					"size": [
+						50,
+						52
+					],
+					"size@2x": [
+						96,
+						99
+					],
+					"values": {
+						"aim": 180.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"ne": {
+					"anchor": [
+						23,
+						35
+					],
+					"anchor@2x": [
+						44,
+						68
+					],
+					"file": "gun_turret_ne.png",
+					"file@2x": "gun_turret_ne@2x.png",
+					"size": [
+						55,
+						48
+					],
+					"size@2x": [
+						106,
+						91
+					],
+					"values": {
+						"aim": 135.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"nw": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						44,
+						82
+					],
+					"file": "gun_turret_nw.png",
+					"file@2x": "gun_turret_nw@2x.png",
+					"size": [
+						46,
+						55
+					],
+					"size@2x": [
+						88,
+						105
+					],
+					"values": {
+						"aim": -135.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"s": {
+					"anchor": [
+						27,
+						36
+					],
+					"anchor@2x": [
+						52,
+						69
+					],
+					"file": "gun_turret_s.png",
+					"file@2x": "gun_turret_s@2x.png",
+					"size": [
+						50,
+						49
+					],
+					"size@2x": [
+						96,
+						92
+					],
+					"values": {
+						"aim": 0.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"se": {
+					"anchor": [
+						23,
+						35
+					],
+					"anchor@2x": [
+						44,
+						67
+					],
+					"file": "gun_turret_se.png",
+					"file@2x": "gun_turret_se@2x.png",
+					"size": [
+						46,
+						48
+					],
+					"size@2x": [
+						88,
+						90
+					],
+					"values": {
+						"aim": 45.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"sw": {
+					"anchor": [
+						32,
+						35
+					],
+					"anchor@2x": [
+						62,
+						68
+					],
+					"file": "gun_turret_sw.png",
+					"file@2x": "gun_turret_sw@2x.png",
+					"size": [
+						55,
+						48
+					],
+					"size@2x": [
+						106,
+						91
+					],
+					"values": {
+						"aim": -45.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				},
+				"w": {
+					"anchor": [
+						27,
+						39
+					],
+					"anchor@2x": [
+						52,
+						76
+					],
+					"file": "gun_turret_w.png",
+					"file@2x": "gun_turret_w@2x.png",
+					"size": [
+						50,
+						52
+					],
+					"size@2x": [
+						96,
+						99
+					],
+					"values": {
+						"aim": -90.0,
+						"rust": 0.5,
+						"weapon": "Gun"
+					}
+				}
+			},
+			"generator": "bb_turret",
+			"size": 1
+		},
+		"heavy_turret": {
+			"frames": {
+				"e": {
+					"anchor": [
+						23,
+						39
+					],
+					"anchor@2x": [
+						44,
+						76
+					],
+					"file": "heavy_turret_e.png",
+					"file@2x": "heavy_turret_e@2x.png",
+					"size": [
+						52,
+						52
+					],
+					"size@2x": [
+						100,
+						99
+					],
+					"values": {
+						"aim": 90.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"n": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						44,
+						82
+					],
+					"file": "heavy_turret_n.png",
+					"file@2x": "heavy_turret_n@2x.png",
+					"size": [
+						52,
+						55
+					],
+					"size@2x": [
+						100,
+						105
+					],
+					"values": {
+						"aim": 180.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"ne": {
+					"anchor": [
+						23,
+						37
+					],
+					"anchor@2x": [
+						44,
+						72
+					],
+					"file": "heavy_turret_ne.png",
+					"file@2x": "heavy_turret_ne@2x.png",
+					"size": [
+						60,
+						50
+					],
+					"size@2x": [
+						115,
+						95
+					],
+					"values": {
+						"aim": 135.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"nw": {
+					"anchor": [
+						23,
+						46
+					],
+					"anchor@2x": [
+						44,
+						89
+					],
+					"file": "heavy_turret_nw.png",
+					"file@2x": "heavy_turret_nw@2x.png",
+					"size": [
+						46,
+						59
+					],
+					"size@2x": [
+						88,
+						112
+					],
+					"values": {
+						"aim": -135.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"s": {
+					"anchor": [
+						29,
+						39
+					],
+					"anchor@2x": [
+						56,
+						76
+					],
+					"file": "heavy_turret_s.png",
+					"file@2x": "heavy_turret_s@2x.png",
+					"size": [
+						52,
+						52
+					],
+					"size@2x": [
+						100,
+						99
+					],
+					"values": {
+						"aim": 0.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"se": {
+					"anchor": [
+						23,
+						37
+					],
+					"anchor@2x": [
+						44,
+						72
+					],
+					"file": "heavy_turret_se.png",
+					"file@2x": "heavy_turret_se@2x.png",
+					"size": [
+						46,
+						50
+					],
+					"size@2x": [
+						88,
+						95
+					],
+					"values": {
+						"aim": 45.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"sw": {
+					"anchor": [
+						37,
+						37
+					],
+					"anchor@2x": [
+						71,
+						72
+					],
+					"file": "heavy_turret_sw.png",
+					"file@2x": "heavy_turret_sw@2x.png",
+					"size": [
+						60,
+						50
+					],
+					"size@2x": [
+						115,
+						95
+					],
+					"values": {
+						"aim": -45.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				},
+				"w": {
+					"anchor": [
+						29,
+						42
+					],
+					"anchor@2x": [
+						56,
+						82
+					],
+					"file": "heavy_turret_w.png",
+					"file@2x": "heavy_turret_w@2x.png",
+					"size": [
+						52,
+						55
+					],
+					"size@2x": [
+						100,
+						105
+					],
+					"values": {
+						"aim": -90.0,
+						"rust": 0.5,
+						"weapon": "Heavy"
+					}
+				}
+			},
+			"generator": "bb_turret",
+			"size": 1
+		},
+		"heavy_wall": {
+			"frames": {
+				"default": {
+					"anchor": [
+						34,
+						51
+					],
+					"anchor@2x": [
+						66,
+						100
+					],
+					"file": "heavy_wall.png",
+					"file@2x": "heavy_wall@2x.png",
+					"size": [
+						68,
+						69
+					],
+					"size@2x": [
+						132,
+						134
+					],
+					"values": {
+						"rust": 0.5,
+						"tier": "Heavy"
+					}
+				}
+			},
+			"generator": "bb_wall",
+			"size": 1
+		},
+		"inserter": {
+			"frames": {
+				"east": {
+					"anchor": [
+						14,
+						24
+					],
+					"anchor@2x": [
+						26,
+						46
+					],
+					"file": "inserter_east.png",
+					"file@2x": "inserter_east@2x.png",
+					"size": [
+						32,
+						32
+					],
+					"size@2x": [
+						60,
+						60
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Basic"
+					}
+				},
+				"north": {
+					"anchor": [
+						14,
+						31
+					],
+					"anchor@2x": [
+						26,
+						59
+					],
+					"file": "inserter_north.png",
+					"file@2x": "inserter_north@2x.png",
+					"size": [
+						32,
+						39
+					],
+					"size@2x": [
+						60,
+						73
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Basic"
+					}
+				},
+				"south": {
+					"anchor": [
+						18,
+						24
+					],
+					"anchor@2x": [
+						34,
+						46
+					],
+					"file": "inserter_south.png",
+					"file@2x": "inserter_south@2x.png",
+					"size": [
+						32,
+						32
+					],
+					"size@2x": [
+						60,
+						60
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Basic"
+					}
+				},
+				"west": {
+					"anchor": [
+						18,
+						31
+					],
+					"anchor@2x": [
+						34,
+						59
+					],
+					"file": "inserter_west.png",
+					"file@2x": "inserter_west@2x.png",
+					"size": [
+						32,
+						39
+					],
+					"size@2x": [
+						60,
+						73
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5,
+						"swing": 0.0,
+						"tier": "Basic"
+					}
+				}
+			},
+			"generator": "bb_inserter",
+			"size": 1
+		},
+		"lab": {
+			"frames": {
+				"default": {
+					"anchor": [
+						31,
+						40
+					],
+					"anchor@2x": [
+						59,
+						77
+					],
+					"file": "lab.png",
+					"file@2x": "lab@2x.png",
+					"size": [
+						62,
+						57
+					],
+					"size@2x": [
+						118,
+						108
+					],
+					"values": {
+						"rust": 0.5,
+						"working": true
+					}
+				}
+			},
+			"generator": "bb_lab",
+			"size": 1
+		},
+		"laser_turret": {
+			"frames": {
+				"e": {
+					"anchor": [
+						23,
+						37
+					],
+					"anchor@2x": [
+						44,
+						71
+					],
+					"file": "laser_turret_e.png",
+					"file@2x": "laser_turret_e@2x.png",
+					"size": [
+						47,
+						50
+					],
+					"size@2x": [
+						89,
+						94
+					],
+					"values": {
+						"aim": 90.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"n": {
+					"anchor": [
+						23,
+						38
+					],
+					"anchor@2x": [
+						44,
+						74
+					],
+					"file": "laser_turret_n.png",
+					"file@2x": "laser_turret_n@2x.png",
+					"size": [
+						47,
+						51
+					],
+					"size@2x": [
+						89,
+						97
+					],
+					"values": {
+						"aim": 180.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"ne": {
+					"anchor": [
+						23,
+						36
+					],
+					"anchor@2x": [
+						44,
+						69
+					],
+					"file": "laser_turret_ne.png",
+					"file@2x": "laser_turret_ne@2x.png",
+					"size": [
+						54,
+						49
+					],
+					"size@2x": [
+						104,
+						92
+					],
+					"values": {
+						"aim": 135.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"nw": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						44,
+						82
+					],
+					"file": "laser_turret_nw.png",
+					"file@2x": "laser_turret_nw@2x.png",
+					"size": [
+						46,
+						55
+					],
+					"size@2x": [
+						88,
+						105
+					],
+					"values": {
+						"aim": -135.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"s": {
+					"anchor": [
+						24,
+						37
+					],
+					"anchor@2x": [
+						45,
+						71
+					],
+					"file": "laser_turret_s.png",
+					"file@2x": "laser_turret_s@2x.png",
+					"size": [
+						47,
+						50
+					],
+					"size@2x": [
+						89,
+						94
+					],
+					"values": {
+						"aim": 0.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"se": {
+					"anchor": [
+						23,
+						35
+					],
+					"anchor@2x": [
+						44,
+						68
+					],
+					"file": "laser_turret_se.png",
+					"file@2x": "laser_turret_se@2x.png",
+					"size": [
+						46,
+						48
+					],
+					"size@2x": [
+						88,
+						91
+					],
+					"values": {
+						"aim": 45.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"sw": {
+					"anchor": [
+						31,
+						36
+					],
+					"anchor@2x": [
+						60,
+						69
+					],
+					"file": "laser_turret_sw.png",
+					"file@2x": "laser_turret_sw@2x.png",
+					"size": [
+						54,
+						49
+					],
+					"size@2x": [
+						104,
+						92
+					],
+					"values": {
+						"aim": -45.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				},
+				"w": {
+					"anchor": [
+						24,
+						38
+					],
+					"anchor@2x": [
+						45,
+						74
+					],
+					"file": "laser_turret_w.png",
+					"file@2x": "laser_turret_w@2x.png",
+					"size": [
+						47,
+						51
+					],
+					"size@2x": [
+						89,
+						97
+					],
+					"values": {
+						"aim": -90.0,
+						"rust": 0.5,
+						"weapon": "Laser"
+					}
+				}
+			},
+			"generator": "bb_turret",
+			"size": 1
+		},
+		"nexus": {
+			"frames": {
+				"east": {
+					"anchor": [
+						86,
+						92
+					],
+					"anchor@2x": [
+						170,
+						181
+					],
+					"file": "nexus_east.png",
+					"file@2x": "nexus_east@2x.png",
+					"size": [
+						172,
+						136
+					],
+					"size@2x": [
+						340,
+						267
+					],
+					"values": {
+						"dir": "East",
+						"pulse": 1.0,
+						"rust": 0.5
+					}
+				},
+				"north": {
+					"anchor": [
+						86,
+						92
+					],
+					"anchor@2x": [
+						170,
+						181
+					],
+					"file": "nexus_north.png",
+					"file@2x": "nexus_north@2x.png",
+					"size": [
+						172,
+						136
+					],
+					"size@2x": [
+						340,
+						267
+					],
+					"values": {
+						"dir": "North",
+						"pulse": 1.0,
+						"rust": 0.5
+					}
+				},
+				"south": {
+					"anchor": [
+						86,
+						92
+					],
+					"anchor@2x": [
+						170,
+						181
+					],
+					"file": "nexus_south.png",
+					"file@2x": "nexus_south@2x.png",
+					"size": [
+						172,
+						136
+					],
+					"size@2x": [
+						340,
+						267
+					],
+					"values": {
+						"dir": "South",
+						"pulse": 1.0,
+						"rust": 0.5
+					}
+				},
+				"west": {
+					"anchor": [
+						86,
+						92
+					],
+					"anchor@2x": [
+						170,
+						181
+					],
+					"file": "nexus_west.png",
+					"file@2x": "nexus_west@2x.png",
+					"size": [
+						172,
+						136
+					],
+					"size@2x": [
+						340,
+						267
+					],
+					"values": {
+						"dir": "West",
+						"pulse": 1.0,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_nexus",
+			"size": 3
+		},
+		"nuclear_silo": {
+			"frames": {
+				"default": {
+					"anchor": [
+						61,
+						58
+					],
+					"anchor@2x": [
+						119,
+						113
+					],
+					"file": "nuclear_silo.png",
+					"file@2x": "nuclear_silo@2x.png",
+					"size": [
+						122,
+						90
+					],
+					"size@2x": [
+						238,
+						174
+					],
+					"values": {
+						"open": 0.0,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_silo",
+			"size": 2
+		},
+		"nuclear_silo_open": {
+			"frames": {
+				"default": {
+					"anchor": [
+						61,
+						62
+					],
+					"anchor@2x": [
+						119,
+						121
+					],
+					"file": "nuclear_silo_open.png",
+					"file@2x": "nuclear_silo_open@2x.png",
+					"size": [
+						122,
+						94
+					],
+					"size@2x": [
+						238,
+						182
+					],
+					"values": {
+						"open": 1.0,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_silo",
+			"size": 2
+		},
+		"pole": {
+			"frames": {
+				"default": {
+					"anchor": [
+						25,
+						63
+					],
+					"anchor@2x": [
+						48,
+						123
+					],
+					"file": "pole.png",
+					"file@2x": "pole@2x.png",
+					"size": [
+						50,
+						69
+					],
+					"size@2x": [
+						96,
+						132
+					],
+					"values": {
+						"rust": 0.5,
+						"wires": true
+					}
+				}
+			},
+			"generator": "bb_pole",
+			"size": 1
+		},
+		"reinforced_wall": {
+			"frames": {
+				"default": {
+					"anchor": [
+						34,
+						47
+					],
+					"anchor@2x": [
+						66,
+						92
+					],
+					"file": "reinforced_wall.png",
+					"file@2x": "reinforced_wall@2x.png",
+					"size": [
+						68,
+						65
+					],
+					"size@2x": [
+						132,
+						126
+					],
+					"values": {
+						"rust": 0.5,
+						"tier": "Reinforced"
+					}
+				}
+			},
+			"generator": "bb_wall",
+			"size": 1
+		},
+		"rocket_turret": {
+			"frames": {
+				"e": {
+					"anchor": [
+						23,
+						41
+					],
+					"anchor@2x": [
+						44,
+						79
+					],
+					"file": "rocket_turret_e.png",
+					"file@2x": "rocket_turret_e@2x.png",
+					"size": [
+						46,
+						54
+					],
+					"size@2x": [
+						88,
+						102
+					],
+					"values": {
+						"aim": 90.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"n": {
+					"anchor": [
+						23,
+						41
+					],
+					"anchor@2x": [
+						44,
+						79
+					],
+					"file": "rocket_turret_n.png",
+					"file@2x": "rocket_turret_n@2x.png",
+					"size": [
+						46,
+						54
+					],
+					"size@2x": [
+						88,
+						102
+					],
+					"values": {
+						"aim": 180.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"ne": {
+					"anchor": [
+						23,
+						40
+					],
+					"anchor@2x": [
+						44,
+						77
+					],
+					"file": "rocket_turret_ne.png",
+					"file@2x": "rocket_turret_ne@2x.png",
+					"size": [
+						46,
+						53
+					],
+					"size@2x": [
+						88,
+						100
+					],
+					"values": {
+						"aim": 135.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"nw": {
+					"anchor": [
+						23,
+						39
+					],
+					"anchor@2x": [
+						44,
+						76
+					],
+					"file": "rocket_turret_nw.png",
+					"file@2x": "rocket_turret_nw@2x.png",
+					"size": [
+						46,
+						52
+					],
+					"size@2x": [
+						88,
+						99
+					],
+					"values": {
+						"aim": -135.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"s": {
+					"anchor": [
+						23,
+						41
+					],
+					"anchor@2x": [
+						44,
+						79
+					],
+					"file": "rocket_turret_s.png",
+					"file@2x": "rocket_turret_s@2x.png",
+					"size": [
+						46,
+						54
+					],
+					"size@2x": [
+						88,
+						102
+					],
+					"values": {
+						"aim": 0.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"se": {
+					"anchor": [
+						23,
+						39
+					],
+					"anchor@2x": [
+						44,
+						76
+					],
+					"file": "rocket_turret_se.png",
+					"file@2x": "rocket_turret_se@2x.png",
+					"size": [
+						46,
+						52
+					],
+					"size@2x": [
+						88,
+						99
+					],
+					"values": {
+						"aim": 45.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"sw": {
+					"anchor": [
+						23,
+						40
+					],
+					"anchor@2x": [
+						44,
+						77
+					],
+					"file": "rocket_turret_sw.png",
+					"file@2x": "rocket_turret_sw@2x.png",
+					"size": [
+						46,
+						53
+					],
+					"size@2x": [
+						88,
+						100
+					],
+					"values": {
+						"aim": -45.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				},
+				"w": {
+					"anchor": [
+						23,
+						41
+					],
+					"anchor@2x": [
+						44,
+						79
+					],
+					"file": "rocket_turret_w.png",
+					"file@2x": "rocket_turret_w@2x.png",
+					"size": [
+						46,
+						54
+					],
+					"size@2x": [
+						88,
+						102
+					],
+					"values": {
+						"aim": -90.0,
+						"rust": 0.5,
+						"weapon": "Rocket"
+					}
+				}
+			},
+			"generator": "bb_turret",
+			"size": 1
+		},
+		"satellite_uplink": {
+			"frames": {
+				"default": {
+					"anchor": [
+						63,
+						86
+					],
+					"anchor@2x": [
+						123,
+						170
+					],
+					"file": "satellite_uplink.png",
+					"file@2x": "satellite_uplink@2x.png",
+					"size": [
+						126,
+						119
+					],
+					"size@2x": [
+						246,
+						233
+					],
+					"values": {
+						"charge": 0.6,
+						"pan": 0.0,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_uplink",
+			"size": 2
+		},
+		"splitter": {
+			"frames": {
+				"east": {
+					"anchor": [
+						32,
+						24
+					],
+					"anchor@2x": [
+						62,
+						46
+					],
+					"file": "splitter_east.png",
+					"file@2x": "splitter_east@2x.png",
+					"size": [
+						64,
+						41
+					],
+					"size@2x": [
+						124,
+						78
+					],
+					"values": {
+						"dir": "East",
+						"rust": 0.5
+					}
+				},
+				"north": {
+					"anchor": [
+						32,
+						24
+					],
+					"anchor@2x": [
+						62,
+						46
+					],
+					"file": "splitter_north.png",
+					"file@2x": "splitter_north@2x.png",
+					"size": [
+						64,
+						41
+					],
+					"size@2x": [
+						124,
+						78
+					],
+					"values": {
+						"dir": "North",
+						"rust": 0.5
+					}
+				},
+				"south": {
+					"anchor": [
+						32,
+						24
+					],
+					"anchor@2x": [
+						62,
+						46
+					],
+					"file": "splitter_south.png",
+					"file@2x": "splitter_south@2x.png",
+					"size": [
+						64,
+						41
+					],
+					"size@2x": [
+						124,
+						78
+					],
+					"values": {
+						"dir": "South",
+						"rust": 0.5
+					}
+				},
+				"west": {
+					"anchor": [
+						32,
+						24
+					],
+					"anchor@2x": [
+						62,
+						46
+					],
+					"file": "splitter_west.png",
+					"file@2x": "splitter_west@2x.png",
+					"size": [
+						64,
+						41
+					],
+					"size@2x": [
+						124,
+						78
+					],
+					"values": {
+						"dir": "West",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_splitter",
+			"size": 1
+		},
+		"tunnel_entrance": {
+			"frames": {
+				"east": {
+					"anchor": [
+						33,
+						33
+					],
+					"anchor@2x": [
+						64,
+						63
+					],
+					"file": "tunnel_entrance_east.png",
+					"file@2x": "tunnel_entrance_east@2x.png",
+					"size": [
+						66,
+						50
+					],
+					"size@2x": [
+						128,
+						94
+					],
+					"values": {
+						"dir": "East",
+						"end": "In",
+						"rust": 0.5
+					}
+				},
+				"north": {
+					"anchor": [
+						33,
+						42
+					],
+					"anchor@2x": [
+						64,
+						81
+					],
+					"file": "tunnel_entrance_north.png",
+					"file@2x": "tunnel_entrance_north@2x.png",
+					"size": [
+						66,
+						59
+					],
+					"size@2x": [
+						128,
+						112
+					],
+					"values": {
+						"dir": "North",
+						"end": "In",
+						"rust": 0.5
+					}
+				},
+				"south": {
+					"anchor": [
+						33,
+						33
+					],
+					"anchor@2x": [
+						64,
+						63
+					],
+					"file": "tunnel_entrance_south.png",
+					"file@2x": "tunnel_entrance_south@2x.png",
+					"size": [
+						66,
+						50
+					],
+					"size@2x": [
+						128,
+						94
+					],
+					"values": {
+						"dir": "South",
+						"end": "In",
+						"rust": 0.5
+					}
+				},
+				"west": {
+					"anchor": [
+						33,
+						42
+					],
+					"anchor@2x": [
+						64,
+						81
+					],
+					"file": "tunnel_entrance_west.png",
+					"file@2x": "tunnel_entrance_west@2x.png",
+					"size": [
+						66,
+						59
+					],
+					"size@2x": [
+						128,
+						112
+					],
+					"values": {
+						"dir": "West",
+						"end": "In",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_tunnel",
+			"size": 1
+		},
+		"tunnel_exit": {
+			"frames": {
+				"east": {
+					"anchor": [
+						33,
+						42
+					],
+					"anchor@2x": [
+						64,
+						81
+					],
+					"file": "tunnel_exit_east.png",
+					"file@2x": "tunnel_exit_east@2x.png",
+					"size": [
+						66,
+						59
+					],
+					"size@2x": [
+						128,
+						112
+					],
+					"values": {
+						"dir": "East",
+						"end": "Out",
+						"rust": 0.5
+					}
+				},
+				"north": {
+					"anchor": [
+						33,
+						33
+					],
+					"anchor@2x": [
+						64,
+						63
+					],
+					"file": "tunnel_exit_north.png",
+					"file@2x": "tunnel_exit_north@2x.png",
+					"size": [
+						66,
+						50
+					],
+					"size@2x": [
+						128,
+						94
+					],
+					"values": {
+						"dir": "North",
+						"end": "Out",
+						"rust": 0.5
+					}
+				},
+				"south": {
+					"anchor": [
+						33,
+						42
+					],
+					"anchor@2x": [
+						64,
+						81
+					],
+					"file": "tunnel_exit_south.png",
+					"file@2x": "tunnel_exit_south@2x.png",
+					"size": [
+						66,
+						59
+					],
+					"size@2x": [
+						128,
+						112
+					],
+					"values": {
+						"dir": "South",
+						"end": "Out",
+						"rust": 0.5
+					}
+				},
+				"west": {
+					"anchor": [
+						33,
+						33
+					],
+					"anchor@2x": [
+						64,
+						63
+					],
+					"file": "tunnel_exit_west.png",
+					"file@2x": "tunnel_exit_west@2x.png",
+					"size": [
+						66,
+						50
+					],
+					"size@2x": [
+						128,
+						94
+					],
+					"values": {
+						"dir": "West",
+						"end": "Out",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_tunnel",
+			"size": 1
+		},
+		"wall": {
+			"frames": {
+				"default": {
+					"anchor": [
+						34,
+						43
+					],
+					"anchor@2x": [
+						66,
+						84
+					],
+					"file": "wall.png",
+					"file@2x": "wall@2x.png",
+					"size": [
+						68,
+						61
+					],
+					"size@2x": [
+						132,
+						118
+					],
+					"values": {
+						"rust": 0.5,
+						"tier": "Basic"
+					}
+				}
+			},
+			"generator": "bb_wall",
+			"size": 1
+		},
+		"workshop": {
+			"frames": {
+				"default": {
+					"anchor": [
+						31,
+						32
+					],
+					"anchor@2x": [
+						59,
+						61
+					],
+					"file": "workshop.png",
+					"file@2x": "workshop@2x.png",
+					"size": [
+						62,
+						49
+					],
+					"size@2x": [
+						118,
+						92
+					],
+					"values": {
+						"crates": 4.0,
+						"lit": true,
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_workshop",
+			"size": 1
+		}
+	},
+	"enemies": {
+		"brute": {
+			"frames": {
+				"e_1": {
+					"anchor": [
+						18,
+						44
+					],
+					"anchor@2x": [
+						33,
+						86
+					],
+					"file": "brute_e_1.png",
+					"file@2x": "brute_e_1@2x.png",
+					"size": [
+						42,
+						52
+					],
+					"size@2x": [
+						78,
+						99
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"e_2": {
+					"anchor": [
+						17,
+						44
+					],
+					"anchor@2x": [
+						32,
+						86
+					],
+					"file": "brute_e_2.png",
+					"file@2x": "brute_e_2@2x.png",
+					"size": [
+						36,
+						52
+					],
+					"size@2x": [
+						67,
+						100
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"n_1": {
+					"anchor": [
+						17,
+						45
+					],
+					"anchor@2x": [
+						32,
+						88
+					],
+					"file": "brute_n_1.png",
+					"file@2x": "brute_n_1@2x.png",
+					"size": [
+						36,
+						51
+					],
+					"size@2x": [
+						67,
+						98
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"n_2": {
+					"anchor": [
+						18,
+						45
+					],
+					"anchor@2x": [
+						33,
+						88
+					],
+					"file": "brute_n_2.png",
+					"file@2x": "brute_n_2@2x.png",
+					"size": [
+						42,
+						52
+					],
+					"size@2x": [
+						78,
+						100
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"ne_1": {
+					"anchor": [
+						15,
+						47
+					],
+					"anchor@2x": [
+						28,
+						91
+					],
+					"file": "brute_ne_1.png",
+					"file@2x": "brute_ne_1@2x.png",
+					"size": [
+						32,
+						55
+					],
+					"size@2x": [
+						59,
+						104
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"ne_2": {
+					"anchor": [
+						15,
+						47
+					],
+					"anchor@2x": [
+						28,
+						91
+					],
+					"file": "brute_ne_2.png",
+					"file@2x": "brute_ne_2@2x.png",
+					"size": [
+						32,
+						55
+					],
+					"size@2x": [
+						59,
+						105
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"nw_1": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						43,
+						82
+					],
+					"file": "brute_nw_1.png",
+					"file@2x": "brute_nw_1@2x.png",
+					"size": [
+						46,
+						47
+					],
+					"size@2x": [
+						86,
+						89
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"nw_2": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						43,
+						82
+					],
+					"file": "brute_nw_2.png",
+					"file@2x": "brute_nw_2@2x.png",
+					"size": [
+						46,
+						47
+					],
+					"size@2x": [
+						86,
+						89
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"s_1": {
+					"anchor": [
+						19,
+						44
+					],
+					"anchor@2x": [
+						35,
+						86
+					],
+					"file": "brute_s_1.png",
+					"file@2x": "brute_s_1@2x.png",
+					"size": [
+						36,
+						52
+					],
+					"size@2x": [
+						67,
+						100
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"s_2": {
+					"anchor": [
+						24,
+						44
+					],
+					"anchor@2x": [
+						45,
+						86
+					],
+					"file": "brute_s_2.png",
+					"file@2x": "brute_s_2@2x.png",
+					"size": [
+						42,
+						52
+					],
+					"size@2x": [
+						78,
+						99
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"se_1": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						43,
+						82
+					],
+					"file": "brute_se_1.png",
+					"file@2x": "brute_se_1@2x.png",
+					"size": [
+						46,
+						48
+					],
+					"size@2x": [
+						86,
+						92
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"se_2": {
+					"anchor": [
+						23,
+						42
+					],
+					"anchor@2x": [
+						43,
+						82
+					],
+					"file": "brute_se_2.png",
+					"file@2x": "brute_se_2@2x.png",
+					"size": [
+						46,
+						48
+					],
+					"size@2x": [
+						86,
+						92
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"sw_1": {
+					"anchor": [
+						17,
+						47
+					],
+					"anchor@2x": [
+						31,
+						91
+					],
+					"file": "brute_sw_1.png",
+					"file@2x": "brute_sw_1@2x.png",
+					"size": [
+						32,
+						55
+					],
+					"size@2x": [
+						59,
+						105
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"sw_2": {
+					"anchor": [
+						17,
+						47
+					],
+					"anchor@2x": [
+						31,
+						91
+					],
+					"file": "brute_sw_2.png",
+					"file@2x": "brute_sw_2@2x.png",
+					"size": [
+						32,
+						55
+					],
+					"size@2x": [
+						59,
+						104
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"w_1": {
+					"anchor": [
+						24,
+						45
+					],
+					"anchor@2x": [
+						45,
+						88
+					],
+					"file": "brute_w_1.png",
+					"file@2x": "brute_w_1@2x.png",
+					"size": [
+						42,
+						52
+					],
+					"size@2x": [
+						78,
+						100
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"w_2": {
+					"anchor": [
+						19,
+						45
+					],
+					"anchor@2x": [
+						35,
+						88
+					],
+					"file": "brute_w_2.png",
+					"file@2x": "brute_w_2@2x.png",
+					"size": [
+						36,
+						51
+					],
+					"size@2x": [
+						67,
+						98
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Brute",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				}
+			},
+			"generator": "bb_enemy"
+		},
+		"grunt": {
+			"frames": {
+				"e_1": {
+					"anchor": [
+						9,
+						32
+					],
+					"anchor@2x": [
+						16,
+						62
+					],
+					"file": "grunt_e_1.png",
+					"file@2x": "grunt_e_1@2x.png",
+					"size": [
+						31,
+						38
+					],
+					"size@2x": [
+						57,
+						71
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"e_2": {
+					"anchor": [
+						10,
+						32
+					],
+					"anchor@2x": [
+						17,
+						62
+					],
+					"file": "grunt_e_2.png",
+					"file@2x": "grunt_e_2@2x.png",
+					"size": [
+						28,
+						37
+					],
+					"size@2x": [
+						50,
+						69
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"n_1": {
+					"anchor": [
+						11,
+						34
+					],
+					"anchor@2x": [
+						19,
+						66
+					],
+					"file": "grunt_n_1.png",
+					"file@2x": "grunt_n_1@2x.png",
+					"size": [
+						23,
+						37
+					],
+					"size@2x": [
+						40,
+						70
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"n_2": {
+					"anchor": [
+						11,
+						34
+					],
+					"anchor@2x": [
+						19,
+						66
+					],
+					"file": "grunt_n_2.png",
+					"file@2x": "grunt_n_2@2x.png",
+					"size": [
+						26,
+						39
+					],
+					"size@2x": [
+						46,
+						74
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"ne_1": {
+					"anchor": [
+						9,
+						33
+					],
+					"anchor@2x": [
+						16,
+						64
+					],
+					"file": "grunt_ne_1.png",
+					"file@2x": "grunt_ne_1@2x.png",
+					"size": [
+						31,
+						38
+					],
+					"size@2x": [
+						57,
+						72
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"ne_2": {
+					"anchor": [
+						9,
+						33
+					],
+					"anchor@2x": [
+						16,
+						64
+					],
+					"file": "grunt_ne_2.png",
+					"file@2x": "grunt_ne_2@2x.png",
+					"size": [
+						25,
+						39
+					],
+					"size@2x": [
+						45,
+						73
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"nw_1": {
+					"anchor": [
+						12,
+						35
+					],
+					"anchor@2x": [
+						22,
+						67
+					],
+					"file": "grunt_nw_1.png",
+					"file@2x": "grunt_nw_1@2x.png",
+					"size": [
+						24,
+						39
+					],
+					"size@2x": [
+						43,
+						73
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"nw_2": {
+					"anchor": [
+						12,
+						35
+					],
+					"anchor@2x": [
+						22,
+						67
+					],
+					"file": "grunt_nw_2.png",
+					"file@2x": "grunt_nw_2@2x.png",
+					"size": [
+						24,
+						39
+					],
+					"size@2x": [
+						43,
+						73
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"s_1": {
+					"anchor": [
+						12,
+						32
+					],
+					"anchor@2x": [
+						21,
+						61
+					],
+					"file": "grunt_s_1.png",
+					"file@2x": "grunt_s_1@2x.png",
+					"size": [
+						23,
+						37
+					],
+					"size@2x": [
+						40,
+						68
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"s_2": {
+					"anchor": [
+						15,
+						32
+					],
+					"anchor@2x": [
+						27,
+						61
+					],
+					"file": "grunt_s_2.png",
+					"file@2x": "grunt_s_2@2x.png",
+					"size": [
+						26,
+						38
+					],
+					"size@2x": [
+						46,
+						70
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"se_1": {
+					"anchor": [
+						12,
+						31
+					],
+					"anchor@2x": [
+						21,
+						60
+					],
+					"file": "grunt_se_1.png",
+					"file@2x": "grunt_se_1@2x.png",
+					"size": [
+						24,
+						36
+					],
+					"size@2x": [
+						43,
+						68
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"se_2": {
+					"anchor": [
+						12,
+						31
+					],
+					"anchor@2x": [
+						21,
+						60
+					],
+					"file": "grunt_se_2.png",
+					"file@2x": "grunt_se_2@2x.png",
+					"size": [
+						24,
+						36
+					],
+					"size@2x": [
+						43,
+						68
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"sw_1": {
+					"anchor": [
+						22,
+						33
+					],
+					"anchor@2x": [
+						41,
+						64
+					],
+					"file": "grunt_sw_1.png",
+					"file@2x": "grunt_sw_1@2x.png",
+					"size": [
+						31,
+						39
+					],
+					"size@2x": [
+						57,
+						73
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"sw_2": {
+					"anchor": [
+						16,
+						33
+					],
+					"anchor@2x": [
+						29,
+						64
+					],
+					"file": "grunt_sw_2.png",
+					"file@2x": "grunt_sw_2@2x.png",
+					"size": [
+						25,
+						38
+					],
+					"size@2x": [
+						45,
+						72
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"w_1": {
+					"anchor": [
+						22,
+						34
+					],
+					"anchor@2x": [
+						41,
+						66
+					],
+					"file": "grunt_w_1.png",
+					"file@2x": "grunt_w_1@2x.png",
+					"size": [
+						31,
+						39
+					],
+					"size@2x": [
+						57,
+						74
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"w_2": {
+					"anchor": [
+						18,
+						34
+					],
+					"anchor@2x": [
+						33,
+						66
+					],
+					"file": "grunt_w_2.png",
+					"file@2x": "grunt_w_2@2x.png",
+					"size": [
+						28,
+						37
+					],
+					"size@2x": [
+						50,
+						70
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Grunt",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				}
+			},
+			"generator": "bb_enemy"
+		},
+		"runner": {
+			"frames": {
+				"e_1": {
+					"anchor": [
+						8,
+						28
+					],
+					"anchor@2x": [
+						13,
+						53
+					],
+					"file": "runner_e_1.png",
+					"file@2x": "runner_e_1@2x.png",
+					"size": [
+						20,
+						33
+					],
+					"size@2x": [
+						34,
+						60
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"e_2": {
+					"anchor": [
+						10,
+						28
+					],
+					"anchor@2x": [
+						18,
+						53
+					],
+					"file": "runner_e_2.png",
+					"file@2x": "runner_e_2@2x.png",
+					"size": [
+						22,
+						31
+					],
+					"size@2x": [
+						39,
+						56
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"n_1": {
+					"anchor": [
+						10,
+						30
+					],
+					"anchor@2x": [
+						18,
+						58
+					],
+					"file": "runner_n_1.png",
+					"file@2x": "runner_n_1@2x.png",
+					"size": [
+						22,
+						34
+					],
+					"size@2x": [
+						39,
+						63
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"n_2": {
+					"anchor": [
+						8,
+						30
+					],
+					"anchor@2x": [
+						13,
+						58
+					],
+					"file": "runner_n_2.png",
+					"file@2x": "runner_n_2@2x.png",
+					"size": [
+						20,
+						35
+					],
+					"size@2x": [
+						34,
+						66
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"ne_1": {
+					"anchor": [
+						10,
+						28
+					],
+					"anchor@2x": [
+						18,
+						53
+					],
+					"file": "runner_ne_1.png",
+					"file@2x": "runner_ne_1@2x.png",
+					"size": [
+						25,
+						32
+					],
+					"size@2x": [
+						45,
+						58
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"ne_2": {
+					"anchor": [
+						10,
+						28
+					],
+					"anchor@2x": [
+						18,
+						53
+					],
+					"file": "runner_ne_2.png",
+					"file@2x": "runner_ne_2@2x.png",
+					"size": [
+						25,
+						32
+					],
+					"size@2x": [
+						45,
+						59
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"nw_1": {
+					"anchor": [
+						8,
+						31
+					],
+					"anchor@2x": [
+						13,
+						60
+					],
+					"file": "runner_nw_1.png",
+					"file@2x": "runner_nw_1@2x.png",
+					"size": [
+						16,
+						36
+					],
+					"size@2x": [
+						26,
+						68
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"nw_2": {
+					"anchor": [
+						8,
+						31
+					],
+					"anchor@2x": [
+						13,
+						60
+					],
+					"file": "runner_nw_2.png",
+					"file@2x": "runner_nw_2@2x.png",
+					"size": [
+						16,
+						36
+					],
+					"size@2x": [
+						26,
+						68
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"s_1": {
+					"anchor": [
+						12,
+						28
+					],
+					"anchor@2x": [
+						21,
+						53
+					],
+					"file": "runner_s_1.png",
+					"file@2x": "runner_s_1@2x.png",
+					"size": [
+						22,
+						31
+					],
+					"size@2x": [
+						39,
+						56
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"s_2": {
+					"anchor": [
+						12,
+						28
+					],
+					"anchor@2x": [
+						21,
+						53
+					],
+					"file": "runner_s_2.png",
+					"file@2x": "runner_s_2@2x.png",
+					"size": [
+						20,
+						33
+					],
+					"size@2x": [
+						34,
+						60
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"se_1": {
+					"anchor": [
+						8,
+						28
+					],
+					"anchor@2x": [
+						13,
+						53
+					],
+					"file": "runner_se_1.png",
+					"file@2x": "runner_se_1@2x.png",
+					"size": [
+						16,
+						32
+					],
+					"size@2x": [
+						26,
+						59
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"se_2": {
+					"anchor": [
+						8,
+						28
+					],
+					"anchor@2x": [
+						13,
+						53
+					],
+					"file": "runner_se_2.png",
+					"file@2x": "runner_se_2@2x.png",
+					"size": [
+						16,
+						32
+					],
+					"size@2x": [
+						26,
+						59
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"sw_1": {
+					"anchor": [
+						15,
+						28
+					],
+					"anchor@2x": [
+						27,
+						53
+					],
+					"file": "runner_sw_1.png",
+					"file@2x": "runner_sw_1@2x.png",
+					"size": [
+						25,
+						32
+					],
+					"size@2x": [
+						45,
+						59
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"sw_2": {
+					"anchor": [
+						15,
+						28
+					],
+					"anchor@2x": [
+						27,
+						53
+					],
+					"file": "runner_sw_2.png",
+					"file@2x": "runner_sw_2@2x.png",
+					"size": [
+						25,
+						32
+					],
+					"size@2x": [
+						45,
+						58
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"w_1": {
+					"anchor": [
+						12,
+						30
+					],
+					"anchor@2x": [
+						21,
+						58
+					],
+					"file": "runner_w_1.png",
+					"file@2x": "runner_w_1@2x.png",
+					"size": [
+						20,
+						35
+					],
+					"size@2x": [
+						34,
+						66
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"w_2": {
+					"anchor": [
+						12,
+						30
+					],
+					"anchor@2x": [
+						21,
+						58
+					],
+					"file": "runner_w_2.png",
+					"file@2x": "runner_w_2@2x.png",
+					"size": [
+						22,
+						34
+					],
+					"size@2x": [
+						39,
+						63
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Runner",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				}
+			},
+			"generator": "bb_enemy"
+		},
+		"sapper": {
+			"frames": {
+				"e_1": {
+					"anchor": [
+						12,
+						29
+					],
+					"anchor@2x": [
+						21,
+						56
+					],
+					"file": "sapper_e_1.png",
+					"file@2x": "sapper_e_1@2x.png",
+					"size": [
+						27,
+						34
+					],
+					"size@2x": [
+						49,
+						64
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"e_2": {
+					"anchor": [
+						12,
+						29
+					],
+					"anchor@2x": [
+						21,
+						56
+					],
+					"file": "sapper_e_2.png",
+					"file@2x": "sapper_e_2@2x.png",
+					"size": [
+						25,
+						33
+					],
+					"size@2x": [
+						45,
+						62
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"n_1": {
+					"anchor": [
+						12,
+						28
+					],
+					"anchor@2x": [
+						21,
+						53
+					],
+					"file": "sapper_n_1.png",
+					"file@2x": "sapper_n_1@2x.png",
+					"size": [
+						24,
+						31
+					],
+					"size@2x": [
+						43,
+						57
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"n_2": {
+					"anchor": [
+						12,
+						28
+					],
+					"anchor@2x": [
+						21,
+						53
+					],
+					"file": "sapper_n_2.png",
+					"file@2x": "sapper_n_2@2x.png",
+					"size": [
+						26,
+						33
+					],
+					"size@2x": [
+						47,
+						60
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"ne_1": {
+					"anchor": [
+						12,
+						28
+					],
+					"anchor@2x": [
+						21,
+						53
+					],
+					"file": "sapper_ne_1.png",
+					"file@2x": "sapper_ne_1@2x.png",
+					"size": [
+						27,
+						33
+					],
+					"size@2x": [
+						48,
+						60
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"ne_2": {
+					"anchor": [
+						12,
+						28
+					],
+					"anchor@2x": [
+						21,
+						53
+					],
+					"file": "sapper_ne_2.png",
+					"file@2x": "sapper_ne_2@2x.png",
+					"size": [
+						25,
+						33
+					],
+					"size@2x": [
+						45,
+						61
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"nw_1": {
+					"anchor": [
+						9,
+						28
+					],
+					"anchor@2x": [
+						16,
+						54
+					],
+					"file": "sapper_nw_1.png",
+					"file@2x": "sapper_nw_1@2x.png",
+					"size": [
+						18,
+						32
+					],
+					"size@2x": [
+						32,
+						60
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"nw_2": {
+					"anchor": [
+						9,
+						28
+					],
+					"anchor@2x": [
+						16,
+						54
+					],
+					"file": "sapper_nw_2.png",
+					"file@2x": "sapper_nw_2@2x.png",
+					"size": [
+						18,
+						32
+					],
+					"size@2x": [
+						32,
+						60
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"s_1": {
+					"anchor": [
+						12,
+						29
+					],
+					"anchor@2x": [
+						22,
+						56
+					],
+					"file": "sapper_s_1.png",
+					"file@2x": "sapper_s_1@2x.png",
+					"size": [
+						24,
+						33
+					],
+					"size@2x": [
+						43,
+						62
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"s_2": {
+					"anchor": [
+						14,
+						29
+					],
+					"anchor@2x": [
+						26,
+						56
+					],
+					"file": "sapper_s_2.png",
+					"file@2x": "sapper_s_2@2x.png",
+					"size": [
+						26,
+						34
+					],
+					"size@2x": [
+						47,
+						64
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"se_1": {
+					"anchor": [
+						9,
+						30
+					],
+					"anchor@2x": [
+						16,
+						58
+					],
+					"file": "sapper_se_1.png",
+					"file@2x": "sapper_se_1@2x.png",
+					"size": [
+						18,
+						35
+					],
+					"size@2x": [
+						32,
+						65
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"se_2": {
+					"anchor": [
+						9,
+						30
+					],
+					"anchor@2x": [
+						16,
+						58
+					],
+					"file": "sapper_se_2.png",
+					"file@2x": "sapper_se_2@2x.png",
+					"size": [
+						18,
+						35
+					],
+					"size@2x": [
+						32,
+						65
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"sw_1": {
+					"anchor": [
+						15,
+						28
+					],
+					"anchor@2x": [
+						27,
+						53
+					],
+					"file": "sapper_sw_1.png",
+					"file@2x": "sapper_sw_1@2x.png",
+					"size": [
+						27,
+						33
+					],
+					"size@2x": [
+						48,
+						61
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"sw_2": {
+					"anchor": [
+						13,
+						28
+					],
+					"anchor@2x": [
+						24,
+						53
+					],
+					"file": "sapper_sw_2.png",
+					"file@2x": "sapper_sw_2@2x.png",
+					"size": [
+						25,
+						33
+					],
+					"size@2x": [
+						45,
+						60
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"w_1": {
+					"anchor": [
+						15,
+						28
+					],
+					"anchor@2x": [
+						28,
+						53
+					],
+					"file": "sapper_w_1.png",
+					"file@2x": "sapper_w_1@2x.png",
+					"size": [
+						27,
+						33
+					],
+					"size@2x": [
+						49,
+						60
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"w_2": {
+					"anchor": [
+						13,
+						28
+					],
+					"anchor@2x": [
+						24,
+						53
+					],
+					"file": "sapper_w_2.png",
+					"file@2x": "sapper_w_2@2x.png",
+					"size": [
+						25,
+						31
+					],
+					"size@2x": [
+						45,
+						57
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Sapper",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				}
+			},
+			"generator": "bb_enemy"
+		},
+		"spitter": {
+			"frames": {
+				"e_1": {
+					"anchor": [
+						14,
+						29
+					],
+					"anchor@2x": [
+						25,
+						55
+					],
+					"file": "spitter_e_1.png",
+					"file@2x": "spitter_e_1@2x.png",
+					"size": [
+						27,
+						34
+					],
+					"size@2x": [
+						48,
+						63
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"e_2": {
+					"anchor": [
+						14,
+						29
+					],
+					"anchor@2x": [
+						25,
+						55
+					],
+					"file": "spitter_e_2.png",
+					"file@2x": "spitter_e_2@2x.png",
+					"size": [
+						26,
+						34
+					],
+					"size@2x": [
+						46,
+						63
+					],
+					"values": {
+						"facing": 90.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"n_1": {
+					"anchor": [
+						14,
+						32
+					],
+					"anchor@2x": [
+						25,
+						61
+					],
+					"file": "spitter_n_1.png",
+					"file@2x": "spitter_n_1@2x.png",
+					"size": [
+						26,
+						36
+					],
+					"size@2x": [
+						46,
+						67
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"n_2": {
+					"anchor": [
+						14,
+						32
+					],
+					"anchor@2x": [
+						25,
+						61
+					],
+					"file": "spitter_n_2.png",
+					"file@2x": "spitter_n_2@2x.png",
+					"size": [
+						27,
+						37
+					],
+					"size@2x": [
+						48,
+						69
+					],
+					"values": {
+						"facing": 180.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"ne_1": {
+					"anchor": [
+						13,
+						30
+					],
+					"anchor@2x": [
+						24,
+						57
+					],
+					"file": "spitter_ne_1.png",
+					"file@2x": "spitter_ne_1@2x.png",
+					"size": [
+						26,
+						35
+					],
+					"size@2x": [
+						48,
+						65
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"ne_2": {
+					"anchor": [
+						13,
+						30
+					],
+					"anchor@2x": [
+						24,
+						57
+					],
+					"file": "spitter_ne_2.png",
+					"file@2x": "spitter_ne_2@2x.png",
+					"size": [
+						26,
+						36
+					],
+					"size@2x": [
+						48,
+						66
+					],
+					"values": {
+						"facing": 135.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"nw_1": {
+					"anchor": [
+						12,
+						33
+					],
+					"anchor@2x": [
+						21,
+						63
+					],
+					"file": "spitter_nw_1.png",
+					"file@2x": "spitter_nw_1@2x.png",
+					"size": [
+						24,
+						37
+					],
+					"size@2x": [
+						42,
+						68
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"nw_2": {
+					"anchor": [
+						12,
+						33
+					],
+					"anchor@2x": [
+						21,
+						63
+					],
+					"file": "spitter_nw_2.png",
+					"file@2x": "spitter_nw_2@2x.png",
+					"size": [
+						24,
+						37
+					],
+					"size@2x": [
+						42,
+						68
+					],
+					"values": {
+						"facing": -135.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"s_1": {
+					"anchor": [
+						12,
+						29
+					],
+					"anchor@2x": [
+						21,
+						55
+					],
+					"file": "spitter_s_1.png",
+					"file@2x": "spitter_s_1@2x.png",
+					"size": [
+						26,
+						34
+					],
+					"size@2x": [
+						46,
+						63
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"s_2": {
+					"anchor": [
+						13,
+						29
+					],
+					"anchor@2x": [
+						23,
+						55
+					],
+					"file": "spitter_s_2.png",
+					"file@2x": "spitter_s_2@2x.png",
+					"size": [
+						27,
+						34
+					],
+					"size@2x": [
+						48,
+						63
+					],
+					"values": {
+						"facing": 0.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"se_1": {
+					"anchor": [
+						12,
+						30
+					],
+					"anchor@2x": [
+						21,
+						57
+					],
+					"file": "spitter_se_1.png",
+					"file@2x": "spitter_se_1@2x.png",
+					"size": [
+						24,
+						35
+					],
+					"size@2x": [
+						42,
+						64
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"se_2": {
+					"anchor": [
+						12,
+						30
+					],
+					"anchor@2x": [
+						21,
+						57
+					],
+					"file": "spitter_se_2.png",
+					"file@2x": "spitter_se_2@2x.png",
+					"size": [
+						24,
+						35
+					],
+					"size@2x": [
+						42,
+						64
+					],
+					"values": {
+						"facing": 45.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"sw_1": {
+					"anchor": [
+						13,
+						30
+					],
+					"anchor@2x": [
+						24,
+						57
+					],
+					"file": "spitter_sw_1.png",
+					"file@2x": "spitter_sw_1@2x.png",
+					"size": [
+						26,
+						36
+					],
+					"size@2x": [
+						48,
+						66
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"sw_2": {
+					"anchor": [
+						13,
+						30
+					],
+					"anchor@2x": [
+						24,
+						57
+					],
+					"file": "spitter_sw_2.png",
+					"file@2x": "spitter_sw_2@2x.png",
+					"size": [
+						26,
+						35
+					],
+					"size@2x": [
+						48,
+						65
+					],
+					"values": {
+						"facing": -45.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				},
+				"w_1": {
+					"anchor": [
+						13,
+						32
+					],
+					"anchor@2x": [
+						23,
+						61
+					],
+					"file": "spitter_w_1.png",
+					"file@2x": "spitter_w_1@2x.png",
+					"size": [
+						27,
+						37
+					],
+					"size@2x": [
+						48,
+						69
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": 0.6
+					}
+				},
+				"w_2": {
+					"anchor": [
+						12,
+						32
+					],
+					"anchor@2x": [
+						21,
+						61
+					],
+					"file": "spitter_w_2.png",
+					"file@2x": "spitter_w_2@2x.png",
+					"size": [
+						26,
+						36
+					],
+					"size@2x": [
+						46,
+						67
+					],
+					"values": {
+						"facing": -90.0,
+						"kind": "Spitter",
+						"rust": 0.5,
+						"stride": -0.6
+					}
+				}
+			},
+			"generator": "bb_enemy"
+		}
+	},
+	"game": "Belt & Barricade",
+	"items": {
+		"ammo_magazine": {
+			"frames": {
+				"default": {
+					"anchor": [
+						7,
+						6
+					],
+					"anchor@2x": [
+						11,
+						9
+					],
+					"anchor@4x": [
+						19,
+						16
+					],
+					"file": "ammo_magazine.png",
+					"file@2x": "ammo_magazine@2x.png",
+					"file@4x": "ammo_magazine@4x.png",
+					"size": [
+						14,
+						10
+					],
+					"size@2x": [
+						22,
+						14
+					],
+					"size@4x": [
+						38,
+						24
+					],
+					"values": {
+						"item": "Ammo magazine",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"coal": {
+			"frames": {
+				"default": {
+					"anchor": [
+						7,
+						6
+					],
+					"anchor@2x": [
+						11,
+						9
+					],
+					"anchor@4x": [
+						19,
+						15
+					],
+					"file": "coal.png",
+					"file@2x": "coal@2x.png",
+					"file@4x": "coal@4x.png",
+					"size": [
+						13,
+						10
+					],
+					"size@2x": [
+						20,
+						15
+					],
+					"size@4x": [
+						35,
+						24
+					],
+					"values": {
+						"item": "Coal",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"copper_ore": {
+			"frames": {
+				"default": {
+					"anchor": [
+						6,
+						6
+					],
+					"anchor@2x": [
+						9,
+						10
+					],
+					"anchor@4x": [
+						16,
+						18
+					],
+					"file": "copper_ore.png",
+					"file@2x": "copper_ore@2x.png",
+					"file@4x": "copper_ore@4x.png",
+					"size": [
+						13,
+						11
+					],
+					"size@2x": [
+						20,
+						17
+					],
+					"size@4x": [
+						35,
+						29
+					],
+					"values": {
+						"item": "Copper ore",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"copper_plate": {
+			"frames": {
+				"default": {
+					"anchor": [
+						8,
+						7
+					],
+					"anchor@2x": [
+						13,
+						11
+					],
+					"anchor@4x": [
+						24,
+						19
+					],
+					"file": "copper_plate.png",
+					"file@2x": "copper_plate@2x.png",
+					"file@4x": "copper_plate@4x.png",
+					"size": [
+						15,
+						12
+					],
+					"size@2x": [
+						25,
+						18
+					],
+					"size@4x": [
+						45,
+						31
+					],
+					"values": {
+						"item": "Copper plate",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"gold_bar": {
+			"frames": {
+				"default": {
+					"anchor": [
+						7,
+						6
+					],
+					"anchor@2x": [
+						11,
+						10
+					],
+					"anchor@4x": [
+						19,
+						18
+					],
+					"file": "gold_bar.png",
+					"file@2x": "gold_bar@2x.png",
+					"file@4x": "gold_bar@4x.png",
+					"size": [
+						14,
+						11
+					],
+					"size@2x": [
+						22,
+						17
+					],
+					"size@4x": [
+						38,
+						29
+					],
+					"values": {
+						"item": "Gold bar",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"gold_ore": {
+			"frames": {
+				"default": {
+					"anchor": [
+						6,
+						6
+					],
+					"anchor@2x": [
+						9,
+						10
+					],
+					"anchor@4x": [
+						16,
+						18
+					],
+					"file": "gold_ore.png",
+					"file@2x": "gold_ore@2x.png",
+					"file@4x": "gold_ore@4x.png",
+					"size": [
+						13,
+						11
+					],
+					"size@2x": [
+						20,
+						17
+					],
+					"size@4x": [
+						35,
+						29
+					],
+					"values": {
+						"item": "Gold ore",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"heavy_shell": {
+			"frames": {
+				"default": {
+					"anchor": [
+						5,
+						12
+					],
+					"anchor@2x": [
+						7,
+						21
+					],
+					"anchor@4x": [
+						12,
+						40
+					],
+					"file": "heavy_shell.png",
+					"file@2x": "heavy_shell@2x.png",
+					"file@4x": "heavy_shell@4x.png",
+					"size": [
+						10,
+						16
+					],
+					"size@2x": [
+						14,
+						26
+					],
+					"size@4x": [
+						24,
+						47
+					],
+					"values": {
+						"item": "Heavy shell",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"iron_ore": {
+			"frames": {
+				"default": {
+					"anchor": [
+						6,
+						6
+					],
+					"anchor@2x": [
+						9,
+						10
+					],
+					"anchor@4x": [
+						16,
+						18
+					],
+					"file": "iron_ore.png",
+					"file@2x": "iron_ore@2x.png",
+					"file@4x": "iron_ore@4x.png",
+					"size": [
+						13,
+						11
+					],
+					"size@2x": [
+						20,
+						17
+					],
+					"size@4x": [
+						35,
+						29
+					],
+					"values": {
+						"item": "Iron ore",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"iron_plate": {
+			"frames": {
+				"default": {
+					"anchor": [
+						8,
+						7
+					],
+					"anchor@2x": [
+						13,
+						11
+					],
+					"anchor@4x": [
+						24,
+						19
+					],
+					"file": "iron_plate.png",
+					"file@2x": "iron_plate@2x.png",
+					"file@4x": "iron_plate@4x.png",
+					"size": [
+						15,
+						12
+					],
+					"size@2x": [
+						25,
+						18
+					],
+					"size@4x": [
+						45,
+						31
+					],
+					"values": {
+						"item": "Iron plate",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"rocket": {
+			"frames": {
+				"default": {
+					"anchor": [
+						7,
+						8
+					],
+					"anchor@2x": [
+						11,
+						13
+					],
+					"anchor@4x": [
+						19,
+						23
+					],
+					"file": "rocket.png",
+					"file@2x": "rocket@2x.png",
+					"file@4x": "rocket@4x.png",
+					"size": [
+						14,
+						12
+					],
+					"size@2x": [
+						22,
+						18
+					],
+					"size@4x": [
+						39,
+						30
+					],
+					"values": {
+						"item": "Rocket",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"silver_bar": {
+			"frames": {
+				"default": {
+					"anchor": [
+						7,
+						6
+					],
+					"anchor@2x": [
+						11,
+						10
+					],
+					"anchor@4x": [
+						19,
+						18
+					],
+					"file": "silver_bar.png",
+					"file@2x": "silver_bar@2x.png",
+					"file@4x": "silver_bar@4x.png",
+					"size": [
+						14,
+						11
+					],
+					"size@2x": [
+						22,
+						17
+					],
+					"size@4x": [
+						38,
+						29
+					],
+					"values": {
+						"item": "Silver bar",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		},
+		"silver_ore": {
+			"frames": {
+				"default": {
+					"anchor": [
+						6,
+						6
+					],
+					"anchor@2x": [
+						9,
+						10
+					],
+					"anchor@4x": [
+						16,
+						18
+					],
+					"file": "silver_ore.png",
+					"file@2x": "silver_ore@2x.png",
+					"file@4x": "silver_ore@4x.png",
+					"size": [
+						13,
+						11
+					],
+					"size@2x": [
+						20,
+						17
+					],
+					"size@4x": [
+						35,
+						29
+					],
+					"values": {
+						"item": "Silver ore",
+						"rust": 0.5
+					}
+				}
+			},
+			"generator": "bb_item"
+		}
+	},
+	"metres_per_tile": 2.0,
+	"rise_px_per_tile": 39.19,
+	"seed": 1,
+	"tile_px": [
+		64,
+		32
+	]
+}

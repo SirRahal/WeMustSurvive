@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace BeltAndBarricade.Sim;
 
 /// <summary>
@@ -68,9 +70,17 @@ public sealed class Belt : Building, IItemSource
     private bool TryHandOff(World w, string item, int entryPos) => w.BuildingAt(Front) switch
     {
         Belt next when next.Dir != Dir.Opposite() => next.TryInsertAt(item, entryPos, w.Tick),
+        IBeltInput target when target is Nexus or Depot => Stored(w, (Building)target, item, target.TryInsert(item)),
         IBeltInput target => target.TryInsert(item),
         _ => false,
     };
+
+    /// <summary>Reports a delivery into storage (view-only event) and passes the insert result through.</summary>
+    private bool Stored(World w, Building storage, string item, bool ok)
+    {
+        if (ok) w.Events.Add(new ItemStoredEvent(Center + new Vector2(Dir.Offset().X, Dir.Offset().Y) * 0.5f, storage.Origin, item));
+        return ok;
+    }
 
     public bool TryTake(Func<string, bool> want, out string item)
     {

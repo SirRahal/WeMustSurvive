@@ -187,7 +187,6 @@ public static class SettingsPanel
 
         AddToggle(into, "Screen-edge scrolling", settings.EdgePan, on => { settings.EdgePan = on; changed(); });
         AddToggle(into, "Fullscreen", settings.Fullscreen, on => { settings.Fullscreen = on; changed(); });
-        AddToggle(into, "Show help panel", settings.ShowHelp, on => { settings.ShowHelp = on; changed(); });
         AddToggle(into, "Show minimap", settings.ShowMinimap, on => { settings.ShowMinimap = on; changed(); });
         speed.GrabFocus();
     }

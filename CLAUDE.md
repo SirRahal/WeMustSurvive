@@ -51,7 +51,14 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40
   clock time, no iteration over unordered collections where order affects state, no Godot types. Game state changes
   only through `Commands` so both co-op peers apply them on the same tick.
 - Gameplay numbers belong in `game/data/*.json`, not hard-coded in C#.
-- UI is built in code from Godot controls using `UI/UiKit.cs` styles; don't add `.tscn` scenes for menus.
+- UI is built in code from Godot controls using `UI/UiKit.cs` styles; don't add `.tscn` scenes for menus. The in-game
+  HUD (`UI/Hud.cs`) is drawn directly in 1920x1080 design units (scaled to 80%) with `UI/HudTheme.cs` colours and
+  fonts and `UI/Icons.cs` icons.
+- Keys and mouse buttons are InputMap actions registered in `Input/Bindings.cs`; check actions, not raw keys, so the
+  Controls panel stays in sync.
+- Building art comes from Prop Studio (`C:\Coding\Prop Studio`, provider `bb_*`), never made here: export there, then
+  `tools\sync-art.bat` copies the sprites into `game/art/buildings`. `View/BuildingSprites.cs` draws them (frames picked
+  for the view angle); anything without a sprite falls back to the coded boxes in `WorldView`.
 - New sim behaviour gets a test in `sim.tests/`. GIT PUSH runs `dotnet test sim.tests` before it touches `main`.
 - Match the existing style: file-scoped namespaces, nullable enabled, `/// <summary>` on public types.
 

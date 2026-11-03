@@ -13,7 +13,7 @@ the document left things open. All balance numbers live in `game/data/*.json`.
 | 5 | "Build if materials exist anywhere in the shared network" | ✅ | The **storage network** = Nexus + every Storage Depot; costs are paid from the Nexus first, then depots. Depots make remote outposts possible without long belts. |
 | 6 | Power grid | ✅ | Poles link within wire reach; buildings within supply radius join the grid. Satisfaction = supply/demand; consumers slow down proportionally, and below 25% they **brown out** entirely. Coal generators burn fuel in proportion to load; the Nexus supplies 200 kW. |
 | 7 | Shared research | ✅ | 16 techs over 4 tiers; costs mix current and previous tiers; prerequisites; labs (more labs = faster). Research is shared and synced in co-op. |
-| 8 | Waves | ✅ | Strict timer, prep window you can end early (Space), next-wave preview. |
+| 8 | Waves | ✅ | Strict timer, prep window you can end early (call-wave button), next-wave preview. |
 | 8 | Enemy roster | ✅ | Grunt, Runner, Brute (tank), Spitter (stops to spit acid at structures), Sapper (hunts belts/poles/generators/drills, explodes). Grunts and Brutes chew through belts and poles they walk over ("when convenient"). |
 | 8 | Loss / Nexus | ✅ | Nexus = main storage + starting power + weak built-in gun. Loss when it dies. Surrender also counts as a loss. |
 | 9 | Map 1 "The Funnel" | ✅ | V-shaped valley, single choke, coal/iron near the Nexus, copper halfway up the arms, silver claim zone behind the choke. 10 waves: 1–4 iron tier, 5–6 introduce Spitters/Brutes/Sappers (copper/power/lasers expected), 7–10 heavy silver-tier pressure. A test confirms a fortified choke can hold all 10 waves. |
