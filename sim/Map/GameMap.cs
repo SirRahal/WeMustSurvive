@@ -14,6 +14,7 @@ public sealed class GameMap
     private readonly Terrain[] _terrain;
     private readonly string?[] _ore;
     private readonly int[] _oreAmount;
+    private readonly int[] _oreStart;
     private readonly bool[] _claim;
 
     public int Width { get; }
@@ -27,6 +28,7 @@ public sealed class GameMap
         _terrain = new Terrain[width * height];
         _ore = new string?[width * height];
         _oreAmount = new int[width * height];
+        _oreStart = new int[width * height];
         _claim = new bool[width * height];
     }
 
@@ -41,6 +43,8 @@ public sealed class GameMap
 
     public string? OreAt(Int2 t) => InBounds(t) && _oreAmount[Index(t)] > 0 ? _ore[Index(t)] : null;
     public int OreAmount(Int2 t) => InBounds(t) ? _oreAmount[Index(t)] : 0;
+    /// <summary>How much ore the tile started the game with (0 if it never had any).</summary>
+    public int OreStartAmount(Int2 t) => InBounds(t) ? _oreStart[Index(t)] : 0;
     public bool IsClaimZone(Int2 t) => InBounds(t) && _claim[Index(t)];
 
     public void SetOre(Int2 t, string item, int amount, bool claimZone)
@@ -48,14 +52,17 @@ public sealed class GameMap
         int i = Index(t);
         _ore[i] = item;
         _oreAmount[i] = amount;
+        _oreStart[i] = amount;
         _claim[i] = claimZone;
     }
 
-    /// <summary>Removes one unit of ore; returns the item mined or null if empty.</summary>
+    /// <summary>Removes one unit of ore; returns the item mined or null if empty. The last unit clears the tile's ore.</summary>
     public string? Mine(Int2 t)
     {
         string? ore = OreAt(t);
-        if (ore != null) _oreAmount[Index(t)]--;
+        if (ore == null) return null;
+        int i = Index(t);
+        if (--_oreAmount[i] == 0) _ore[i] = null;
         return ore;
     }
 

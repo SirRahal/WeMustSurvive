@@ -15,6 +15,15 @@ public sealed class Drill : Building, IItemAcceptor
     private int _outputCount;
 
     public string? Ore { get; private set; }
+    /// <summary>The ore this drill has been mining; kept after the tile runs dry (for the empty icon).</summary>
+    public string? LastOre { get; private set; }
+    /// <summary>Ore left under the drill, and how much the tile started with (refreshed every tick).</summary>
+    public int OreLeft { get; private set; }
+    public int OreStart { get; private set; }
+    /// <summary>0..1 share of the tile's ore still in the ground.</summary>
+    public float OreFraction => OreStart <= 0 ? 0 : (float)OreLeft / OreStart;
+    /// <summary>The tile had ore and it is all mined out.</summary>
+    public bool Depleted => OreStart > 0 && OreLeft == 0;
     /// <summary>Ore mined per minute (UI only).</summary>
     public RateMeter Mined { get; } = new();
     public bool NeedsFuel => Def.UsesFuel && Ore != "coal";
@@ -25,6 +34,8 @@ public sealed class Drill : Building, IItemAcceptor
 
     public override void Tick(World w)
     {
+        OreLeft = w.Map.OreAmount(Origin);
+        OreStart = w.Map.OreStartAmount(Origin);
         if (_outputCount > 0)
         {
             if (!PushInto(w, Front, _output!))
@@ -40,6 +51,7 @@ public sealed class Drill : Building, IItemAcceptor
         Mined.Start(w.Tick);
         Ore = w.Map.OreAt(Origin);
         if (Ore == null) return;
+        LastOre = Ore;
         float speed = PowerFactor * w.Mods.Mult(Stat.MiningSpeed);
         if (speed <= 0) return;
         bool claim = w.Map.IsClaimZone(Origin);
@@ -52,6 +64,10 @@ public sealed class Drill : Building, IItemAcceptor
 
         _output = w.Map.Mine(Origin);
         if (_output == null) return;
+        OreLeft = w.Map.OreAmount(Origin);
+        if (OreLeft == 0)
+            for (int p = 0; p < w.Engineers.Count; p++)
+                w.Message(p, $"A {Def.Name} ran out of {w.Data.Items[_output].Name.ToLowerInvariant()}");
         _outputCount = claim ? (int)MathF.Round(ClaimZoneYield * w.Mods.Mult(Stat.ClaimYield)) : 1;
         Mined.Add(_output, w.Tick, _outputCount);
         if (PushInto(w, Front, _output) && --_outputCount == 0) _output = null;
@@ -131,8 +147,9 @@ public sealed class Drill : Building, IItemAcceptor
     {
         get
         {
-            if (Ore == null) return "No ore";
             if (_outputCount > 0) return _blockedReason == null ? "Output blocked" : $"Waiting: {_blockedReason}";
+            if (Depleted) return "Depleted: the ore here is used up (deconstruct it for a full refund)";
+            if (Ore == null) return "No ore";
             if (NeedsPower && PowerFactor <= 0) return "No power";
             if (NeedsFuel && _fuel.Starved) return FuelTank.StarvedText;
             return $"Mining {Ore}";
