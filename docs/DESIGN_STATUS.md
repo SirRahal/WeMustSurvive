@@ -32,6 +32,9 @@ the document left things open. All balance numbers live in `game/data/*.json`.
 - **Sandbox** mode (all research, plenty of resources, waves on demand) for testing.
 - Main menu with map select, settings (game speed, edge scrolling, fullscreen, help, minimap), controls reference.
 - Minimap, research panel, storage network panel, super weapon strip, building tooltips.
+- **Ore depletion feedback:** every drill shows a bar of the ore left under it (blinks red under 15%). When the tile
+  runs dry the ore is removed from the map, the drill shows an "empty" icon, its status says Depleted, and both
+  players get a message.
 
 ## Not done yet
 

@@ -789,6 +789,10 @@ public partial class Hud : Control
             case Drill d:
                 yield return $"Mining {RateText(d.Mined.PerMinute(d.Ore ?? "", w.Tick))}/min (max {RateText(d.MaxPerMinute(w))}/min)"
                              + (d.NeedsFuel ? $"   Fuel: {d.Coal} coal" : "");
+                if (d.OreStart > 0)
+                    yield return d.Depleted
+                        ? "Ore left: none (tile is empty)"
+                        : $"Ore left: {d.OreLeft} / {d.OreStart} ({d.OreFraction:P0})";
                 break;
             case Generator g:
                 yield return $"Fuel: {g.Coal} coal";
