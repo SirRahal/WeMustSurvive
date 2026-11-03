@@ -81,8 +81,11 @@ public partial class App : Node
 
     public void ApplyDisplaySettings()
     {
-        var mode = Settings.Fullscreen ? DisplayServer.WindowMode.Fullscreen : DisplayServer.WindowMode.Windowed;
-        if (DisplayServer.WindowGetMode() != mode) DisplayServer.WindowSetMode(mode);
+        var current = DisplayServer.WindowGetMode();
+        bool isFullscreen = current is DisplayServer.WindowMode.Fullscreen or DisplayServer.WindowMode.ExclusiveFullscreen;
+        // Only switch when fullscreen actually changes, so a maximized window stays maximized.
+        if (Settings.Fullscreen && !isFullscreen) DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
+        else if (!Settings.Fullscreen && isFullscreen) DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
     }
 
     /// <summary>Modifiers from the local player's skill tree.</summary>
