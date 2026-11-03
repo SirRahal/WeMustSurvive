@@ -112,6 +112,7 @@ public partial class GameSession : Node2D
         _camera.SetMapSize(_world.Map.Width, _world.Map.Height);
         _camera.CenterOn(Iso.ToScreen(_world.Engineers[LocalPlayer].Pos));
         if (_app.HudPanels != "") _hud.OpenPanels(_app.HudPanels);
+        if (_app.StartZoom > 0) _camera.FlyTo(Iso.ToScreen(_world.Engineers[LocalPlayer].Pos), _app.StartZoom);
     }
 
     private LockstepPeer CreatePeer()
@@ -220,6 +221,16 @@ public partial class GameSession : Node2D
         w.PlaceDirect("nuclear_silo", new Int2(n.X + 8, n.Y + 1));
         foreach (var e in new[] { "grunt", "runner", "brute", "spitter", "sapper" })
             for (int i = 0; i < 2; i++) w.SpawnEnemy(w.Data.Enemies[e], new System.Numerics.Vector2(n.X + 1.5f + i * 2, n.Y - 24f - i));
+
+        // Wall shapes (joined pieces): an L, a T and a ring, west of the turrets; skipped where the ground won't take them.
+        void Wall(int dx, int dy, string id = "wall")
+        {
+            var t = new Int2(n.X + dx, n.Y + dy);
+            if (w.Map.IsBuildable(t) && w.BuildingAt(t) == null) w.PlaceDirect(id, t);
+        }
+        for (int i = 0; i < 3; i++) { Wall(-12, -14 + i); Wall(-11 + i, -12); }                   // L
+        for (int i = 0; i < 3; i++) Wall(-12 + i, -17, "reinforced_wall"); Wall(-11, -16, "reinforced_wall"); // T
+        for (int x = 0; x < 3; x++) for (int y = 0; y < 3; y++) if (x != 1 || y != 1) Wall(-17 + x, -15 + y, "heavy_wall"); // ring
     }
 
     /// <summary>One-line state summary for automated smoke tests.</summary>
