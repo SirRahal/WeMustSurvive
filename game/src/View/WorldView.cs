@@ -389,6 +389,7 @@ public partial class WorldView : Node2D
                 DrawArrow(b.Origin, b.Dir, Colors.White with { A = 0.7f }, height);
                 if (d.Status.StartsWith("Mining"))
                     DrawLine(top + new Vector2(-6, -3), top + new Vector2(6, 3).Rotated(t * 8), Colors.White with { A = 0.6f }, 2);
+                DrawOreGauge(d, top);
                 break;
             case Crafter { Active: not null } c when !sprite:
                 DrawColoredPolygon(Iso.Diamond(b.Origin.X, b.Origin.Y, 1, height, 0.32f), c.Def.Id == "workshop" ? new Color(0.9f, 0.85f, 0.3f) : new Color(1f, 0.55f, 0.15f));
@@ -771,6 +772,30 @@ public partial class WorldView : Node2D
         }
         if (_input!.Stroke.Count >= 2)
             DrawPolyline(_input.Stroke.Select(p => Iso.ToScreen(p)).ToArray(), PlayerColor(GameSession.LocalPlayer), 3f, true);
+    }
+
+    /// <summary>
+    /// Ore left under a drill: a bar in the ore's colour (blinking red when nearly dry), or an "empty" icon (an
+    /// ore-coloured ring with a red slash) once the tile is mined out.
+    /// </summary>
+    private void DrawOreGauge(Drill d, Vector2 top)
+    {
+        if (d.LastOre is not { } ore || d.OreStart <= 0) return;
+        var oreColor = Iso.ParseColor(_world!.Data.Items[ore].Color);
+        if (oreColor.Luminance < 0.35f) oreColor = oreColor.Lightened(0.45f); // coal would vanish on the dark bar
+
+        if (d.Depleted)
+        {
+            var c = top + new Vector2(0, -14);
+            DrawCircle(c, 8, HpBack);
+            DrawArc(c, 6.5f, 0, Mathf.Tau, 20, oreColor with { A = 0.8f }, 2, true);
+            DrawLine(c + new Vector2(-5, 5), c + new Vector2(5, -5), HpBad, 2.5f, true);
+            return;
+        }
+
+        bool low = d.OreFraction < 0.15f;
+        bool blinkOff = low && (int)(Time.GetTicksMsec() / 400) % 2 == 0;
+        DrawProgressBar(top + new Vector2(0, -5), 26, d.OreFraction, blinkOff ? HpBad : oreColor);
     }
 
     private void DrawHpBar(Vector2 center, float width, float frac) =>

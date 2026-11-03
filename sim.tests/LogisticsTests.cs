@@ -60,6 +60,37 @@ public class LogisticsTests
     }
 
     [Fact]
+    public void Drill_reports_ore_left_and_empties_the_tile_when_mined_out()
+    {
+        var w = TestWorld.Create();
+        w.Map.SetOre(TestWorld.CoalTile, "coal", 3, claimZone: false);
+        var drill = (Drill)w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(1, 0));
+
+        w.Run(150); // mineTicks = 120 -> 1 coal mined
+        Assert.Equal(2, drill.OreLeft);
+        Assert.Equal(3, drill.OreStart);
+        Assert.False(drill.Depleted);
+
+        bool announced = false;
+        for (int i = 0; i < 450; i++)
+        {
+            w.Step();
+            announced |= w.Events.OfType<MessageEvent>().Any(m => m.PlayerId == 0 && m.Text.Contains("ran out of coal"));
+        }
+
+        Assert.Equal(3, furnace.Coal);
+        Assert.Null(w.Map.OreAt(TestWorld.CoalTile));
+        Assert.Equal(0, w.Map.OreAmount(TestWorld.CoalTile));
+        Assert.Equal(3, w.Map.OreStartAmount(TestWorld.CoalTile));
+        Assert.True(drill.Depleted);
+        Assert.Equal(0f, drill.OreFraction);
+        Assert.Equal("coal", drill.LastOre);
+        Assert.StartsWith("Depleted", drill.Status);
+        Assert.True(announced);
+    }
+
+    [Fact]
     public void Iron_drill_draws_coal_from_storage_automatically()
     {
         var w = TestWorld.Create();
