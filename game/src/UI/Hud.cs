@@ -68,6 +68,8 @@ public partial class Hud : Control
     private Rect2 _speedGroup, _minimapPanel, _minimapRect, _buildPanel, _commandsPanel, _controlsRect;
     private Rect2 _tutorialRect, _researchRect, _pickerRect, _engineerRect, _slotHeader;
     private float _dockDivider = -1;
+    /// <summary>Where the build slots go, or a selected building's info and actions.</summary>
+    private Rect2 _slotArea;
     private List<List<BuildingDef>> _slotFamilies = new();
     private float _waveDivider, _resDivider;
     private readonly List<(ResourceStatus Status, float X)> _resItems = new();
@@ -233,6 +235,9 @@ public partial class Hud : Control
         _controlsOpen = names.Contains("controls");
         if (names.Contains("research") && _input != null) _input.ResearchOpen = true;
         if (names.Contains("hero")) _engineerSelected = true;
+        // select:ID selects the first building of that kind.
+        if (names.FirstOrDefault(n => n.StartsWith("select:")) is { } select && _world!.Buildings.FirstOrDefault(b => b.Def.Id == select[7..]) is { } chosen)
+            _input!.Select(chosen);
         // picker:FAMILY holds the tier picker open over that family's slot.
         if (names.FirstOrDefault(n => n.StartsWith("picker:")) is { } picker) _pickerForce = picker[7..];
         // turn:N turns the view N quarter turns.
@@ -855,8 +860,7 @@ public partial class Hud : Control
         _dividers.Add(_engineerRect.End.X + ToolbarGap / 2);
         _dividers.Add(_commandsPanel.Position.X - ToolbarGap / 2);
 
-        if (_input.SelectedBuilding is { } sel) LayoutSelection(sel);
-        else LayoutBuildPanel();
+        LayoutBuildPanel();
         LayoutCommands();
     }
 
@@ -910,16 +914,28 @@ public partial class Hud : Control
             var families = w.Data.FamiliesIn(id);
             int unlocked = families.Count(f => f.Any(w.Research.IsUnlocked));
             var rect = new Rect2(p.Position.X + i % 3 * (cell + DockGap), slotTop + i / 3 * (cell + DockGap), cell, cell);
-            _toolButtons.Add(new Button(rect, label, "category", true, input.CardCategory == id, () => input.OpenCategory(id), $"cat:{id}",
+            // The dock stays up while a building is selected: picking a category drops the selection.
+            _toolButtons.Add(new Button(rect, label, "category", true, input.CardCategory == id, () =>
+            {
+                input.Deselect();
+                input.OpenCategory(id);
+            }, $"cat:{id}",
                 new Tip(label, new[] { CategoryTooltip(id), $"{unlocked} of {families.Count} unlocked" }, TipAnchor.Above)));
         }
         float dockW = 3 * cell + 2 * DockGap;
         _dockDivider = p.Position.X + dockW + ToolbarGap / 2;
 
-        // One slot per family: the tier in use shows; its ^ toggle opens the tier picker.
+        // One slot per family: the tier in use shows; its ^ toggle opens the tier picker. A selected building's info
+        // and actions take this area instead (the dock stays).
         float sx = p.Position.X + dockW + ToolbarGap;
         _slotFamilies = w.Data.FamiliesIn(_shownCategory);
         float slotH = p.End.Y - slotTop;
+        _slotArea = new Rect2(sx, slotTop, p.End.X - sx, slotH);
+        if (input.SelectedBuilding is { } sel)
+        {
+            LayoutSelection(sel);
+            return;
+        }
         float slotW = (p.End.X - sx - 7 * Gap) / 8;
         string shown = _shownCategory;
         for (int i = 0; i < 8; i++)
@@ -1103,13 +1119,17 @@ public partial class Hud : Control
         C.DrawRect(seg, HudTheme.Accent);
 
         foreach (float x in _dividers) FadeDivider(x, t.Position.Y + ToolbarPadTop, t.End.Y - ToolbarPadBottom);
-        if (_input!.SelectedBuilding == null && _dockDivider > 0) FadeDivider(_dockDivider, _slotHeader.End.Y + 4, t.End.Y - ToolbarPadBottom);
+        if (_dockDivider > 0) FadeDivider(_dockDivider, _slotHeader.End.Y + 4, t.End.Y - ToolbarPadBottom);
 
-        if (_input!.SelectedBuilding is { } sel) DrawSelectionInfo(sel);
+        var h = _slotHeader;
+        HudTheme.SectionLabel(C, new Vector2(h.Position.X, h.Position.Y + 13), PlayerInput.Categories.First(c => c.Id == _shownCategory).Label);
+        if (_input!.SelectedBuilding is { } sel)
+        {
+            HudTheme.SectionLabel(C, new Vector2(_slotArea.Position.X, h.Position.Y + 13), "Selected");
+            DrawSelectionInfo(sel);
+        }
         else
         {
-            var h = _slotHeader;
-            HudTheme.SectionLabel(C, new Vector2(h.Position.X, h.Position.Y + 13), PlayerInput.Categories.First(c => c.Id == _shownCategory).Label);
             int unlocked = _slotFamilies.Count(f => f.Any(_world!.Research.IsUnlocked));
             C.DrawString(HudTheme.Body, new Vector2(h.Position.X, h.Position.Y + 13), $"{unlocked} of {_slotFamilies.Count} unlocked",
                 HorizontalAlignment.Right, h.Size.X, 12, HudTheme.TextMuted);
@@ -1323,21 +1343,21 @@ public partial class Hud : Control
 
     // ================================================================== selection (replaces the categories and slots)
 
-    private Rect2 SelectionInfoRect => new(_buildPanel.Position + new Vector2(4, 4), new Vector2(Math.Min(420, _buildPanel.Size.X * 0.42f), _buildPanel.Size.Y - 8));
+    private Rect2 SelectionInfoRect => new(_slotArea.Position, new Vector2(Math.Min(380, _slotArea.Size.X * 0.36f), _slotArea.Size.Y));
 
+    /// <summary>Selected building: its info on the left of the slot area, its actions as two rows of buttons beside it.</summary>
     private void LayoutSelection(Building sel)
     {
         var actions = BuildingCommands(sel).Where(a => a != null).Select(a => a!).ToList();
         var info = SelectionInfoRect;
-        float left = info.End.X + ToolbarGap, right = _buildPanel.End.X;
+        float left = info.End.X + ToolbarGap, right = _slotArea.End.X;
         _dividers.Add(info.End.X + ToolbarGap / 2);
-        const int cols = 3;
-        const float gap = 8;
-        float y0 = _buildPanel.Position.Y;
-        float bw = (right - left - (cols - 1) * gap) / cols, bh = (_buildPanel.Size.Y - 2 * gap) / 3;
+        const float gap = 8, maxW = 190;
+        int cols = Math.Max(1, (actions.Count + 1) / 2);
+        float bw = Math.Min(maxW, (right - left - (cols - 1) * gap) / cols), bh = (_slotArea.Size.Y - gap) / 2;
         for (int i = 0; i < actions.Count; i++)
         {
-            var rect = new Rect2(left + i % cols * (bw + gap), y0 + i / cols * (bh + gap), bw, bh);
+            var rect = new Rect2(left + i % cols * (bw + gap), _slotArea.Position.Y + i / cols * (bh + gap), bw, bh);
             _toolButtons.Add(actions[i] with { Rect = rect });
         }
     }
