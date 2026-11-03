@@ -31,7 +31,7 @@ public partial class IssueReporter : CanvasLayer
     private static readonly (string Name, string Login)[] Assignees =
     {
         ("Sari", "SirRahal"),
-        ("Kyle", ""), // TODO: Kyle's GitHub username (not email). Until set, Kyle's issues are filed unassigned.
+        ("Kyle", "KyleKarnes"),
     };
 
     /// <summary>Remembered between reports so you don't have to re-pick it every time.</summary>

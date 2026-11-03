@@ -143,10 +143,24 @@ public abstract class Building
 
 public sealed class Wall : Building { }
 
+/// <summary>A building that burns coal it holds: burner drills (off coal), furnaces, generators. Read by the UI fuel gauge.</summary>
+public interface IBurner
+{
+    /// <summary>False for a burner that doesn't need coal here (a drill sitting on coal fuels itself).</summary>
+    bool BurnsFuel { get; }
+    /// <summary>Unburned coal waiting inside.</summary>
+    int Coal { get; }
+    int CoalCapacity { get; }
+    /// <summary>A piece of coal is alight right now.</summary>
+    bool Burning { get; }
+    /// <summary>It wanted to burn and had nothing.</summary>
+    bool OutOfFuel { get; }
+}
+
 /// <summary>
-/// Burner fuel bookkeeping shared by drills, crafters and generators. Coal delivered into the building is burned
-/// first; when that runs out it automatically draws coal from the storage network (Nexus + depots), so players
-/// only have to get coal home, not route it to every machine.
+/// Burner fuel bookkeeping shared by drills, crafters and generators. A burner only burns coal that has been
+/// delivered into it (by a drill, belt or inserter); it never takes coal from the storage network on its own.
+/// To fuel machines from the Nexus or a depot, put an inserter between the storage and the machine.
 /// </summary>
 public struct FuelTank
 {
@@ -154,25 +168,25 @@ public struct FuelTank
 
     public int Coal;
     public float BurnTicksLeft;
-    /// <summary>True when the last burn found no coal locally or in storage.</summary>
+    /// <summary>True when the last burn found no coal in the building.</summary>
     public bool Starved;
 
     public bool HasFuel => Coal > 0 || BurnTicksLeft > 0;
 
-    /// <summary>Could this tank keep burning (local fuel, or coal available in storage)?</summary>
-    public bool CanBurn(World w) => HasFuel || w.Network.Count("coal") > 0;
+    /// <summary>Could this tank keep burning on the coal it holds?</summary>
+    public bool CanBurn => HasFuel;
 
     /// <summary>Consumes <paramref name="amount"/> ticks of fuel, lighting a new coal if needed. False when out of fuel.</summary>
     public bool Burn(World w, float amount = 1f)
     {
         if (BurnTicksLeft <= 0)
         {
-            if (Coal > 0) Coal--;
-            else if (!w.Network.Remove("coal"))
+            if (Coal <= 0)
             {
                 Starved = true;
                 return false;
             }
+            Coal--;
             BurnTicksLeft += w.Data.FuelTicks("coal");
         }
         Starved = false;
@@ -180,7 +194,7 @@ public struct FuelTank
         return true;
     }
 
-    public const string StarvedText = "No fuel: no coal here or in storage. Mine coal into the Nexus";
+    public const string StarvedText = "No fuel: deliver coal to it (drill, belt, or an inserter from the Nexus)";
 
     public void HashInto(StateHash h)
     {

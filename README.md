@@ -78,7 +78,7 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40   # prints desyn
 
 ## Rules of thumb
 
-- **Coal** fuels burner drills, furnaces and generators. They burn coal delivered to them first, then **draw it from the Nexus/depots automatically**, so just keep coal flowing home. Drills on coal fuel themselves.
+- **Coal** fuels burner drills, furnaces and generators. They **only burn coal delivered to them**: point a coal drill at them, run a belt with an inserter, or put an inserter between the Nexus/a depot and the machine. Drills on coal fuel themselves.
 - **Drills aim themselves** while you place them (furnace that smelts the ore > belt > storage); the ghost shows where the ore will go. Press R to override.
 - When belts, inserters, tunnels or drills don't deliver anywhere, the end of the chain gets a red marker. Hover any part of the chain to see orange broken-link rings on every piece of it, a line to the end, and what's missing.
 - Drills output into whatever they face. Belts feed straight into the Nexus, depots, splitters and tunnels.

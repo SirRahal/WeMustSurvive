@@ -1,20 +1,24 @@
 namespace BeltAndBarricade.Sim;
 
 /// <summary>Burns coal to supply power to its grid. Fuel burns in proportion to how loaded the grid is.</summary>
-public sealed class Generator : Building, IItemAcceptor
+public sealed class Generator : Building, IItemAcceptor, IBurner
 {
     private FuelTank _fuel;
 
     public int Coal => _fuel.Coal;
     public bool HasFuel => _fuel.HasFuel;
+    public bool BurnsFuel => true;
+    public int CoalCapacity => FuelTank.MaxCoal * 2;
+    public bool Burning => _fuel.BurnTicksLeft > 0;
+    public bool OutOfFuel => !_fuel.HasFuel;
     private bool _canBurn;
     /// <summary>Fraction of capacity the grid used last tick (for the UI).</summary>
     public float Load { get; private set; }
 
-    /// <summary>Full output while it has coal of its own or there is coal in storage to draw on.</summary>
+    /// <summary>Full output while it has coal of its own (delivered by a drill, belt or inserter).</summary>
     public float AvailableOutput(World w)
     {
-        _canBurn = _fuel.CanBurn(w);
+        _canBurn = _fuel.CanBurn;
         return _canBurn ? Def.PowerOutput * w.Mods.Mult(Stat.PowerOutput) : 0f;
     }
 
@@ -25,7 +29,7 @@ public sealed class Generator : Building, IItemAcceptor
         if (load > 0) _fuel.Burn(w, load);
     }
 
-    public bool CanAccept(string item) => item == "coal" && _fuel.Coal < FuelTank.MaxCoal * 2;
+    public bool CanAccept(string item) => item == "coal" && _fuel.Coal < CoalCapacity;
 
     public bool TryInsert(string item)
     {

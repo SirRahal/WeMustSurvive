@@ -179,7 +179,7 @@ public sealed class ResourceWatch
             }
             float mined = drills.Sum(d => d.Mined.PerMinute(item, w.Tick));
             var starved = drills.Count(d => d.Status == FuelTank.StarvedText);
-            if (starved > 0) yield return $"FIX: {starved} of your {name} drills have no coal. Get coal into storage first.";
+            if (starved > 0) yield return $"FIX: {starved} of your {name} drills have no coal. Deliver it: point a coal drill at them, or feed them with an inserter from a coal belt or the Nexus.";
             if (income <= 0 && mined > 0)
                 yield return $"FIX: your {drills.Count} {name} drill(s) mine {mined:0}/min but none reaches storage. Follow red markers on belts.";
             else if (income <= 0)
@@ -202,7 +202,7 @@ public sealed class ResourceWatch
         var missing = recipe.Inputs.Keys.Where(i => w.Network.Count(i) == 0).Select(i => w.Data.Items[i].Name).ToList();
         if (crafters.All(c => c.Active == null && c.StockedOut == null))
             yield return $"FIX: your {Group(crafters)} {(crafters.Count == 1 ? "is" : "are")} idle: {(missing.Count > 0 ? $"get {string.Join(", ", missing)} first." : $"feed them {inputs} with an inserter.")}";
-        if (crafters.Any(c => c.Status == FuelTank.StarvedText)) yield return "FIX: some of them have no coal.";
+        if (crafters.Any(c => c.Status == FuelTank.StarvedText)) yield return "FIX: some of them have no coal. Feed them coal with an inserter (from a coal belt or the Nexus) or point a coal drill at them.";
         if (income <= 0 && crafters.Any(c => c.Produced.PerMinute(item, w.Tick) > 0))
             yield return $"FIX: {name} is made but never reaches storage: add an inserter + belt (or a turret) to take it out.";
         else if (income > 0)
