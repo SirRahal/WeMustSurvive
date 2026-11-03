@@ -27,6 +27,16 @@ public partial class IssueReporter : CanvasLayer
         ("Task", null),
     };
 
+    /// <summary>Who the issue is assigned to: display name -> GitHub username (must be a repo collaborator).</summary>
+    private static readonly (string Name, string Login)[] Assignees =
+    {
+        ("Sari", "SirRahal"),
+        ("Kyle", ""), // TODO: Kyle's GitHub username (not email). Until set, Kyle's issues are filed unassigned.
+    };
+
+    /// <summary>Remembered between reports so you don't have to re-pick it every time.</summary>
+    private static int _lastAssignee;
+
     /// <summary>True while the dialog is open; the camera ignores keyboard and edge panning meanwhile.</summary>
     public static bool IsOpen { get; private set; }
 
@@ -37,6 +47,7 @@ public partial class IssueReporter : CanvasLayer
     private Control _dialog = null!;
     private LineEdit _title = null!;
     private OptionButton _kind = null!;
+    private OptionButton _assignee = null!;
     private TextEdit _body = null!;
     private CheckBox _attach = null!;
     private TextureRect _preview = null!;
@@ -115,6 +126,15 @@ public partial class IssueReporter : CanvasLayer
         titleRow.AddChild(_kind);
         column.AddChild(titleRow);
 
+        var assignRow = new HBoxContainer();
+        assignRow.AddThemeConstantOverride("separation", 8);
+        assignRow.AddChild(UiKit.Label("Assign to", 16));
+        _assignee = new OptionButton();
+        foreach (var (name, _) in Assignees) _assignee.AddItem(name);
+        _assignee.ItemSelected += i => _lastAssignee = (int)i;
+        assignRow.AddChild(_assignee);
+        column.AddChild(assignRow);
+
         _body = new TextEdit
         {
             PlaceholderText = "What happened? What did you expect? Steps to reproduce...",
@@ -169,8 +189,9 @@ public partial class IssueReporter : CanvasLayer
         _title.Text = "";
         _body.Text = "";
         _kind.Selected = 0;
+        _assignee.Selected = _lastAssignee;
         _title.Editable = _body.Editable = true;
-        _kind.Disabled = _attach.Disabled = false;
+        _kind.Disabled = _assignee.Disabled = _attach.Disabled = false;
         _preview.Texture = ImageTexture.CreateFromImage(_shot);
         _preview.Visible = _attach.ButtonPressed;
         _status.Text = "";
@@ -216,6 +237,7 @@ public partial class IssueReporter : CanvasLayer
         string title = _title.Text.Trim();
         string description = _body.Text.Trim();
         string? label = Kinds[_kind.Selected].GitHubLabel;
+        var (assigneeName, assigneeLogin) = Assignees[_assignee.Selected];
         byte[]? png = _attach.ButtonPressed && _shot != null ? _shot.SavePngToBuffer() : null;
 
         SetBusy(true, "Signing in to GitHub...");
@@ -235,14 +257,23 @@ public partial class IssueReporter : CanvasLayer
             SetBusy(true, "Creating issue...");
             var issue = new JsonObject { ["title"] = title, ["body"] = BuildBody(description, shotUrl) };
             if (label != null) issue["labels"] = new JsonArray(label);
+            if (assigneeLogin.Length > 0) issue["assignees"] = new JsonArray(assigneeLogin);
             var created = await gh.Send(HttpMethod.Post, $"repos/{Repo}/issues", issue);
             _issueUrl = created?["html_url"]?.GetValue<string>();
             int number = created?["number"]?.GetValue<int>() ?? 0;
 
-            SetBusy(false, $"Created issue #{number}. The link is copied to the clipboard.", UiKit.Good);
+            // GitHub silently drops assignees who aren't collaborators, so confirm it stuck.
+            bool assigned = created?["assignees"] is JsonArray list &&
+                            list.Any(a => string.Equals(a?["login"]?.GetValue<string>(), assigneeLogin, StringComparison.OrdinalIgnoreCase));
+            string assignNote = assigned
+                ? $" Assigned to {assigneeName}."
+                : assigneeLogin.Length == 0
+                    ? $" Not assigned: {assigneeName}'s GitHub username isn't set in IssueReporter.cs yet."
+                    : $" Not assigned: {assigneeName} ({assigneeLogin}) isn't a collaborator yet (invite pending?).";
+            SetBusy(false, $"Created issue #{number}.{assignNote} The link is copied to the clipboard.", assigned ? UiKit.Good : UiKit.Gold);
             if (_issueUrl != null) DisplayServer.ClipboardSet(_issueUrl);
             _title.Editable = _body.Editable = false;
-            _kind.Disabled = _attach.Disabled = true;
+            _kind.Disabled = _assignee.Disabled = _attach.Disabled = true;
             _submit.Visible = false;
             _openLink.Visible = _issueUrl != null;
             _cancel.Text = "Close";

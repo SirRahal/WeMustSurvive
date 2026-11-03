@@ -75,7 +75,8 @@ We don't split the codebase by owner, so **GitHub Issues are how we avoid collid
 ## Dev tools
 
 - **Issue reporter** (`game/src/UI/IssueReporter.cs`): debug builds only. A "Report issue" button at the top of the
-  screen, or **F8** anywhere. It files a GitHub issue with a title, type, description, the current screen/game
+  screen, or **F8** anywhere. It files a GitHub issue with a title, type, assignee (Sari / Kyle, mapped to GitHub
+  usernames in the `Assignees` table), description, the current screen/game
   state, and optionally a screenshot ("Add Screenshot" checkbox). Screenshots are committed to the
   `issue-screenshots` branch (never `main`) and embedded in the issue. The repo is public, so screenshots are public.
   Auth: uses `WMS_GITHUB_TOKEN` / `GITHUB_TOKEN` / `GH_TOKEN` if set, otherwise the GitHub login git already has
