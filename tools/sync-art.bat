@@ -1,5 +1,5 @@
 @echo off
-rem Copies the sprites exported by Prop Studio into the game (game\art\props): sprites.json and the atlas pages.
+rem Copies the sprites exported by Prop Studio into the game (game\art\props): sprites.json, the atlas pages and HUD portraits.
 rem Export them first in Prop Studio:  godot --headless --path . -s res://tools/bb_export.gd -- --out=exports/belt_barricade
 setlocal
 if "%PROP_STUDIO%"=="" set "PROP_STUDIO=%~dp0..\..\Prop Studio"
@@ -14,6 +14,12 @@ if not exist "%SRC%\atlas" (
     exit /b 1
 )
 robocopy "%SRC%\atlas" "%DST%\atlas" *.png /MIR /NJH /NJS /NDL /NFL >nul
+if errorlevel 8 (
+    echo Copy failed.
+    exit /b 1
+)
+rem HUD portraits (the engineer slot in the toolbar).
+robocopy "%SRC%\sprites" "%DST%\portraits" portrait_*.png /MIR /NJH /NJS /NDL /NFL >nul
 if errorlevel 8 (
     echo Copy failed.
     exit /b 1

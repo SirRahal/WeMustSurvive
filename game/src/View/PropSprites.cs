@@ -42,6 +42,7 @@ public sealed class PropSprites
         {
             if (!doc.TryGetValue(section, out var entries)) continue;
             var ids = new Dictionary<string, Dictionary<string, Frame>>();
+            sprites._sections[section] = ids; // filled below; "strips" look their frames up as each id is read
             // Items are tiny: the 4x render, drawn at a quarter size, stays sharp when zoomed in.
             var scales = section == "items" ? new[] { ("@4x", 4f), ("@2x", 2f), ("", 1f) } : new[] { ("@2x", 2f), ("", 1f) };
             foreach (var (id, entry) in entries.AsGodotDictionary())
@@ -53,7 +54,6 @@ public sealed class PropSprites
                 if (frames.Count > 0) ids[(string)id] = frames;
                 sprites.ReadFps(section, (string)id, entry.AsGodotDictionary());
             }
-            sprites._sections[section] = ids;
         }
         return sprites;
     }
@@ -106,12 +106,24 @@ public sealed class PropSprites
     {
         float? all = entry.TryGetValue("fps", out var f) ? (float)f.AsDouble() : null;
         var strips = new Dictionary<string, float>();
-        if (entry.TryGetValue("anims", out var anims))
+        foreach (string key in new[] { "anims", "strips" })
+        {
+            if (!entry.TryGetValue(key, out var anims)) continue;
             foreach (var (name, a) in anims.AsGodotDictionary())
             {
-                if (a.VariantType is Godot.Variant.Type.Float or Godot.Variant.Type.Int) strips[(string)name] = (float)a.AsDouble();
-                else if (a.AsGodotDictionary().TryGetValue("fps", out var af)) strips[(string)name] = (float)af.AsDouble();
+                if (a.VariantType is Godot.Variant.Type.Float or Godot.Variant.Type.Int)
+                {
+                    strips[(string)name] = (float)a.AsDouble();
+                    continue;
+                }
+                var strip = a.AsGodotDictionary();
+                if (strip.TryGetValue("fps", out var af)) strips[(string)name] = (float)af.AsDouble();
+                // "strips": {name: {"frames": [...], "fps": n}} lists the strip's frames by name, in play order.
+                if (strip.TryGetValue("frames", out var names) && Frames(section, id) is { } frames)
+                    _strips[(section, id, (string)name)] = names.AsGodotArray()
+                        .Select(n => frames.GetValueOrDefault((string)n)).OfType<Frame>().ToArray();
             }
+        }
         if (all != null || strips.Count > 0) _fps[(section, id)] = (all, strips);
     }
 
@@ -127,7 +139,8 @@ public sealed class PropSprites
     }
 
     /// <summary>
-    /// An animation strip: the frames "&lt;prefix&gt;_0", "_1"... (or from "_1"), in order. Empty if there are none.
+    /// An animation strip: the frames sprites.json lists under "strips" for <paramref name="prefix"/>, else the frames
+    /// "&lt;prefix&gt;_0", "_1"... (or from "_1"), in order. Empty if there are none.
     /// </summary>
     public Frame[] Strip(string section, string id, string prefix)
     {

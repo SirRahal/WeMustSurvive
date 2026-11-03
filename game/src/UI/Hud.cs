@@ -36,7 +36,8 @@ public partial class Hud : Control
     private enum TipAnchor { BelowLeft, BelowRight, Above, Mouse }
 
     /// <summary>Hover text: a title line and body lines, placed relative to the element (or the mouse).</summary>
-    private sealed record Tip(string Title, IReadOnlyList<string> Body, TipAnchor Anchor = TipAnchor.Mouse, float Width = 0);
+    /// <param name="TitleColor">Title colour (default text colour); a coloured title also shows the first body line brighter.</param>
+    private sealed record Tip(string Title, IReadOnlyList<string> Body, TipAnchor Anchor = TipAnchor.Mouse, float Width = 0, Color? TitleColor = null);
 
     /// <param name="Key">Identifies the button for tutorial highlighting (building id, "cat:&lt;id&gt;", "filter:&lt;item&gt;", "research", "back").</param>
     /// <param name="DefId">The building a build slot or version button places.</param>
@@ -106,6 +107,8 @@ public partial class Hud : Control
     /// <summary>Logistics buildings whose items never arrive anywhere (refreshed a few times a second).</summary>
     public Dictionary<int, LogisticsIssue> Issues { get; set; } = new();
     public CameraController? Camera { get; set; }
+    /// <summary>The logistics problem under the mouse on the map (badge or chain), for its pop-up.</summary>
+    public Func<(Building At, LogisticsIssue Issue)?>? HoveredIssue { get; set; }
     public Settings Settings { get; set; } = new();
     public bool IsCoop { get; set; }
     public bool Sandbox { get; set; }
@@ -1154,6 +1157,17 @@ public partial class Hud : Control
                 case "research" or "deconstruct" or "ping" or "controls":
                     DrawCommand(b, mouse);
                     break;
+                case "action":
+                    DrawAction(b, mouse);
+                    break;
+                case "mode":
+                    DrawMode(b, mouse);
+                    break;
+                case "card":
+                    DrawItemCard(b, mouse);
+                    break;
+                case "close":
+                    break; // drawn with the selection header
                 default:
                     DrawCardButton(b, mouse, compact: true);
                     break;
@@ -1204,8 +1218,10 @@ public partial class Hud : Control
         }
         var well = new Rect2(r.GetCenter().X - 40, r.Position.Y + 10, 80, 80);
         DashedRect(well, HudTheme.ChipBorder);
-        // Placeholder portrait until real art exists.
-        IconAt("engineer", eng.Alive ? WorldView.PlayerColor(eng.PlayerId) : HudTheme.Locked, well.GetCenter(), 56);
+        // Prop Studio portrait in the player's colour (greyed while downed); the stroke icon if it's missing.
+        if (Portrait(eng.PlayerId) is { } portrait)
+            C.DrawTextureRect(portrait, well, false, eng.Alive ? Colors.White : new Color(0.45f, 0.45f, 0.5f, 0.8f));
+        else IconAt("engineer", eng.Alive ? WorldView.PlayerColor(eng.PlayerId) : HudTheme.Locked, well.GetCenter(), 56);
         var (icon, color) = HeroBadge(eng);
         var badge = well.End - new Vector2(4, 4);
         C.DrawCircle(badge, 12, HudTheme.PopoverBg);
@@ -1217,6 +1233,19 @@ public partial class Hud : Control
     }
 
     /// <summary>Category dock button: icon only (the name is in the tooltip and above the slots).</summary>
+    private static readonly Dictionary<int, Texture2D?> Portraits = new();
+
+    /// <summary>The engineer's 80 x 80 HUD portrait for a player (the @2x render, drawn at half size), or null without art.</summary>
+    private static Texture2D? Portrait(int player)
+    {
+        if (Portraits.TryGetValue(player, out var cached)) return cached;
+        string path = $"res://art/props/portraits/portrait_engineer_p{player + 1}@2x.png";
+        Texture2D? tex = ResourceLoader.Exists(path) ? ResourceLoader.Load<Texture2D>(path) : null;
+        if (tex == null && Image.LoadFromFile(ProjectSettings.GlobalizePath(path)) is { } img && !img.IsEmpty())
+            tex = ImageTexture.CreateFromImage(img); // checkout the editor hasn't imported yet
+        return Portraits[player] = tex;
+    }
+
     private void DrawCategory(Button b, Vector2 mouse)
     {
         bool hover = b.Rect.HasPoint(mouse);
@@ -1341,47 +1370,266 @@ public partial class Hud : Control
         C.DrawString(HudTheme.Body, new Vector2(x, cy + (compact ? 12 : 14)), Ellipsize(HudTheme.Body, b.Sub, subSize, width), HorizontalAlignment.Left, width, subSize, HudTheme.TextMuted);
     }
 
-    // ================================================================== selection (replaces the categories and slots)
+    // ================================================================== selection (replaces the slots; the dock stays)
 
-    private Rect2 SelectionInfoRect => new(_slotArea.Position, new Vector2(Math.Min(380, _slotArea.Size.X * 0.36f), _slotArea.Size.Y));
+    private const float SelBlockMaxW = 500, ModeW = 140, CardW2 = 100, LowStock = 5;
+    private Rect2 _selBlock, _sideBlock;
+    private readonly List<(string Label, float X)> _cardGroups = new();
+    private readonly Dictionary<string, int> _cardCounts = new();
+    private string _filterSummary = "";
 
-    /// <summary>Selected building: its info on the left of the slot area, its actions as two rows of buttons beside it.</summary>
+    /// <summary>
+    /// Selected building: on the left its portrait, name and HP, a chip row showing where items come from and go
+    /// (inserters), and its actions as icon buttons; on the right an inserter's FILTER picker, or the building's
+    /// details. A close button in the header deselects.
+    /// </summary>
     private void LayoutSelection(Building sel)
     {
-        var actions = BuildingCommands(sel).Where(a => a != null).Select(a => a!).ToList();
-        var info = SelectionInfoRect;
-        float left = info.End.X + ToolbarGap, right = _slotArea.End.X;
-        _dividers.Add(info.End.X + ToolbarGap / 2);
-        const float gap = 8, maxW = 190;
-        int cols = Math.Max(1, (actions.Count + 1) / 2);
-        float bw = Math.Min(maxW, (right - left - (cols - 1) * gap) / cols), bh = (_slotArea.Size.Y - gap) / 2;
+        var a = _slotArea;
+        _selBlock = new Rect2(a.Position, new Vector2(Math.Min(SelBlockMaxW, a.Size.X * 0.36f), a.Size.Y));
+        _sideBlock = new Rect2(_selBlock.End.X + ToolbarGap * 1.5f, a.Position.Y, a.End.X - _selBlock.End.X - ToolbarGap * 1.5f, a.Size.Y);
+        _dividers.Add(_selBlock.End.X + ToolbarGap * 0.75f);
+        _toolButtons.Add(new Button(new Rect2(_selBlock.End.X - 22, _slotHeader.Position.Y - 2, 22, 22), "close", "close", true, false, _input!.Deselect, "back",
+            new Tip("Close", new[] { "Back to building." }, TipAnchor.Above)));
+
+        // Actions: icon above label, one row under the info.
+        var actions = BuildingCommands(sel).Where(b => b != null).Select(b => b!).ToList();
+        const float gap = 8;
+        float ay = _selBlock.Position.Y + 62, ah = _selBlock.End.Y - ay;
+        float aw = Math.Min(116, (_selBlock.Size.X - (actions.Count - 1) * gap) / Math.Max(1, actions.Count));
         for (int i = 0; i < actions.Count; i++)
+            _toolButtons.Add(actions[i] with { Rect = new Rect2(_selBlock.Position.X + i * (aw + gap), ay, aw, ah), Sub = "action" });
+
+        _cardGroups.Clear();
+        _cardCounts.Clear();
+        if (sel is Inserter ins) LayoutFilter(ins);
+    }
+
+    /// <summary>Inserter FILTER: Any / Auto / One item, then item cards for what the source holds and what it doesn't.</summary>
+    private void LayoutFilter(Inserter ins)
+    {
+        var w = _world!;
+        var input = _input!;
+        var b = _sideBlock;
+        bool one = !ins.AutoFilter && ins.Filter != null;
+        string? autoItem = ins.AutoFilter ? ins.Filter : null;
+        _filterSummary = ins.AutoFilter ? autoItem != null ? $"Auto: moving {ItemName(autoItem)}" : "Auto: nothing to move yet"
+            : one ? $"Moving {ItemName(ins.Filter)} only" : "Moving any item";
+
+        // Mode column.
+        float mh = (b.Size.Y - 2 * 6) / 3;
+        var source = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input);
+        var stocked = SourceStock(source);
+        string? firstItem = stocked.Select(s => s.Item).FirstOrDefault() ?? PlayerInput.FilterChoices.FirstOrDefault(f => f != null);
+        (string Label, bool Active, Action Click, string Key, string Tip)[] modes =
         {
-            var rect = new Rect2(left + i % cols * (bw + gap), _slotArea.Position.Y + i / cols * (bh + gap), bw, bh);
-            _toolButtons.Add(actions[i] with { Rect = rect });
+            ("Any item", !ins.AutoFilter && ins.Filter == null, () => input.SetSelectedFilter(null), "filter:", "Take whatever the source offers."),
+            ("Auto", ins.AutoFilter, input.SetSelectedAutoFilter, "filter:auto", "Let it choose: what the building in front needs, or what the one behind makes."),
+            ("One item", one, () => { if (!one && firstItem != null) input.SetSelectedFilter(firstItem); }, "filter:one", "Move only the item picked on the right."),
+        };
+        for (int i = 0; i < modes.Length; i++)
+        {
+            var m = modes[i];
+            _toolButtons.Add(new Button(new Rect2(b.Position.X, b.Position.Y + i * (mh + 6), ModeW, mh), m.Label, "mode", true, m.Active, m.Click, m.Key,
+                new Tip(m.Label, new[] { m.Tip }, TipAnchor.Above, 260)));
         }
+
+        // Item cards: stocked at the source (with counts), then items it could carry that the source doesn't hold.
+        float x = b.Position.X + ModeW + 16, top = b.Position.Y + 18, ch = b.End.Y - top, right = b.End.X;
+        void Card(string item, int count, bool inStock)
+        {
+            if (x + CardW2 > right) return;
+            _cardCounts[item] = inStock ? count : -1;
+            bool picked = one && ins.Filter == item || ins.AutoFilter && autoItem == item;
+            _toolButtons.Add(new Button(new Rect2(x, top, CardW2, ch), w.Data.Items[item].Name, "card", true, picked, () => input.SetSelectedFilter(item), $"filter:{item}",
+                new Tip(w.Data.Items[item].Name, new[] { inStock ? $"{count} here. Click to move only this." : "None here right now. Click to move only this." }, TipAnchor.Above, 240)));
+            x += CardW2 + 8;
+        }
+        if (stocked.Count > 0) _cardGroups.Add(($"In {source!.Def.Name}", x));
+        foreach (var (item, count) in stocked) Card(item, count, true);
+        var missing = WantedItems(ins, source).Where(i => stocked.All(s => s.Item != i)).ToList();
+        if (missing.Count > 0)
+        {
+            if (stocked.Count > 0) x += 16;
+            if (x + CardW2 <= right) _cardGroups.Add((stocked.Count > 0 ? "Not stocked here" : source == null ? "Nothing to take from" : $"Not in {source.Def.Name}", x));
+            foreach (var item in missing) Card(item, 0, false);
+        }
+    }
+
+    /// <summary>What the inserter's source holds right now, most first.</summary>
+    private List<(string Item, int Count)> SourceStock(Building? source)
+    {
+        var counts = new Dictionary<string, int>();
+        void Add(string item, int n) => counts[item] = counts.GetValueOrDefault(item) + n;
+        switch (source)
+        {
+            case Nexus nx: foreach (var (item, n) in nx.Storage.Entries) Add(item, n); break;
+            case Depot d: foreach (var (item, n) in d.Storage.Entries) Add(item, n); break;
+            case Crafter c: foreach (var (item, n) in c.Output.Entries) Add(item, n); break;
+            case Belt belt: foreach (var it in belt.Items) Add(it.Item, 1); break;
+        }
+        return counts.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Select(kv => (kv.Key, kv.Value)).ToList();
+    }
+
+    /// <summary>Items worth offering as a filter: what the target uses, else the usual filter choices.</summary>
+    private IEnumerable<string> WantedItems(Inserter ins, Building? source)
+    {
+        var w = _world!;
+        var target = w.BuildingAt(ins.Front);
+        var wanted = new List<string>();
+        if (target is Crafter c) wanted.AddRange(c.Recipes.SelectMany(r => r.Inputs.Keys));
+        if (target is Turret { UsesAmmo: true } tu) wanted.Add(tu.Def.AmmoItem!);
+        if (source is Drill { Ore: { } ore }) wanted.Add(ore);
+        wanted.AddRange(PlayerInput.FilterChoices.Where(f => f != null).Select(f => f!));
+        return wanted.Distinct();
     }
 
     private void DrawSelectionInfo(Building b)
     {
-        var r = SelectionInfoRect;
-        var well = new Rect2(r.Position, new Vector2(ArtWellPx, ArtWellPx));
+        var w = _world!;
+        var s = _selBlock;
+        var mouse = GetLocalMousePosition();
+        var well = new Rect2(s.Position, new Vector2(56, 56));
         ArtWell(well, b.Def, false);
-        float tx = well.End.X + 12, tw = r.End.X - tx;
-        string title = b is ConstructionSite ? $"{b.Def.Name} (construction site)" : b.Def.Name;
-        C.DrawString(HudTheme.DisplaySemi, new Vector2(tx, r.Position.Y + 20), Ellipsize(HudTheme.DisplaySemi, title, 17, tw), HorizontalAlignment.Left, -1, 17, HudTheme.Text);
+        float tx = well.End.X + 10, tw = s.End.X - tx;
+        string title = b is ConstructionSite ? $"{b.Def.Name} (site)" : b.Def.Name;
+        C.DrawString(HudTheme.DisplaySemi, new Vector2(tx, s.Position.Y + 15), Ellipsize(HudTheme.DisplaySemi, title, 16, tw - 70), HorizontalAlignment.Left, -1, 16, HudTheme.Text);
+        C.DrawString(HudTheme.DisplaySemi, new Vector2(tx, s.Position.Y + 15), $"{Math.Ceiling(b.Hp)} / {b.MaxHp:0}", HorizontalAlignment.Right, tw, 13, HudTheme.TextMuted);
         float frac = Math.Clamp(b.Hp / b.MaxHp, 0, 1);
-        Bar(new Rect2(tx, r.Position.Y + 32, tw, 4), frac, frac > 0.35f ? HudTheme.Good : HudTheme.Danger);
-        C.DrawString(HudTheme.Body, new Vector2(tx, r.Position.Y + 52), $"HP {Math.Ceiling(b.Hp)} / {b.MaxHp:0}", HorizontalAlignment.Left, -1, 12, HudTheme.Text);
-        var lines = new List<string>();
-        if (b.Status != "") lines.Add(b.Status);
-        lines.AddRange(BuildingDetails(b));
-        float y = well.End.Y + 20;
+        Bar(new Rect2(tx, s.Position.Y + 22, tw, 4), frac, frac > 0.35f ? HudTheme.Good : HudTheme.Danger);
+
+        // Chips: where items come from -> what moves -> where they go (inserters); otherwise the building's status.
+        float cy = s.Position.Y + 33;
+        if (b is Inserter ins)
+        {
+            var source = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input);
+            var target = w.BuildingAt(ins.Front);
+            float x = tx;
+            x = FlowChip(x, cy, source?.Def.Name ?? "Nothing", source != null ? Icons.Get(Icons.ForBuilding(source.Def), HudTheme.AccentLight, 28) : null, HudTheme.Accent);
+            x = ChipArrow(x, cy);
+            var item = ins.Filter;
+            x = FlowChip(x, cy, item != null ? ItemName(item) : ins.AutoFilter ? "Auto" : "Any item",
+                item != null ? Icons.Item(w.Data.Items[item], 28) : null, HudTheme.ChipBorder);
+            x = ChipArrow(x, cy);
+            FlowChip(x, cy, target?.Def.Name ?? "Nothing", target != null ? Icons.Get(Icons.ForBuilding(target.Def), HudTheme.WarmLight, 28) : null, HudTheme.Warm);
+        }
+        else
+        {
+            string status = b.Status != "" ? b.Status : BuildingDetails(b).FirstOrDefault() ?? "";
+            C.DrawString(HudTheme.Body, new Vector2(tx, cy + 15), Ellipsize(HudTheme.Body, status, 12, tw), HorizontalAlignment.Left, -1, 12, HudTheme.TextMuted);
+        }
+
+        // Header extras: the close button, and the right block's label.
+        foreach (var close in _toolButtons.Where(t => t.Sub == "close"))
+        {
+            if (close.Rect.HasPoint(mouse)) HudTheme.Button(C, close.Rect, HudTheme.Look.Hover);
+            IconAt("close", close.Rect.HasPoint(mouse) ? HudTheme.Text : HudTheme.TextMuted, close.Rect.GetCenter(), 14);
+        }
+        var side = _sideBlock;
+        float hy = _slotHeader.Position.Y + 13;
+        if (b is Inserter)
+        {
+            HudTheme.SectionLabel(C, new Vector2(side.Position.X, hy), "Filter");
+            C.DrawString(HudTheme.BodyMedium, new Vector2(side.Position.X, hy), _filterSummary, HorizontalAlignment.Right, side.Size.X, 12, HudTheme.Text);
+            foreach (var (label, gx) in _cardGroups)
+                C.DrawString(HudTheme.Body, new Vector2(gx, side.Position.Y + 12), label, HorizontalAlignment.Left, -1, 12, HudTheme.TextMuted);
+        }
+        else
+        {
+            HudTheme.SectionLabel(C, new Vector2(side.Position.X, hy), "Details");
+            var lines = BuildingDetails(b).ToList();
+            float colW = side.Size.X / 2 - 12, y = side.Position.Y + 14;
+            for (int i = 0; i < lines.Count && i < 12; i++)
+            {
+                float x = side.Position.X + i / 6 * (colW + 24);
+                C.DrawString(HudTheme.Body, new Vector2(x, y + i % 6 * 18), Ellipsize(HudTheme.Body, lines[i], 12, colW), HorizontalAlignment.Left, -1, 12, HudTheme.TextMuted);
+            }
+        }
+    }
+
+    /// <summary>A flow chip: icon and name in a bordered pill. Returns the x after it.</summary>
+    private float FlowChip(float x, float y, string text, Texture2D? icon, Color border)
+    {
+        float textW = TextW(HudTheme.BodyMedium, text, 12);
+        var r = new Rect2(x, y, 8 + (icon != null ? 18 : 0) + textW + 10, 22);
+        C.DrawRect(r, border with { A = 0.10f });
+        C.DrawRect(r, border, false, 1);
+        float tx = r.Position.X + 8;
+        if (icon != null)
+        {
+            C.DrawTextureRect(icon, new Rect2(tx, y + 4, 14, 14), false);
+            tx += 18;
+        }
+        TextMid(HudTheme.BodyMedium, tx, r.GetCenter().Y, text, 12, HudTheme.Text);
+        return r.End.X;
+    }
+
+    private float ChipArrow(float x, float y)
+    {
+        IconAt("move", HudTheme.TextMuted, new Vector2(x + 12, y + 11), 14);
+        return x + 24;
+    }
+
+    /// <summary>Selection action: icon above its label.</summary>
+    private void DrawAction(Button b, Vector2 mouse)
+    {
+        bool hover = b.Rect.HasPoint(mouse);
+        HudTheme.Button(C, b.Rect, LookOf(b, hover));
+        string icon = b.Label switch
+        {
+            "Rotate" => "turn_right",
+            "Take from" => "ping",
+            "Repair" => "wrench",
+            "Deconstruct" or "Cancel" => "deconstruct",
+            "Resume build" => "hammer",
+            _ => "beacon",
+        };
+        var color = !b.Enabled ? HudTheme.Locked : b.Active ? HudTheme.AccentLight : icon == "ping" ? HudTheme.Accent : HudTheme.Icon;
+        var c = b.Rect.GetCenter();
+        IconAt(icon, color, c - new Vector2(0, 9), 18);
+        TextCentered(HudTheme.BodySemi, new Rect2(b.Rect.Position.X, c.Y + 5, b.Rect.Size.X, 16), Ellipsize(HudTheme.BodySemi, b.Label, 12, b.Rect.Size.X - 6), 12,
+            !b.Enabled ? HudTheme.Locked : HudTheme.Text);
+    }
+
+    /// <summary>Filter mode: a radio button with its label.</summary>
+    private void DrawMode(Button b, Vector2 mouse)
+    {
+        bool hover = b.Rect.HasPoint(mouse);
+        HudTheme.Button(C, b.Rect, LookOf(b, hover));
+        var dot = new Vector2(b.Rect.Position.X + 16, b.Rect.GetCenter().Y);
+        C.DrawArc(dot, 6, 0, Mathf.Tau, 20, b.Active ? HudTheme.Accent : HudTheme.Icon, 1.5f, true);
+        if (b.Active)
+        {
+            C.DrawCircle(dot, 6, HudTheme.Accent with { A = 0.25f });
+            C.DrawCircle(dot, 3.5f, HudTheme.Accent);
+        }
+        TextMid(HudTheme.BodySemi, dot.X + 14, dot.Y, b.Label, 12, b.Active ? HudTheme.AccentLight : HudTheme.Text);
+    }
+
+    /// <summary>Item card: count in the corner (red when low), the item's picture, its name; dimmed if the source has none.</summary>
+    private void DrawItemCard(Button b, Vector2 mouse)
+    {
+        var item = b.Key![7..];
+        int count = _cardCounts.GetValueOrDefault(item, -1);
+        bool inStock = count >= 0;
+        bool hover = b.Rect.HasPoint(mouse);
+        var r = hover ? b.Rect with { Position = b.Rect.Position - new Vector2(0, 2) } : b.Rect;
+        HudTheme.Button(C, r, b.Active ? HudTheme.Look.Selected : hover ? HudTheme.Look.Hover : HudTheme.Look.Normal);
+        if (!inStock && !b.Active) C.DrawRect(r, HudTheme.PlateBottom with { A = 0.55f });
+        if (b.Active) HudTheme.Brackets(C, r, 10, HudTheme.AccentLight);
+        if (inStock)
+            C.DrawString(HudTheme.DisplaySemi, new Vector2(r.Position.X, r.Position.Y + 16), Amount(count), HorizontalAlignment.Right, r.Size.X - 8, 12,
+                count < LowStock ? HudTheme.DangerLight : HudTheme.TextMuted);
+        var c = r.GetCenter();
+        var alpha = inStock || b.Active ? 1f : 0.45f;
+        C.DrawTextureRect(Icons.Item(_world!.Data.Items[item], 32), new Rect2(c - new Vector2(14, 22), new Vector2(28, 28)), false, Colors.White with { A = alpha });
+        var lines = WrapPx(HudTheme.BodySemi, b.Label, 12, r.Size.X - 10).Take(2).ToList();
+        float ly = c.Y + 18 - (lines.Count - 1) * 7;
         foreach (var line in lines)
         {
-            if (y > r.End.Y) break;
-            C.DrawString(HudTheme.Body, new Vector2(r.Position.X, y), Ellipsize(HudTheme.Body, line, 12, r.Size.X), HorizontalAlignment.Left, r.Size.X, 12, HudTheme.TextMuted);
-            y += 17;
+            TextCentered(HudTheme.BodySemi, new Rect2(r.Position.X, ly - 8, r.Size.X, 16), line, 12,
+                b.Active ? HudTheme.AccentLight : inStock ? HudTheme.Text : HudTheme.Locked);
+            ly += 15;
         }
     }
 
@@ -1401,17 +1649,10 @@ public partial class Hud : Control
         }
         else if (b is Inserter ins)
         {
-            list.Add(new Button(default, "Auto filter", ins.AutoFilter ? ItemName(ins.Filter) : "Pick for me", true, ins.AutoFilter,
-                input.SetSelectedAutoFilter, "filter:auto", TipFrom("Auto filter\nLet the inserter choose: what the building in front needs,\nor what the building behind makes.")));
-            for (int i = 0; i < 3; i++)
-            {
-                string? item = PlayerInput.FilterChoices[i];
-                string label = item == null ? "Any item" : w.Data.Items[item].Name;
-                list.Add(new Button(default, label, "Filter", true, !ins.AutoFilter && ins.Filter == item, () => input.SetSelectedFilter(item), $"filter:{item}"));
-            }
-            list.Add(new Button(default, "Take from", ins.Input.ToString(), true, false, input.CycleInputSide, "input",
-                TipFrom("Take from\nWhich side to take from: Auto (behind, then left, then right),\nor fixed Back / Left / Right. Inserters drop where the arrow points.")));
+            // Filtering lives in the FILTER panel beside the actions.
             list.Add(rotate);
+            list.Add(new Button(default, "Take from", ins.Input.ToString(), true, false, input.CycleInputSide, "input",
+                TipFrom($"Take from: {ins.Input}\nWhich side to take from: Auto (behind, then left, then right),\nor fixed Back / Left / Right. Inserters drop where the arrow points.")));
         }
         else if (b is SuperWeapon sw)
         {
@@ -1429,7 +1670,6 @@ public partial class Hud : Control
             list.Add(new Button(default, "Repair", "Uses iron plates", b.Hp < b.MaxHp, false, input.RepairSelected));
         if (b is not Nexus)
             list.Add(new Button(default, b is ConstructionSite ? "Cancel" : "Deconstruct", "Full refund", true, false, input.DeconstructSelected));
-        list.Add(new Button(default, "Back", "", true, false, input.Deselect, "back"));
         return list;
     }
 
@@ -1808,6 +2048,12 @@ public partial class Hud : Control
             anchor = chip.Rect;
         }
         if (tip == null && AllButtons.Any(b => b.Rect.HasPoint(m))) return;
+        if (tip == null && !IsMouseOverHud() && HoveredIssue?.Invoke() is var (_, issue))
+        {
+            var (_, color, title) = View.IssueLook.Of(issue);
+            var (what, fix) = View.IssueLook.Explain(issue);
+            tip = new Tip(title, fix == "" ? new[] { what } : new[] { what, fix }, TipAnchor.Mouse, 320, color);
+        }
         if (tip == null && !IsMouseOverHud() && WorldTooltip() is { } world) tip = TipFrom(world);
         if (tip == null) return;
 
@@ -1815,7 +2061,7 @@ public partial class Hud : Control
         var body2 = wrapW > 0 ? tip.Body.SelectMany(l => WrapPx(HudTheme.Body, l, 13, wrapW)).ToList() : tip.Body.ToList();
         float width = tip.Width > 0 ? tip.Width
             : Math.Max(TextW(HudTheme.DisplaySemi, tip.Title, 16), body2.Select(l => TextW(HudTheme.Body, l, 13)).DefaultIfEmpty(0).Max()) + 24;
-        float height = 14 + 20 + body2.Count * 18 + (body2.Count > 0 ? 6 : 0) + 6;
+        float height = 14 + 20 + body2.Count * 18 + (body2.Count > 0 ? 6 : 0) + 6 + (tip.TitleColor != null ? 4 : 0);
         var size = Screen;
         var pos = tip.Anchor switch
         {
@@ -1835,11 +2081,14 @@ public partial class Hud : Control
         if (_tip is not { } shown) return;
         var (tip, rect, body) = shown;
         HudTheme.Popover(C, rect);
-        TextBaseline(HudTheme.DisplaySemi, rect.Position.X + 12, rect.Position.Y + 28, tip.Title, 16, HudTheme.Text);
+        TextBaseline(HudTheme.DisplaySemi, rect.Position.X + 12, rect.Position.Y + 28, tip.Title, 16, tip.TitleColor ?? HudTheme.Text);
         float y = rect.Position.Y + 28 + 22;
-        foreach (var line in body)
+        // A coloured title marks a problem pop-up: what's wrong in body text, the fix muted below it.
+        int bright = tip.TitleColor != null ? WrapPx(HudTheme.Body, tip.Body[0], 13, rect.Size.X - 24).Count() : 0;
+        for (int i = 0; i < body.Count; i++)
         {
-            TextBaseline(HudTheme.Body, rect.Position.X + 12, y, line, 13, HudTheme.TextMuted);
+            if (i == bright && bright > 0) y += 4;
+            TextBaseline(HudTheme.Body, rect.Position.X + 12, y, body[i], 13, i < bright ? HudTheme.Text : HudTheme.TextMuted);
             y += 18;
         }
     }
@@ -1860,7 +2109,6 @@ public partial class Hud : Control
         {
             string text = b.Status == "" ? b.Def.Name : $"{b.Def.Name}\n{b.Status}";
             if (b is Crafter or Drill) text += "\n" + string.Join("\n", BuildingDetails(b).Where(l => !l.StartsWith("Grid")));
-            if (Issues.TryGetValue(b.Id, out var issue)) text += "\n" + DescribeIssue(b, issue);
             return text;
         }
         if (w.Map.OreAt(t) is { } ore)
