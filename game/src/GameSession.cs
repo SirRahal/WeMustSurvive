@@ -54,6 +54,7 @@ public partial class GameSession : Node2D
         AddChild(hudLayer);
         hudLayer.AddChild(_hud = new Hud { Name = "Hud", Camera = _camera, Settings = _app.Settings, IsCoop = IsCoop, Sandbox = _cfg.Sandbox });
         _input.Hud = _hud;
+        _hud.HoveredIssue = () => _view.HoveredIssue;
         _hud.TutorialNextRequested += () => _tutorial?.Next(_world);
         _hud.TutorialSkipRequested += SkipTutorial;
         _hud.SpeedRequested += SetSpeed;

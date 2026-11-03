@@ -1,5 +1,6 @@
 ﻿using BeltAndBarricade.Input;
 using BeltAndBarricade.Sim;
+using BeltAndBarricade.UI;
 using Godot;
 using SVec = System.Numerics.Vector2;
 
@@ -997,53 +998,79 @@ public partial class WorldView : Node2D
     /// Every disconnected logistics building gets a small orange broken-link badge; each chain end gets a pulsing
     /// red marker. Hovering a disconnected building highlights where its chain ends.
     /// </summary>
+    /// <summary>The logistics problem whose badge or chain is under the mouse (for the HUD's pop-up), if any.</summary>
+    public (Building At, LogisticsIssue Issue)? HoveredIssue { get; private set; }
+
+    private const float BadgeR = 11;
+
+    /// <summary>Badge centre over a chain's end building: above its roof on a short stem.</summary>
+    private static Vector2 BadgePoint(Building end) => Iso.ToScreen(end.Center) + new Vector2(0, -HeightOf(end.Def) - 30);
+
+    /// <summary>
+    /// Logistics problems stay quiet: one round icon badge over the building where each broken chain ends (red =
+    /// broken, amber = needs something). Hovering the badge or any piece of the chain traces the flow and outlines
+    /// what's involved; the HUD shows the explanation in a pop-up.
+    /// </summary>
     private void DrawLogisticsIssues()
     {
+        HoveredIssue = null;
         if (Issues.Count == 0) return;
         var w = _world!;
         float t = (float)Time.GetTicksMsec() / 1000f;
-        var badge = new Color(1f, 0.6f, 0.15f);
-        var endColor = new Color(1f, 0.25f, 0.2f);
+        var mouse = GetGlobalMousePosition();
 
-        // Per-building rings only for the chain under the mouse; the end marker below is always shown.
-        var hoveredEnd = w.BuildingAt(_input!.HoverTile) is { } over && Issues.TryGetValue(over.Id, out var overIssue) ? overIssue.End : null;
-        foreach (var (id, chain) in Issues)
+        // Which chain is hovered: its badge first, then any building in it.
+        var ends = Issues.Values.GroupBy(i => i.End).Where(g => !g.Key.Dead).ToList();
+        foreach (var g in ends)
+            if (mouse.DistanceTo(BadgePoint(g.Key)) <= BadgeR + 3) HoveredIssue = (g.Key, g.First());
+        if (HoveredIssue == null && w.BuildingAt(_input!.HoverTile) is { } over && Issues.TryGetValue(over.Id, out var overIssue))
+            HoveredIssue = (over, overIssue);
+
+        if (HoveredIssue is var (at, issue))
         {
-            if (chain.End != hoveredEnd || w.BuildingById(id) is not { } b) continue;
-            var p = Iso.ToScreen(b.Center) + new Vector2(10, -HeightOf(b.Def) - 12);
-            // Broken chain link: two rings with a gap.
-            DrawArc(p + new Vector2(-4, 0), 4, 0.6f, Mathf.Tau - 0.6f, 12, badge, 2, true);
-            DrawArc(p + new Vector2(4, 0), 4, Mathf.Pi + 0.6f, Mathf.Pi + Mathf.Tau - 0.6f, 12, badge, 2, true);
+            var (_, color, _) = IssueLook.Of(issue);
+            // Flow: dashed from the hovered piece to where its chain ends, the end tile outlined.
+            if (issue.End != at) DrawDashedLine(Iso.ToScreen(at.Center), Iso.ToScreen(issue.End.Center), color, 2f, 6f);
+            DashedFootprint(issue.End, color);
+            // Inserters: the source (cyan) and the drop tile (amber), like the arrows in their own UI.
+            if (issue.End is Inserter ins)
+            {
+                if (Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input) is { } source)
+                {
+                    DashedFootprint(source, Core);
+                    DrawDashedLine(Iso.ToScreen(source.Center) + new Vector2(0, -HeightOf(source.Def) * 0.5f), Iso.ToScreen(ins.Center) + new Vector2(0, -8), Core, 2f, 5f);
+                }
+                var drop = ins.Front;
+                var d = Iso.Diamond(drop.X, drop.Y, 1, 0, 0.06f);
+                for (int k = 0; k < 4; k++) DrawDashedLine(d[k], d[(k + 1) % 4], HudTheme.Warm, 2f, 5f);
+                DrawDashedLine(Iso.ToScreen(ins.Center) + new Vector2(0, -8), Iso.ToScreen(drop.X + 0.5f, drop.Y + 0.5f), HudTheme.Warm, 2f, 5f);
+                DrawSetTransform(Iso.ToScreen(ins.Center), 0, new Vector2(1, 0.5f));
+                DrawArc(Vector2.Zero, 26, 0, Mathf.Tau, 32, Core, 2f, true);
+                DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+            }
         }
 
-        foreach (var group in Issues.Values.GroupBy(i => i.End))
+        foreach (var g in ends)
         {
-            var end = group.Key;
-            if (end.Dead) continue;
-            var c = Iso.ToScreen(end.Center);
-            float pulse = 0.5f + 0.5f * MathF.Sin(t * 5);
-            DrawSetTransform(c, 0, new Vector2(1, 0.5f));
-            DrawArc(Vector2.Zero, 18 + 4 * pulse, 0, Mathf.Tau, 24, endColor with { A = 0.5f + 0.5f * pulse }, 2.5f, true);
-            DrawSetTransform(Vector2.Zero, 0, Vector2.One);
-            var x = c + new Vector2(0, -HeightOf(end.Def) - 26);
-            DrawLine(x + new Vector2(-5, -5), x + new Vector2(5, 5), endColor, 3);
-            DrawLine(x + new Vector2(-5, 5), x + new Vector2(5, -5), endColor, 3);
-
-            // Always-visible short label so the problem reads at a glance (hover for the full explanation).
-            string label = group.First().Short;
-            float labelW = _font.GetStringSize(label, HorizontalAlignment.Left, -1, 12).X + 10;
-            var lp = x + new Vector2(-labelW / 2, -26);
-            DrawRect(new Rect2(lp, new Vector2(labelW, 17)), new Color(0.35f, 0.05f, 0.05f, 0.85f));
-            DrawString(_font, lp + new Vector2(5, 13), label, HorizontalAlignment.Left, -1, 12, Colors.White);
+            var end = g.Key;
+            var (icon, color, _) = IssueLook.Of(g.First());
+            bool hot = HoveredIssue is var (_, hi) && hi.End == end;
+            var c = BadgePoint(end);
+            float pulse = 0.5f + 0.5f * MathF.Sin(t * 4);
+            // Stem down to the roof, a soft pulsing halo, then the badge.
+            DrawLine(c + new Vector2(0, BadgeR), Iso.ToScreen(end.Center) + new Vector2(0, -HeightOf(end.Def) - 4), color with { A = 0.7f }, 1.5f);
+            DrawCircle(c, BadgeR + 4 + 2 * pulse, color with { A = (hot ? 0.3f : 0.14f) * (0.6f + 0.4f * pulse) });
+            DrawCircle(c, BadgeR, new Color(0.04f, 0.07f, 0.13f, 0.92f));
+            DrawArc(c, BadgeR, 0, Mathf.Tau, 28, color, hot ? 2.5f : 2f, true);
+            DrawTextureRect(Icons.Get(icon, color, 28), new Rect2(c - new Vector2(7, 7), new Vector2(14, 14)), false);
         }
+    }
 
-        // Hovering a broken building: trace a line to where its chain ends.
-        if (_world!.BuildingAt(_input!.HoverTile) is { } hovered && Issues.TryGetValue(hovered.Id, out var issue) && issue.End != hovered)
-        {
-            DrawDashedLine(Iso.ToScreen(hovered.Center), Iso.ToScreen(issue.End.Center), endColor, 2f, 6f);
-            var d = Iso.Diamond(issue.End.Origin.X, issue.End.Origin.Y, issue.End.Size, 0, -0.06f);
-            DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, endColor, 2.5f, true);
-        }
+    /// <summary>Dashed outline of a building's footprint.</summary>
+    private void DashedFootprint(Building b, Color color)
+    {
+        var d = Iso.Diamond(b.Origin.X, b.Origin.Y, b.Size, 0, -0.08f);
+        for (int k = 0; k < 4; k++) DrawDashedLine(d[k], d[(k + 1) % 4], color, 2f, 6f);
     }
 
     // ------------------------------------------------------------------ units
