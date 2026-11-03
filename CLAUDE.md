@@ -65,7 +65,10 @@ We don't split the codebase by owner, so **GitHub Issues are how we avoid collid
    Claude: before starting work, check open issues (`gh issue list`) for anything overlapping the same files or
    system, and warn the user if there is one.
 3. **One branch per issue**, named `<name>/<issue#>-short-desc` (e.g. `sari/14-belt-jam`). Do your work there.
-4. **Sync first:** `git pull origin main` into your branch before starting a session.
+4. **"GIT PULL" syncs you.** When anyone says **GIT PULL**, Claude runs the `git-pull` skill
+   (`.claude/skills/git-pull/SKILL.md`): set uncommitted work aside, merge the latest `origin/main` into the current
+   branch, resolve conflicts (picking the best version), put the uncommitted work back, and check the build and tests.
+   It never pushes. Do this before starting a session.
 5. **"GIT PUSH" ships your work.** When anyone says **GIT PUSH**, Claude runs the `git-push` skill
    (`.claude/skills/git-push/SKILL.md`): commit everything, merge `origin/main` into the branch and resolve conflicts
    (picking the best version), build and run the tests, merge the branch into `main` with a merge commit, push `main`,
