@@ -27,6 +27,7 @@ by IP), **Skill Tree**, **Settings**, **Controls**.
 | `--smoke=SECONDS` | Play by itself, print a `SMOKE ...` state summary, and quit (use with `--headless`) |
 | `--tutorial` | With `--autostart`, start with the tutorial |
 | `--screenshot=PATH` | Save a PNG of the window after 3 s and quit (pair with Godot's `--resolution 1920x1080`) |
+| `--zoom=N` | Camera zoom when the game starts (1 = normal, 2 = close; for screenshots) |
 | `--hud=storage,controls,research,tool:ID,turn:N` | Open HUD panels, hold a blueprint, or turn the view N quarter turns when the game starts (for screenshots) |
 
 Example two-instance co-op smoke test:
@@ -44,7 +45,7 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40   # prints desyn
 | `sim.tests/` | xUnit tests (67): logistics, power, research, enemies, super weapons, modifiers, tutorial playthrough, balance checks, command serialization, host/client sync with latency and desync detection. |
 | `game/src/` | Godot layer: `App` (screens), `GameSession` (one game), `View/` (isometric rendering, camera), `Input/` (RTS controls → commands), `UI/` (HUD, menus, skill tree, lobby), `Net/` (ENet transport). |
 | `game/data/` | All content and balance as JSON: items, recipes, buildings, enemies, techs, maps, waves, tutorial, skill tree. |
-| `game/art/buildings/` | Building sprites exported from Prop Studio (refresh with `tools\sync-art.bat`); missing ones draw as boxes. |
+| `game/art/props/` | World sprites from Prop Studio: atlas pages and `sprites.json` (refresh with `tools\sync-art.bat`); anything missing draws as coded shapes. |
 | `docs/` | Design coverage and Steam guide. |
 
 ## Controls

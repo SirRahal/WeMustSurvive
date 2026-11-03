@@ -52,6 +52,8 @@ public partial class App : Node
 
     /// <summary>--hud=storage,controls,research (debug): HUD panels to open when a game starts, for screenshots.</summary>
     public string HudPanels { get; private set; } = "";
+    /// <summary>--zoom=N: camera zoom when a game starts (for screenshots; 1 = normal, 2 = close).</summary>
+    public float StartZoom { get; private set; }
 
     /// <summary>
     /// Automation switches (after "--" on the Godot command line):
@@ -62,6 +64,7 @@ public partial class App : Node
     {
         var args = OS.GetCmdlineUserArgs().Select(a => a.Split('=', 2)).ToDictionary(a => a[0], a => a.Length > 1 ? a[1] : "");
         HudPanels = args.GetValueOrDefault("--hud", "");
+        if (args.TryGetValue("--zoom", out var zoom)) StartZoom = float.Parse(zoom, System.Globalization.CultureInfo.InvariantCulture);
         if (args.TryGetValue("--screenshot", out var shotPath))
         {
             GetTree().CreateTimer(3, processAlways: true).Timeout += () =>

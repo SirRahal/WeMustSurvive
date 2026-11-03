@@ -70,9 +70,11 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40
   fonts and `UI/Icons.cs` icons.
 - Keys and mouse buttons are InputMap actions registered in `Input/Bindings.cs`; check actions, not raw keys, so the
   Controls panel stays in sync.
-- Building art comes from Prop Studio (`C:\Coding\Prop Studio`, provider `bb_*`), never made here: export there, then
-  `tools\sync-art.bat` copies the sprites into `game/art/buildings`. `View/BuildingSprites.cs` draws them (frames picked
-  for the view angle); anything without a sprite falls back to the coded boxes in `WorldView`.
+- World art (buildings, units, enemies, items, effects, ground) comes from Prop Studio (`C:\Coding\Prop Studio`,
+  provider `bb_*`), never made here: export there, then `tools\sync-art.bat` copies the atlas pages and `sprites.json`
+  into `game/art/props`. `View/PropSprites.cs` loads them (frames turned for the view angle, animation strips
+  `<name>_0..N` with an optional `fps`); `WorldView`/`TerrainView` pick frames from game state, and anything without a
+  sprite or strip keeps its coded drawing or motion.
 - New sim behaviour gets a test in `sim.tests/`. GIT PUSH runs `dotnet test sim.tests` before it touches `main`.
 - Match the existing style: file-scoped namespaces, nullable enabled, `/// <summary>` on public types.
 
