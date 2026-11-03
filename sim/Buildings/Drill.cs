@@ -4,7 +4,7 @@ namespace BeltAndBarricade.Sim;
 /// Mines the ore under it and outputs to the tile it faces. Burner drills burn coal (drills sitting on coal
 /// fuel themselves); electric drills run on grid power. Claim zones mine faster and yield double.
 /// </summary>
-public sealed class Drill : Building, IItemAcceptor
+public sealed class Drill : Building, IItemAcceptor, IBurner
 {
     public const float ClaimZoneSpeedMultiplier = 1.6f;
     public const int ClaimZoneYield = 2;
@@ -28,6 +28,10 @@ public sealed class Drill : Building, IItemAcceptor
     public RateMeter Mined { get; } = new();
     public bool NeedsFuel => Def.UsesFuel && Ore != "coal";
     public int Coal => _fuel.Coal;
+    public bool BurnsFuel => NeedsFuel;
+    public int CoalCapacity => FuelTank.MaxCoal;
+    public bool Burning => _fuel.BurnTicksLeft > 0;
+    public bool OutOfFuel => _fuel.Starved;
     public float Fraction => Def.MineTicks <= 0 ? 0 : _progress / Def.MineTicks;
 
     protected override bool IsBusy => Ore != null && _outputCount == 0;

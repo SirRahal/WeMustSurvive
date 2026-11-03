@@ -91,15 +91,19 @@ public class LogisticsTests
     }
 
     [Fact]
-    public void Iron_drill_draws_coal_from_storage_automatically()
+    public void Iron_drill_runs_only_on_coal_delivered_to_it()
     {
         var w = TestWorld.Create();
         int coal = w.Storage.Count("coal");
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
         var depot = (Depot)w.PlaceDirect("depot", TestWorld.IronTile + new Int2(1, 0));
         w.Run(600);
-        Assert.Equal(5, depot.Storage.Count("iron_ore"));
-        Assert.Equal(coal - 1, w.Storage.Count("coal")); // one coal lasts 20 s
+        Assert.Equal(0, depot.Storage.Count("iron_ore")); // storage has coal, but nobody delivered any
+        Assert.Equal(coal, w.Storage.Count("coal"));
+
+        drill.TryInsert("coal");
+        w.Run(600);
+        Assert.Equal(5, depot.Storage.Count("iron_ore")); // one coal lasts 20 s
     }
 
     [Fact]
