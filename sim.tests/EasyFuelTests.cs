@@ -4,27 +4,43 @@ namespace BeltAndBarricade.Sim.Tests;
 
 public class EasyFuelTests
 {
+    // Issue #4: burners only burn coal delivered to them; they never pull it from storage on their own.
+
     [Fact]
-    public void Furnace_and_its_iron_drill_run_on_coal_from_the_nexus()
+    public void Furnace_and_its_iron_drill_do_not_take_coal_from_the_nexus()
     {
         var w = TestWorld.Create();
-        // No coal drill at all: the drill and furnace both draw coal from the Nexus' starting stock.
-        w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
+        int coal = w.Storage.Count("coal");
+        var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
         var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(1, 0));
         w.Run(1200);
-        Assert.True(furnace.Output.Count("iron_plate") >= 7, $"made {furnace.Output.Count("iron_plate")}");
+        Assert.Equal(0, furnace.Output.Count("iron_plate"));
+        Assert.Equal(coal, w.Storage.Count("coal"));
+        Assert.Equal(FuelTank.StarvedText, drill.Status);
     }
 
     [Fact]
-    public void Generator_runs_on_coal_from_storage()
+    public void Generator_without_delivered_coal_makes_no_power()
     {
         var w = TestWorld.Create();
-        w.PlaceDirect("generator", new Int2(36, 59)); // inside the Nexus' power area, no coal delivered
-        var furnaces = new[] { new Int2(36, 61), new Int2(37, 61), new Int2(38, 61) }
-            .Select(t => (Crafter)w.PlaceDirect("electric_furnace", t)).ToList();
-        foreach (var f in furnaces) for (int i = 0; i < 5; i++) f.TryInsert("iron_ore");
+        var gen = (Generator)w.PlaceDirect("generator", new Int2(36, 59)); // inside the Nexus' power area
         w.Run(5);
-        Assert.Equal(1f, w.Power.GridOf(w.Nexus)!.Satisfaction);
+        Assert.Equal(0f, gen.AvailableOutput(w));
+        Assert.Equal(FuelTank.StarvedText, gen.Status);
+        Assert.Equal(20, w.Storage.Count("coal"));
+    }
+
+    [Fact]
+    public void Inserter_from_the_nexus_fuels_a_furnace()
+    {
+        var w = TestWorld.Create();
+        int coal = w.Storage.Count("coal");
+        w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(0, -1), Direction.North);
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.NexusOrigin + new Int2(0, -2));
+        for (int i = 0; i < 5; i++) furnace.TryInsert("iron_ore");
+        w.Run(900);
+        Assert.True(furnace.Output.Count("iron_plate") > 0, $"made {furnace.Output.Count("iron_plate")}");
+        Assert.True(w.Storage.Count("coal") < coal, "the inserter should have carried coal out of the Nexus");
     }
 
     [Fact]

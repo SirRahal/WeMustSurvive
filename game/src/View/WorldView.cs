@@ -151,6 +151,7 @@ public partial class WorldView : Node2D
         foreach (var d in drawables) d.Draw();
 
         DrawPowerWires();
+        DrawFeedFlows();
         DrawLogisticsIssues();
         DrawShots();
         DrawTransfers(now);
@@ -434,6 +435,7 @@ public partial class WorldView : Node2D
                 break;
         }
 
+        if (b is IBurner { BurnsFuel: true } burner) DrawFuelGauge(burner, top, t);
         if (b.NeedsPower && b.PowerFactor <= 0 && (int)(t * 2) % 2 == 0)
             DrawPowerWarning(top + new Vector2(0, -24));
         if (b.Hp < b.MaxHp)
@@ -801,6 +803,75 @@ public partial class WorldView : Node2D
         DrawProgressBar(top + new Vector2(0, -5), 26, d.OreFraction, blinkOff ? HpBad : oreColor);
     }
 
+    private static readonly Color CoalPip = new(0.62f, 0.64f, 0.68f);
+    private static readonly Color Flame = new(1f, 0.6f, 0.15f);
+    private static readonly Color FeedOutline = new(1f, 0.72f, 0.25f, 0.9f);
+
+    /// <summary>
+    /// Coal stored in a burner: one pip per coal it can hold (filled = coal waiting), a flickering flame while a piece
+    /// is burning, and a blinking NO FUEL once it wants to burn and has nothing. Makes the fuel buffer visible, so
+    /// a furnace that keeps going for a while after its coal supply is removed is obviously running on its stock.
+    /// </summary>
+    private void DrawFuelGauge(IBurner burner, Vector2 top, float t)
+    {
+        var pos = top + new Vector2(0, 9);
+        if (burner.OutOfFuel && !burner.Burning && burner.Coal == 0)
+        {
+            if ((int)(t * 2) % 2 == 0)
+                DrawString(_font, pos + new Vector2(-24, 4), "NO FUEL", HorizontalAlignment.Center, 48, 10, HpBad);
+            return;
+        }
+
+        int cap = burner.CoalCapacity;
+        float pip = Math.Min(5f, 28f / cap), gap = 1.5f;
+        float width = cap * (pip + gap) - gap;
+        var start = pos + new Vector2(-width / 2 + 5, 0);
+        for (int i = 0; i < cap; i++)
+            DrawRect(new Rect2(start + new Vector2(i * (pip + gap), 0), new Vector2(pip, 3)), i < burner.Coal ? CoalPip : HpBack);
+        if (burner.Burning)
+        {
+            float flicker = 0.75f + 0.25f * MathF.Sin(t * 13f);
+            var f = start + new Vector2(-6, 3);
+            DrawColoredPolygon(new[] { f + new Vector2(-3, 0), f + new Vector2(0, -7 * flicker), f + new Vector2(3, 0) }, Flame);
+        }
+    }
+
+    /// <summary>
+    /// Drill -> building links: a faint arrow from each drill into the machine or storage it feeds, with dots in the
+    /// ore's colour running along it while the drill is actually delivering. Shows which buildings work together
+    /// (coal drill -> furnace, coal drill -> iron drill, iron drill -> furnace). Belts already show their items.
+    /// </summary>
+    private void DrawFeedFlows()
+    {
+        var w = _world!;
+        float t = (float)Time.GetTicksMsec() / 1000f;
+        foreach (var b in w.Buildings)
+        {
+            if (b is not Drill d || d.Ore is not { } ore) continue;
+            var target = w.BuildingAt(d.Front);
+            if (target is null or Belt or Splitter or TunnelEntrance or TunnelExit or ConstructionSite) continue;
+            if (!LogisticsCheck.AcceptsType(w, target, ore)) continue;
+
+            var color = Iso.ParseColor(w.Data.Items[ore].Color);
+            if (color.Luminance < 0.35f) color = color.Lightened(0.45f);
+            var lift = new Vector2(0, -10);
+            var from = Iso.ToScreen(d.Center) + lift;
+            var to = Iso.ToScreen(d.Front.Center) + lift;
+            var dir = (to - from).Normalized();
+            var tip = to - dir * 6;
+            DrawLine(from, tip, color with { A = 0.35f }, 2f, true);
+            var side = new Vector2(-dir.Y, dir.X) * 4;
+            DrawColoredPolygon(new[] { tip + dir * 5, tip + side, tip - side }, color with { A = 0.5f });
+
+            if (!d.Status.StartsWith("Mining")) continue; // linked, but nothing moving right now
+            for (int i = 0; i < 3; i++)
+            {
+                float p = (t * 0.9f + i / 3f) % 1f;
+                DrawCircle(from.Lerp(tip, p), 2.6f, color);
+            }
+        }
+    }
+
     private void DrawHpBar(Vector2 center, float width, float frac) =>
         DrawProgressBar(center, width, frac, frac > 0.4f ? HpGood : HpBad);
 
@@ -834,6 +905,17 @@ public partial class WorldView : Node2D
         if (b is Turret tu) Iso.DrawGroundEllipse(this, b.Center, tu.Range(_world!), Selected with { A = 0.35f });
         else if (b is Nexus) Iso.DrawGroundEllipse(this, b.Center, b.Def.Range, Selected with { A = 0.35f });
         else if (b is Inserter ins) DrawInserterLinks(ins.Origin, ins.Dir, ins.Input);
+
+        // Who works with it: drills and inserters handing items into it, and whatever a drill hands its output to.
+        void Outline(Building n)
+        {
+            var o = Iso.Diamond(n.Origin.X, n.Origin.Y, n.Size, 0, -0.02f);
+            DrawPolyline(new[] { o[0], o[1], o[2], o[3], o[0] }, FeedOutline, 2f, true);
+        }
+        var tiles = b.Tiles.ToHashSet();
+        foreach (var n in _world!.Buildings)
+            if (n != b && n is Drill or Inserter && tiles.Contains(n.Front)) Outline(n);
+        if (b is Drill && _world.BuildingAt(b.Front) is { } fed and not (Belt or ConstructionSite)) Outline(fed);
     }
 
     /// <summary>

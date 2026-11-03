@@ -27,7 +27,7 @@
     {
       "id": "coal_drill",
       "title": "Mine coal",
-      "body": "Coal is fuel for drills, furnaces and generators.\n\nIn the build panel (bottom) open the Production tab (or press 2), then pick Burner Drill (1) and left-click the marked coal tile. Drills aim themselves at the best neighbour; the arrow shows where it will drop what it mines (R to rotate). Your engineer walks over and builds it.",
+      "body": "Coal is fuel for burner drills, furnaces and generators. They only burn coal that is delivered to them.\n\nIn the build panel (bottom) open the Production tab (or press 2), then pick Burner Drill (1) and left-click the marked coal tile. Drills aim themselves at the best neighbour; the arrow shows where it will drop what it mines (R to rotate). Your engineer walks over and builds it.",
       "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
       "goal": "hintsBuilt", "button": "drill",
       "hints": [ { "building": "drill", "x": 44, "y": 60, "dir": "East" } ]
@@ -35,10 +35,13 @@
     {
       "id": "iron_drill",
       "title": "Mine iron",
-      "body": "Iron is your main building material. Place another Burner Drill on the marked iron tile, facing west, toward the empty tile between the two drills. That's where the furnace will go.\n\nDrills on iron burn coal too, but you don't need to deliver it: burner buildings take coal from the Nexus automatically when they run low.",
+      "body": "Iron is your main building material. Place another Burner Drill on the marked iron tile, facing west, toward the empty tile between the two drills. That's where the furnace will go.\n\nA drill on iron needs coal delivered to it. Hold Shift and place a third Burner Drill on the small coal seam just below, facing north: it mines coal straight into the iron drill. (Drills on coal fuel themselves.)",
       "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
       "goal": "hintsBuilt", "button": "drill",
-      "hints": [ { "building": "drill", "x": 46, "y": 60, "dir": "West" } ]
+      "hints": [
+        { "building": "drill", "x": 46, "y": 60, "dir": "West" },
+        { "building": "drill", "x": 46, "y": 61, "dir": "North" }
+      ]
     },
     {
       "id": "furnace",
@@ -71,20 +74,9 @@
       ]
     },
     {
-      "id": "coal_home",
-      "title": "Keep the coal coming",
-      "body": "Burner drills, furnaces and generators pull coal from the Nexus whenever they run low, so the Nexus needs a steady supply.\n\nPlace a Burner Drill on the small coal seam (marked) facing south, then one Belt next to it facing west. It joins your plate line, so coal rides home with the plates. Hold Shift to queue both.",
-      "focus": { "x": 44.5, "y": 62 }, "zoom": 1.8,
-      "goal": "hintsBuilt", "button": "drill",
-      "hints": [
-        { "building": "drill", "x": 46, "y": 61, "dir": "South" },
-        { "building": "belt", "x": 46, "y": 62, "dir": "West" }
-      ]
-    },
-    {
       "id": "factory_info",
       "title": "Your first factory",
-      "body": "Iron plates and coal are flowing into the Nexus. Watch the counts in the top right; click them for the full storage list. Everything you build is paid from that storage, so a growing factory means more defenses.\n\nLeft-click any building to select it. Its details and actions (rotate, repair, deconstruct) replace the build panel. Back returns to the tabs.",
+      "body": "Iron plates are flowing into the Nexus. Watch the counts in the top right; click them for the full storage list. Everything you build is paid from that storage, so a growing factory means more defenses.\n\nLeft-click any building to select it. Its details and actions (rotate, repair, deconstruct) replace the build panel. Back returns to the tabs.",
       "focus": { "x": 43, "y": 62 }, "zoom": 1.4
     },
     {
@@ -109,7 +101,7 @@
     {
       "id": "filter",
       "title": "What inserters carry",
-      "body": "Inserters carry any item the building in front can use. This one takes iron plates out of the Nexus because that's all the workshop accepts.\n\nClick the inserter (marked) to see its options. A filter limits it to one item, and Auto filter picks one for you. Taking from the Nexus onto a belt needs a filter, or it would empty your storage. Click Next when you're ready.",
+      "body": "Inserters carry any item the building in front can use. This one takes iron plates out of the Nexus because that's all the workshop accepts.\n\nClick the inserter (marked) to see its options. A filter limits it to one item, and Auto filter picks one for you. Taking from the Nexus onto a belt needs a filter, or it would empty your storage.\n\nThis is also how you fuel machines from storage: an inserter from the Nexus (or a Storage Depot) into a furnace, drill or generator carries coal into it. Click Next when you're ready.",
       "focus": { "x": 38, "y": 64.5 }, "zoom": 1.8,
       "button": "filter:",
       "hints": [ { "building": "mark", "x": 38, "y": 65 } ]

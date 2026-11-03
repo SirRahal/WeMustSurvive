@@ -4,7 +4,7 @@ namespace BeltAndBarricade.Sim;
 /// Furnaces and workshops. Automatically runs the first of its recipes whose inputs are available.
 /// Inserters feed inputs and coal in, and pull outputs out. Electric versions run on grid power instead of coal.
 /// </summary>
-public sealed class Crafter : Building, IItemAcceptor, IItemSource
+public sealed class Crafter : Building, IItemAcceptor, IItemSource, IBurner
 {
     public const int InputBatches = 5;
     public const int MaxOutput = 20;
@@ -23,6 +23,10 @@ public sealed class Crafter : Building, IItemAcceptor, IItemSource
     public RecipeDef? LastRecipe { get; private set; }
     public float Progress { get; private set; }
     public int Coal => _fuel.Coal;
+    public bool BurnsFuel => Def.UsesFuel;
+    public int CoalCapacity => FuelTank.MaxCoal;
+    public bool Burning => _fuel.BurnTicksLeft > 0;
+    public bool OutOfFuel => _fuel.Starved;
     public IReadOnlyList<RecipeDef> Recipes => _recipes;
 
     protected override bool IsBusy => Active != null;
