@@ -267,7 +267,15 @@ public partial class WorldView : Node2D
         {
             case Inserter ins:
             {
-                var swing = Props.Strip("buildings", id, PropSprites.DirName(dir) + "_swing");
+                // The full cycle strip "<dir>_1..N" (pickup, out to the drop, and back), or a one-way swing strip.
+                string dn = PropSprites.DirName(dir);
+                var cycle = Props.Strip("buildings", id, dn);
+                if (cycle.Length > 0)
+                {
+                    animated = true;
+                    return cycle[Math.Min(cycle.Length - 1, (int)(InserterCycle(ins) * cycle.Length))];
+                }
+                var swing = Props.Strip("buildings", id, dn + "_swing");
                 if (swing.Length > 0)
                 {
                     animated = true;
@@ -276,27 +284,49 @@ public partial class WorldView : Node2D
                 break;
             }
             case Turret:
-                if (Now - _firedAt.GetValueOrDefault(b.Id, double.NegativeInfinity) < 0.12
-                    && Props.Get("buildings", id, main + "_fire") is { } fire)
+            {
+                // Just after a shot: the "<aim>_fire_N" strip played through once, or a single "<aim>_fire" frame.
+                double since = Now - _firedAt.GetValueOrDefault(b.Id, double.NegativeInfinity);
+                if (since >= 0.12) break;
+                var fires = Props.Strip("buildings", id, main + "_fire");
+                var fire = fires.Length > 0 ? fires[Math.Min(fires.Length - 1, (int)(since / 0.12 * fires.Length))] : Props.Get("buildings", id, main + "_fire");
+                if (fire != null)
                 {
                     animated = true;
                     return fire;
                 }
                 break;
+            }
             default:
-                // The working strip: "<frame>_N", "<frame>_work_N" or "work_N" (a furnace's red-hot loop, a drill's bit...).
+                // The working strip: "<frame>_N" (a drill's bit, the nexus), "<frame>_work_N", or a named loop: "work"
+                // (lab, workshop), "lit" (a furnace red hot), "run" (generator), "turn" (uplink dish).
                 float fps = b is Nexus ? IdleFps : WorkFps;
-                if (IsWorking(b) && (Props.Play("buildings", id, main, Now, fps, b.Id * 3)
-                                     ?? Props.Play("buildings", id, main + "_work", Now, fps, b.Id * 3)
-                                     ?? Props.Play("buildings", id, "work", Now, fps, b.Id * 3)) is { } f)
+                if (IsWorking(b))
                 {
-                    animated = true;
-                    return f;
+                    foreach (var strip in new[] { main, main + "_work", "work", "lit", "run", "turn" })
+                        if (Props.Play("buildings", id, strip, Now, fps, b.Id * 3) is { } f)
+                        {
+                            animated = true;
+                            return f;
+                        }
                 }
+                // Idle: the cold/stopped frame where there is one (a furnace or generator "off").
+                else if (Props.Get("buildings", id, "off") is { } off) return off;
                 break;
         }
         return BuildingFrame(id, dir, main, null);
     }
+
+    /// <summary>
+    /// Where an inserter is in its full cycle, 0..1: out from the pickup side to the drop side (0..0.5), then back
+    /// (0.5..1). Idle hands wait at the pickup side.
+    /// </summary>
+    private static float InserterCycle(Inserter ins) => ins.State switch
+    {
+        Inserter.Phase.Swinging => InserterSwing(ins) / 2,
+        Inserter.Phase.Returning => 1 - InserterSwing(ins) / 2,
+        _ => 0,
+    };
 
     /// <summary>
     /// A wall's joined piece for wall <paramref name="id"/> at <paramref name="o"/>: a bit for each side whose neighbour
@@ -435,10 +465,23 @@ public partial class WorldView : Node2D
         return null;
     }
 
-    /// <summary>Belt sprite id: the corner piece named for the side it's fed from (looking the way it runs), or the straight one.</summary>
-    private string BeltSpriteId(Belt belt) => CornerSide(belt) is { } side
-        ? belt.Def.Id + (side == belt.Dir.RotateCw() ? "_turn_right" : "_turn_left")
-        : belt.Def.Id;
+    /// <summary>
+    /// Belt sprite id: the corner piece named for the side it's fed from (looking the way it runs); a junction piece
+    /// with a gap in the side rail(s) a belt feeds in through ("_side_left", "_side_right", "_side_both") when it is also
+    /// fed from behind, or from both sides; else the straight one. Callers fall back to straight without the sprite.
+    /// </summary>
+    private string BeltSpriteId(Belt belt)
+    {
+        if (CornerSide(belt) is { } side)
+            return belt.Def.Id + (side == belt.Dir.RotateCw() ? "_turn_right" : "_turn_left");
+        var w = _world!;
+        bool Feeds(Direction from) => w.BuildingAt(belt.Origin + from.Offset()) is Belt n && n.Front == belt.Origin;
+        bool right = Feeds(belt.Dir.RotateCw()), left = Feeds(belt.Dir.RotateCw().Opposite());
+        return left && right ? belt.Def.Id + "_side_both"
+            : left ? belt.Def.Id + "_side_left"
+            : right ? belt.Def.Id + "_side_right"
+            : belt.Def.Id;
+    }
 
     /// <summary>
     /// Grid point at <paramref name="t"/> (0 = where items enter, 1 = the front edge) along a belt: a straight line
@@ -1096,6 +1139,7 @@ public partial class WorldView : Node2D
         if (acting)
         {
             var act = Props.Play(section, id, facing + "_work", now, WorkFps, seed)
+                      ?? Props.Play(section, id, facing + "_attack", now, WorkFps, seed)
                       ?? Props.Play(section, id, facing + "_act", now, WorkFps, seed)
                       ?? Props.Get(section, id, facing + "_act");
             if (act != null) return act;
