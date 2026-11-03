@@ -11,6 +11,20 @@ Personal, uncommitted notes go in `CLAUDE.local.md` (gitignored).
 **Belt & Barricade** (repo: `SirRahal/WeMustSurvive`, public) is a post-apocalyptic factory-defense game for
 1–2 players: Factorio-style logistics plus wave-based tower defense, defending a Nexus from alien waves.
 
+**One game, two names.** "We Must Survive" is only the repo/folder name (`C:\Coding\We Must Survive`); everywhere
+else the game is **Belt & Barricade**, shortened to `belt_barricade` or `bb`. Look under those names, not "we must
+survive", when searching other projects. In particular, its art in Prop Studio (`C:\Coding\Prop Studio`) lives at:
+
+| What | Where (in Prop Studio) |
+|------|------------------------|
+| Generators, palette, sprite renderer, loading notes | `providers/belt_barricade/` (`bb_kit.gd`, `bb_sprites.gd`, `README.md`) |
+| Prop / generator ids | `bb_*` (e.g. `bb_belt`, `bb_wall`); the game's own building ids map onto them in `BBKit.GAME` |
+| Exports (models, sprites, `sprites.json`) | `exports/belt_barricade/` (not committed; regenerate with Prop Studio's export tool) |
+| Work in progress | `.claude/worktrees/<task>/` on a branch per task (e.g. `bb-polish`), until merged to Prop Studio's `main` |
+
+When asking where Belt & Barricade art is, or whether Prop Studio is done, check those paths and that repo's branches
+and worktrees, not just its `main`.
+
 - Design doc: `Init Instructions.txt` (the original design, treat it as the source of intent).
 - What's implemented vs. the design: `docs/DESIGN_STATUS.md`. **Read this before starting a feature**, and update it
   in the same change when a feature lands or changes.
