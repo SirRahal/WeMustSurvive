@@ -38,7 +38,7 @@ public sealed class PropSprites
         if (!Godot.FileAccess.FileExists(jsonPath)) return sprites;
         var doc = Json.ParseString(Godot.FileAccess.GetFileAsString(jsonPath)).AsGodotDictionary();
         if (doc.TryGetValue("metres_per_tile", out var mpt)) sprites.MetresPerTile = (float)mpt.AsDouble();
-        foreach (string section in new[] { "buildings", "units", "enemies", "items", "effects", "ground" })
+        foreach (string section in new[] { "buildings", "engineer", "units", "enemies", "items", "effects", "ground" })
         {
             if (!doc.TryGetValue(section, out var entries)) continue;
             var ids = new Dictionary<string, Dictionary<string, Frame>>();
@@ -51,6 +51,7 @@ public sealed class PropSprites
                     if (sprites.ReadFrame(f.AsGodotDictionary(), scales) is { } frame)
                         frames[(string)name] = frame;
                 if (frames.Count > 0) ids[(string)id] = frames;
+                sprites.ReadFps(section, (string)id, entry.AsGodotDictionary());
             }
             sprites._sections[section] = ids;
         }
@@ -94,6 +95,70 @@ public sealed class PropSprites
     }
 
     public bool Has(string section, string id) => _sections.TryGetValue(section, out var ids) && ids.ContainsKey(id);
+
+    // ------------------------------------------------------------------ animation strips
+
+    /// <summary>Frames-per-second from sprites.json: an id's "fps" (all its strips), and "anims": {strip: fps or {"fps": n}}.</summary>
+    private readonly Dictionary<(string Section, string Id), (float? All, Dictionary<string, float> Strips)> _fps = new();
+    private readonly Dictionary<(string Section, string Id, string Prefix), Frame[]> _strips = new();
+
+    private void ReadFps(string section, string id, Godot.Collections.Dictionary entry)
+    {
+        float? all = entry.TryGetValue("fps", out var f) ? (float)f.AsDouble() : null;
+        var strips = new Dictionary<string, float>();
+        if (entry.TryGetValue("anims", out var anims))
+            foreach (var (name, a) in anims.AsGodotDictionary())
+            {
+                if (a.VariantType is Godot.Variant.Type.Float or Godot.Variant.Type.Int) strips[(string)name] = (float)a.AsDouble();
+                else if (a.AsGodotDictionary().TryGetValue("fps", out var af)) strips[(string)name] = (float)af.AsDouble();
+            }
+        if (all != null || strips.Count > 0) _fps[(section, id)] = (all, strips);
+    }
+
+    /// <summary>A strip's frames-per-second from sprites.json, or <paramref name="fallback"/> if it gives none.</summary>
+    public float Fps(string section, string id, string prefix, float fallback)
+    {
+        if (!_fps.TryGetValue((section, id), out var fps)) return fallback;
+        // A strip is named by its prefix ("south_0".. is "south"), or by what follows a facing ("s_walk" is "walk").
+        if (fps.Strips.TryGetValue(prefix, out var s)) return s;
+        int cut = prefix.IndexOf('_');
+        if (cut >= 0 && fps.Strips.TryGetValue(prefix[(cut + 1)..], out s)) return s;
+        return fps.All ?? fallback;
+    }
+
+    /// <summary>
+    /// An animation strip: the frames "&lt;prefix&gt;_0", "_1"... (or from "_1"), in order. Empty if there are none.
+    /// </summary>
+    public Frame[] Strip(string section, string id, string prefix)
+    {
+        if (_strips.TryGetValue((section, id, prefix), out var strip)) return strip;
+        var list = new List<Frame>();
+        if (Frames(section, id) is { } frames)
+        {
+            int i = frames.ContainsKey(prefix + "_0") ? 0 : 1;
+            while (frames.TryGetValue($"{prefix}_{i}", out var f)) { list.Add(f); i++; }
+        }
+        return _strips[(section, id, prefix)] = list.ToArray();
+    }
+
+    /// <summary>
+    /// The strip's frame at <paramref name="seconds"/> (real time, looping) at its fps, shifted by
+    /// <paramref name="offset"/> frames so neighbours aren't in lockstep. Null if there is no strip.
+    /// </summary>
+    public Frame? Play(string section, string id, string prefix, double seconds, float fallbackFps, int offset = 0)
+    {
+        var strip = Strip(section, id, prefix);
+        if (strip.Length == 0) return null;
+        long i = (long)(seconds * Fps(section, id, prefix, fallbackFps)) + offset;
+        return strip[(int)(((i % strip.Length) + strip.Length) % strip.Length)];
+    }
+
+    /// <summary>The strip's frame <paramref name="index"/> (wrapping), or null if there is no strip.</summary>
+    public Frame? At(string section, string id, string prefix, int index)
+    {
+        var strip = Strip(section, id, prefix);
+        return strip.Length == 0 ? null : strip[((index % strip.Length) + strip.Length) % strip.Length];
+    }
 
     /// <summary>All of an id's frames, or null if it has no sprite.</summary>
     public IReadOnlyDictionary<string, Frame>? Frames(string section, string id) =>

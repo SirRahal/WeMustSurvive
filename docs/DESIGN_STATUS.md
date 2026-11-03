@@ -23,7 +23,7 @@ the document left things open. All balance numbers live in `game/data/*.json`.
 | 12 | Solo mode | ✅ | Health, damage and count each scaled by ∛0.45 → overall threat ≈45% of co-op (≈55% weaker). Everything else identical. |
 | 13 | Co-op communication | ✅ | **Alt ping wheel** (Look here, Defend, On my way, Need iron/copper/silver, Build here, Danger), Alt+click quick ping, **Ctrl+drag freehand drawing** (fades after 30 s, Ctrl+right-click erases yours), partner's orders and targets highlighted. |
 | — | Co-op networking | ✅ (LAN/IP) | Host-authoritative command scheduling with deterministic lockstep simulation and periodic desync hashing. Works over direct IP / LAN today; Steam transport is documented in `docs/STEAM.md`. The host's skill-tree bonuses apply to both players. |
-| 14 | Visual style | 🟡 | Clean isometric placeholder art with distinct silhouettes and colours per resource, building tier, turret type and enemy type. Final art and audio are still to do. |
+| 14 | Visual style | 🟡 | Pre-rendered isometric sprites from Prop Studio for every building (states: construction, damaged, wrecked; joined walls), enemies, the engineer, items, effects, ground, ore deposits and decals, animated from game state where strips exist (belts, inserter poses, unit walks) with coded motion elsewhere. Building work loops, final textures and audio are still to do. |
 | 15 | Pillars | ✅ | Factory is the weapon (ammo, rockets, shells, coal and power all come from the factory); meaningful expansion (claim zones, gold pockets near the lanes); clear tiers; co-op clarity; readable wave timer and funnel. |
 
 ## Extras not in the document

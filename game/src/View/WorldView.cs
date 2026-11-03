@@ -76,7 +76,8 @@ public partial class WorldView : Node2D
         _corpses.Clear();
         _wrecks.Clear();
         _decals.Clear();
-        _drillOre.Clear();
+        _firedAt.Clear();
+        _beltRuns.Clear();
     }
 
     /// <summary>Called after each sim step to pick up one-shot visual events.</summary>
@@ -87,6 +88,7 @@ public partial class WorldView : Node2D
             switch (e)
             {
                 case ShotEvent s:
+                    if (_world!.BuildingAt(Int2.Floor(s.From)) is Turret shooter) _firedAt[shooter.Id] = Now;
                     int frames = s.Kind switch { "rocket" => 10, "heavy" => 12, "laser" => 5, "flame" => 6, "acid" => 8, _ => 4 };
                     _shots.Add(new Shot(Iso.ToScreen(s.From) + new Vector2(0, -22), Iso.ToScreen(s.To) + new Vector2(0, -UnitLift), s.To - s.From, s.Kind, frames, frames));
                     if (s.Kind is "rocket" or "heavy") _blasts.Add(new Blast(s.To, s.Kind == "heavy" ? 2f : 1.6f, s.Kind, Now + frames / 60.0, 0.35));
@@ -189,8 +191,11 @@ public partial class WorldView : Node2D
     /// <summary>Prop Studio sprites; anything without one falls back to the coded boxes and circles.</summary>
     private static PropSprites Props => PropSprites.Shared;
 
-    /// <summary>The ore each drill last mined, so an exhausted drill still shows its own rig (with the empty lamp).</summary>
-    private readonly Dictionary<int, string> _drillOre = new();
+    /// <summary>Default frames-per-second for strips sprites.json gives no rate for.</summary>
+    private const float WorkFps = 10, IdleFps = 4, WalkFps = 8;
+
+    /// <summary>When each turret last fired (real seconds), for its firing frame.</summary>
+    private readonly Dictionary<int, double> _firedAt = new();
 
     /// <summary>
     /// A building's sprite frame: <paramref name="main"/> (a direction, aim, ore_direction, wall joins...), with a
@@ -217,41 +222,135 @@ public partial class WorldView : Node2D
             case Turret tu:
                 return _world!.NearestEnemy(tu.Center, tu.Range(_world)) is { } foe ? PropSprites.AimName(foe.Pos - tu.Center) : "s";
             case Drill drill:
+                // Its own ore's rig even once mined out, with the red lamp.
                 string? ore = drill.Ore ?? _world!.Map.OreAt(drill.Origin);
-                if (ore != null) _drillOre[drill.Id] = ore;
-                string name = (_drillOre.GetValueOrDefault(drill.Id) ?? "iron_ore").Split('_')[0];
+                string name = (ore ?? drill.LastOre ?? "iron_ore").Split('_')[0];
                 return ore == null ? $"{name}_{d}_empty" : $"{name}_{d}";
             case Inserter ins:
                 // Swing poses in play order: pickup, mid, drop, mid.
                 float t = InserterSwing(ins);
                 return d + (t < 1 / 3f ? "_pickup" : t < 2 / 3f ? "_mid" : "_drop");
             case Wall:
-                return WallJoins(b.Origin);
+                return WallJoins(b.Origin, b.Def.Id);
             default:
                 return d;
         }
     }
 
-    /// <summary>
-    /// A wall's joined piece: the letters (N, E, S, W order, as seen at this view angle) of the neighbours that are
-    /// walls too; a lone wall is the full block ("default").
-    /// </summary>
-    private string WallJoins(Int2 o)
+    /// <summary>Whether a building is busy, so its working strip plays (or its coded motion shows).</summary>
+    private static bool IsWorking(Building b) => b switch
     {
-        Span<bool> join = stackalloc bool[4];
-        foreach (var dir in new[] { Direction.North, Direction.East, Direction.South, Direction.West })
-            if (_world!.BuildingAt(o + dir.Offset()) is Wall)
-                join[PropSprites.ViewTurn(dir) switch { Direction.North => 0, Direction.East => 1, Direction.South => 2, _ => 3 }] = true;
-        string s = (join[0] ? "n" : "") + (join[1] ? "e" : "") + (join[2] ? "s" : "") + (join[3] ? "w" : "");
-        return s == "" ? "default" : s;
+        Drill d => d.Status.StartsWith("Mining"),
+        Generator g => g.HasFuel && g.Load > 0,
+        Crafter c => c.Active != null,
+        Lab lab => lab.Working,
+        Nexus => true,
+        SuperWeapon => true,
+        _ => false,
+    };
+
+    /// <summary>
+    /// A live building's frame, driven by its state: an inserter's swing strip ("&lt;dir&gt;_swing_N", by how far the hand
+    /// is through its swing) or its three poses; a turret's firing frame ("&lt;aim&gt;_fire") just after a shot; for
+    /// anything working, the strip after its frame name ("south_0".., "coal_east_0"..) looping at its fps, offset per
+    /// building. <paramref name="animated"/> is false when no strip played, so the coded motion is drawn instead.
+    /// </summary>
+    private PropSprites.Frame? LiveFrame(Building b, out bool animated)
+    {
+        animated = false;
+        var dir = b is Nexus ? Direction.North : b.Dir;
+        string main = MainFrame(b);
+        string? state = b is Turret ? null : DamageState(b);
+        if (state != null) return BuildingFrame(b.Def.Id, dir, main, state);
+        string id = b.Def.Id;
+        switch (b)
+        {
+            case Inserter ins:
+            {
+                var swing = Props.Strip("buildings", id, PropSprites.DirName(dir) + "_swing");
+                if (swing.Length > 0)
+                {
+                    animated = true;
+                    return swing[(int)MathF.Round(InserterSwing(ins) * (swing.Length - 1))];
+                }
+                break;
+            }
+            case Turret:
+                if (Now - _firedAt.GetValueOrDefault(b.Id, double.NegativeInfinity) < 0.12
+                    && Props.Get("buildings", id, main + "_fire") is { } fire)
+                {
+                    animated = true;
+                    return fire;
+                }
+                break;
+            default:
+                // The working strip: "<frame>_N", "<frame>_work_N" or "work_N" (a furnace's red-hot loop, a drill's bit...).
+                float fps = b is Nexus ? IdleFps : WorkFps;
+                if (IsWorking(b) && (Props.Play("buildings", id, main, Now, fps, b.Id * 3)
+                                     ?? Props.Play("buildings", id, main + "_work", Now, fps, b.Id * 3)
+                                     ?? Props.Play("buildings", id, "work", Now, fps, b.Id * 3)) is { } f)
+                {
+                    animated = true;
+                    return f;
+                }
+                break;
+        }
+        return BuildingFrame(id, dir, main, null);
     }
 
-    /// <summary>Belt slat frame 0..3: one cycle moves the slats 0.25 m, at the belt's speed.</summary>
-    private int BeltPhase(Belt belt)
+    /// <summary>
+    /// A wall's joined piece for wall <paramref name="id"/> at <paramref name="o"/>: a bit for each side whose neighbour
+    /// is a wall of any tier (or a wall being built), N = 1, E = 2, S = 4, W = 8, turned for the view angle. The frame
+    /// is "mask_&lt;n&gt;" if the sprite has it, else the older joined-letters name ("ne", "nesw"), else the block ("default").
+    /// </summary>
+    private string WallJoins(Int2 o, string id)
     {
+        int mask = 0;
+        foreach (var dir in new[] { Direction.North, Direction.East, Direction.South, Direction.West })
+        {
+            var n = _world!.BuildingAt(o + dir.Offset());
+            if (n is Wall || n is ConstructionSite { Def.Kind: BuildingKind.Wall })
+                mask |= PropSprites.ViewTurn(dir) switch { Direction.North => 1, Direction.East => 2, Direction.South => 4, _ => 8 };
+        }
+        if (Props.Get("buildings", id, $"mask_{mask}") != null) return $"mask_{mask}";
+        string s = ((mask & 1) != 0 ? "n" : "") + ((mask & 2) != 0 ? "e" : "") + ((mask & 4) != 0 ? "s" : "") + ((mask & 8) != 0 ? "w" : "");
+        return s == "" || Props.Get("buildings", id, s) == null ? "default" : s;
+    }
+
+    /// <summary>How far a belt's slats have run (in belt positions), and when its items last moved (sim tick).</summary>
+    private sealed class BeltRun
+    {
+        public long Signature;
+        public long MovedTick;
+        public double Last;
+        public float Travel;
+    }
+
+    private readonly Dictionary<int, BeltRun> _beltRuns = new();
+
+    /// <summary>
+    /// Belt slat frame 0..<paramref name="frames"/>-1: one cycle moves the slats 0.25 m, at the belt's speed in real
+    /// time. A jammed belt (carrying items that haven't moved for a few sim ticks) stops; a paused game doesn't count.
+    /// </summary>
+    private int BeltPhase(Belt belt, int frames)
+    {
+        long sig = belt.Items.Count;
+        foreach (var it in belt.Items) sig = sig * 31 + it.Pos;
+        double now = Now;
+        long tick = _world!.Tick;
+        if (!_beltRuns.TryGetValue(belt.Id, out var run))
+            _beltRuns[belt.Id] = run = new BeltRun { Signature = sig, MovedTick = tick, Last = now };
+        if (sig != run.Signature)
+        {
+            run.Signature = sig;
+            run.MovedTick = tick;
+        }
+        bool jammed = belt.Items.Count > 0 && tick - run.MovedTick > 6;
+        if (!jammed) run.Travel += (float)(now - run.Last) * World.TicksPerSecond * belt.Def.BeltSpeed * _world.Mods.Mult(Stat.BeltSpeed);
+        run.Last = now;
         float cycle = 0.25f / Props.MetresPerTile * Belt.Length;
-        float pos = (float)(Now * World.TicksPerSecond % 100000) * belt.Def.BeltSpeed * _world!.Mods.Mult(Stat.BeltSpeed);
-        return (int)(pos / (cycle / 4)) % 4;
+        run.Travel %= cycle * 1000;
+        return (int)(run.Travel / (cycle / frames)) % frames;
     }
 
     /// <summary>Damage state for a building's sprite: "damaged" under half health.</summary>
@@ -298,7 +397,9 @@ public partial class WorldView : Node2D
         var color = Iso.ParseColor(belt.Def.Color);
         string id = BeltSpriteId(belt);
         if (!Props.Has("buildings", id)) id = belt.Def.Id;
-        var frame = BuildingFrame(id, belt.Dir, $"{PropSprites.DirName(belt.Dir)}_{BeltPhase(belt)}", DamageState(belt));
+        string d = PropSprites.DirName(belt.Dir);
+        int slats = Math.Max(1, Props.Strip("buildings", id, d).Length);
+        var frame = BuildingFrame(id, belt.Dir, $"{d}_{BeltPhase(belt, slats)}", DamageState(belt));
         if (frame != null) PropSprites.Draw(this, frame, Iso.ToScreen(belt.Center));
         else
         {
@@ -513,7 +614,7 @@ public partial class WorldView : Node2D
             BuildingKind.Drill => $"{(_world!.Map.OreAt(origin) ?? "iron_ore").Split('_')[0]}_{d}",
             BuildingKind.Inserter => d + "_pickup",
             BuildingKind.Belt => d + "_0",
-            BuildingKind.Wall => WallJoins(origin),
+            BuildingKind.Wall => WallJoins(origin, def.Id),
             _ => d,
         };
         return BuildingFrame(def.Id, dir, main, state);
@@ -523,29 +624,28 @@ public partial class WorldView : Node2D
     {
         var color = Iso.ParseColor(b.Def.Color);
         float height = HeightOf(b.Def);
-        float inset = b is Inserter ? 0.3f : b is PowerPole ? 0.4f : 0.08f;
+        // Walls fill their tile so a run of boxes reads as one wall.
+        float inset = b is Inserter ? 0.3f : b is PowerPole ? 0.4f : b is Wall ? 0f : 0.08f;
         float t = (float)Time.GetTicksMsec() / 1000f;
-        // Prop Studio sprite if there is one (turrets keep their live aim, so no damaged frame); otherwise a box.
+        // Prop Studio sprite if there is one, its frame driven by the building's state; otherwise a box.
         var ground = Iso.ToScreen(b.Center);
-        var frame = BuildingFrame(b.Def.Id, b is Nexus ? Direction.North : b.Dir, MainFrame(b), b is Turret ? null : DamageState(b));
+        var frame = LiveFrame(b, out bool animated);
         bool sprite = frame != null;
+        bool working = IsWorking(b);
         if (frame != null)
         {
             PropSprites.Draw(this, frame, ground);
             height = SpriteHeight(frame);
-            bool working = b switch
-            {
-                Generator g => g.HasFuel && g.Load > 0,
-                Crafter c => c.Active != null,
-                Drill d => d.Status.StartsWith("Mining"),
-                _ => false,
-            };
-            if (frame.Smoke.Length > 0 && (working || DamageState(b) != null)) DrawSmoke(frame, ground, t, b.Id);
+            bool damaged = DamageState(b) != null;
+            if (frame.Smoke.Length > 0 && (working && b is not (Nexus or SuperWeapon) || damaged)) DrawSmoke(frame, ground, t, b.Id);
+            if (damaged) DrawDamageSparks(ground + new Vector2(0, -height * 0.6f), t, b.Id);
+            // Until Prop Studio has a strip for it, the coded motion goes on top of the still sprite.
+            if (!animated && working) DrawWorkingMotion(b, frame, ground, height, t);
         }
         else if (b is not PowerPole) Iso.DrawBox(this, b.Origin.X, b.Origin.Y, b.Size, height, color, inset);
         var top = ground + new Vector2(0, -height);
 
-        // With a sprite, only live overlays are drawn (ammo, smoke, fill); the sprite already shows the rest.
+        // With a sprite, only live overlays are drawn (ammo, smoke, fill, the held item); the sprite shows the rest.
         switch (b)
         {
             case Inserter ins:
@@ -592,9 +692,10 @@ public partial class WorldView : Node2D
             case SuperWeapon sw:
                 float charge = sw.Charge / sw.ChargeNeeded(_world!);
                 bool ready = charge >= 1f;
-                DrawCircle(top + new Vector2(0, -10), 16, color.Darkened(0.3f));
+                if (!sprite) DrawCircle(top + new Vector2(0, -10), 16, color.Darkened(0.3f));
                 DrawArc(top + new Vector2(0, -10), 18, -Mathf.Pi / 2, -Mathf.Pi / 2 + Mathf.Tau * charge, 32,
                     ready ? HintColor with { A = 0.6f + 0.4f * MathF.Sin(t * 6) } : new Color(0.6f, 0.9f, 1f), 3, true);
+                if (sprite) break;
                 if (sw.Def.Id == "nuclear_silo") DrawColoredPolygon(new[] { top + new Vector2(0, -26), top + new Vector2(-6, -8), top + new Vector2(6, -8) }, new Color(0.9f, 0.9f, 0.8f));
                 else DrawArc(top + new Vector2(0, -16), 10, Mathf.Pi, Mathf.Tau, 16, Colors.White, 2, true);
                 break;
@@ -604,6 +705,128 @@ public partial class WorldView : Node2D
             DrawPowerWarning(top + new Vector2(0, -24));
         if (b.Hp < b.MaxHp)
             DrawHpBar(Iso.ToScreen(b.Center) + new Vector2(0, -height - 10), 34 * b.Size, b.Hp / b.MaxHp);
+    }
+
+    /// <summary>
+    /// Coded motion over a still sprite while Prop Studio has no strip for it: dust and a spinning bit on a mining
+    /// drill, a fire glow in a working furnace or workshop, a pulse in the Nexus core and a working lab, and exhaust from
+    /// a running generator without smoke points.
+    /// </summary>
+    private void DrawWorkingMotion(Building b, PropSprites.Frame frame, Vector2 ground, float height, float t)
+    {
+        float seed = b.Id * 0.37f;
+        switch (b)
+        {
+            case Drill:
+            {
+                // The bit: a glint turning round the bore, and dust kicked up round the footprint.
+                var bit = ground + new Vector2(0, -height * 0.35f);
+                var spin = new Vector2(MathF.Cos(t * 9 + seed) * 6, MathF.Sin(t * 9 + seed) * 3);
+                DrawLine(bit - spin, bit + spin, Colors.White with { A = 0.5f }, 2);
+                for (int i = 0; i < 4; i++)
+                {
+                    float k = (t * 1.3f + i / 4f + seed) % 1f;
+                    float a = Mathf.Tau * (i / 4f) + seed;
+                    var p = ground + new Vector2(MathF.Cos(a) * (8 + 14 * k) * b.Size, MathF.Sin(a) * (4 + 7 * k) * b.Size - 6 * k);
+                    DrawCircle(p, 2 + 3 * k, new Color(0.62f, 0.55f, 0.42f, 0.45f * (1 - k)));
+                }
+                break;
+            }
+            case Crafter when b.Def.Id.Contains("furnace"):
+                DrawFurnaceHeat(b, ground, height, t);
+                break;
+            case Crafter c:
+            {
+                bool workshop = c.Def.Id == "workshop";
+                float flicker = 0.55f + 0.25f * MathF.Sin(t * 13 + seed) + 0.2f * MathF.Sin(t * 29 + seed * 3);
+                var mouth = ground + new Vector2(0, -height * 0.3f);
+                var glow = workshop ? new Color(1f, 0.9f, 0.45f) : new Color(1f, 0.5f, 0.12f);
+                DrawCircle(mouth, 9 * b.Size, glow with { A = 0.18f * flicker });
+                DrawCircle(mouth, 4 * b.Size, glow with { A = 0.45f * flicker });
+                if (workshop && (int)(t * 8 + seed) % 3 == 0) DrawDamageSparks(mouth, t, b.Id);
+                break;
+            }
+            case Nexus:
+            {
+                var core = CorePoint(b);
+                float pulse = 0.5f + 0.5f * MathF.Sin(t * 3.3f);
+                DrawCircle(core, 16, Core with { A = 0.10f + 0.12f * pulse });
+                DrawCircle(core, 7, Core with { A = 0.35f + 0.4f * pulse });
+                Ring(core, t * 0.5f % 1f, 8, 40);
+                break;
+            }
+            case Lab:
+            {
+                float pulse = 0.5f + 0.5f * MathF.Sin(t * 4 + seed);
+                var lamp = ground + new Vector2(0, -height + 6);
+                DrawCircle(lamp, 9, new Color(0.5f, 0.8f, 1f, 0.15f + 0.2f * pulse));
+                DrawCircle(lamp, 4, new Color(0.7f, 0.9f, 1f, 0.5f + 0.4f * pulse));
+                break;
+            }
+            case Generator when frame.Smoke.Length == 0:
+                var stack = ground + new Vector2(8, -height);
+                for (int i = 0; i < 3; i++)
+                    DrawCircle(stack + new Vector2(i * 2, -((t * 20 + i * 7) % 18)), 3 + i, new Color(0.6f, 0.6f, 0.65f, 0.4f));
+                break;
+        }
+    }
+
+    /// <summary>
+    /// A smelting furnace burning red hot (until Prop Studio's working loop lands): a warm pool of light on the ground
+    /// in front, a pulsing red heat halo round the body, a flickering orange-to-yellow firebox mouth, and embers rising.
+    /// Real time, phase offset per furnace.
+    /// </summary>
+    private void DrawFurnaceHeat(Building b, Vector2 ground, float height, float t)
+    {
+        float seed = b.Id * 1.618f;
+        float flicker = 0.6f + 0.22f * MathF.Sin(t * 11 + seed) + 0.18f * MathF.Sin(t * 27 + seed * 2.3f);
+        float pulse = 0.5f + 0.5f * MathF.Sin(t * 2.4f + seed);
+        var off = b.Dir.Offset();
+        var front = new SVec(off.X, off.Y);
+
+        // Light spilling on the ground in front of the firebox.
+        var pool = Iso.ToScreen(b.Center + front * (0.55f * b.Size));
+        DrawSetTransform(pool, 0, new Vector2(1, 0.5f));
+        for (int i = 3; i >= 1; i--)
+            DrawCircle(Vector2.Zero, 9 * i * b.Size, new Color(1f, 0.45f, 0.1f, 0.06f * flicker));
+        DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+
+        // Heat halo round the body: concentric low-alpha circles, breathing.
+        var body = ground + new Vector2(0, -height * 0.45f);
+        for (int i = 4; i >= 1; i--)
+            DrawCircle(body, (7 + 6 * i + 3 * pulse) * b.Size, new Color(1f, 0.18f, 0.05f, (0.035f + 0.025f * pulse)));
+
+        // The firebox mouth, low on the front face: orange round a yellow-white core.
+        var mouth = Iso.ToScreen(b.Center + front * (0.42f * b.Size)) + new Vector2(0, -height * 0.22f);
+        DrawCircle(mouth, 8 * b.Size, new Color(1f, 0.35f, 0.05f, 0.30f * flicker));
+        DrawCircle(mouth, 5 * b.Size, new Color(1f, 0.6f, 0.15f, 0.55f * flicker));
+        DrawCircle(mouth, 2.5f * b.Size, new Color(1f, 0.92f, 0.55f, 0.85f * flicker));
+
+        // Embers drifting up from the top and fading.
+        var vent = ground + new Vector2(0, -height + 4);
+        for (int i = 0; i < 5; i++)
+        {
+            float k = (t * 0.55f + i / 5f + seed) % 1f;
+            float sway = 4 * MathF.Sin(t * 3 + i * 1.7f + seed);
+            var p = vent + new Vector2((i - 2) * 3 * b.Size + sway * k, -30 * k);
+            DrawCircle(p, 1.6f * (1 - k) + 0.6f, new Color(1f, 0.55f + 0.4f * (1 - k), 0.15f, 0.9f * (1 - k)));
+        }
+    }
+
+    /// <summary>A few short-lived sparks flicking out of <paramref name="at"/> (damage, welding, a workshop at work).</summary>
+    private void DrawDamageSparks(Vector2 at, float t, int seed)
+    {
+        // Bursts come and go: on for a fifth of every second-and-a-bit, at a different moment per building.
+        float phase = (t * 0.8f + seed * 0.618f) % 1f;
+        if (phase > 0.2f) return;
+        float k = phase / 0.2f;
+        for (int i = 0; i < 5; i++)
+        {
+            float a = -Mathf.Pi / 2 + (i - 2) * 0.5f + seed;
+            var dir = new Vector2(MathF.Cos(a), MathF.Sin(a));
+            var p = at + dir * (4 + 12 * k) + new Vector2(0, 10 * k * k);
+            DrawLine(p, p - dir * 3, new Color(1f, 0.85f, 0.35f, 1 - k), 1.5f);
+        }
     }
 
     /// <param name="barrel">False when a sprite already shows the head (it picks the frame nearest the aim).</param>
@@ -814,7 +1037,16 @@ public partial class WorldView : Node2D
 
     private static int EngineerKey(Engineer eng) => -1 - eng.PlayerId;
 
-    private static string EngineerSprite(Engineer eng) => eng.PlayerId == 0 ? "engineer_blue" : "engineer_orange";
+    /// <summary>Where an engineer's sprites are: section and id, per player colour (null if Prop Studio has none yet).</summary>
+    private static (string Section, string Id)? EngineerArt(Engineer eng)
+    {
+        foreach (var id in new[] { $"engineer_p{eng.PlayerId + 1}", eng.PlayerId == 0 ? "engineer_blue" : "engineer_orange" })
+            foreach (var section in new[] { "engineer", "units" })
+                if (Props.Has(section, id)) return (section, id);
+        return null;
+    }
+
+    private static string EngineerSprite(Engineer eng) => EngineerArt(eng)?.Id ?? "engineer";
 
     /// <summary>Updates facings and strides from how units moved, and leaves corpses for enemies that died.</summary>
     private void TrackUnits(double now)
@@ -853,20 +1085,37 @@ public partial class WorldView : Node2D
         _decals.RemoveAll(d => now - d.Start > d.Duration);
     }
 
-    /// <summary>A unit's frame: dead, acting (attacking or building), a walking stride, or standing on its first stride.</summary>
-    private static PropSprites.Frame? UnitFrame(string section, string id, Pose pose, double now, bool acting, SVec? actToward = null)
+    /// <summary>
+    /// A unit's frame, by what it's doing. Acting (attacking, building): the "&lt;facing&gt;_work" strip looping in real
+    /// time, else the "_act" strip or frame. Moving: the "&lt;facing&gt;_walk" strip (else the "&lt;facing&gt;_1", "_2" strides),
+    /// stepped by distance walked so feet don't slide. Standing: the "&lt;facing&gt;_idle" strip, else the first stride.
+    /// </summary>
+    private static PropSprites.Frame? UnitFrame(string section, string id, Pose pose, double now, bool acting, SVec? actToward, int seed)
     {
         string facing = PropSprites.AimName(actToward is { } at && at != SVec.Zero ? at : pose.Facing);
-        if (acting && Props.Get(section, id, facing + "_act") is { } act) return act;
+        if (acting)
+        {
+            var act = Props.Play(section, id, facing + "_work", now, WorkFps, seed)
+                      ?? Props.Play(section, id, facing + "_act", now, WorkFps, seed)
+                      ?? Props.Get(section, id, facing + "_act");
+            if (act != null) return act;
+        }
         bool moving = now - pose.MovedAt < 0.15;
-        int stride = moving ? 1 + (int)(pose.Walked / StrideTiles) % 2 : 1;
-        return Props.First(section, id, $"{facing}_{stride}", $"{facing}_1", "s_1");
+        string walk = Props.Strip(section, id, facing + "_walk").Length > 0 ? facing + "_walk" : facing;
+        if (moving && Props.At(section, id, walk, (int)(pose.Walked / StrideTiles)) is { } step) return step;
+        return Props.Play(section, id, facing + "_idle", now, IdleFps / 2, seed)
+               ?? Props.At(section, id, walk, 0)
+               ?? Props.First(section, id, "s_1", "s_walk_1");
     }
+
+    /// <summary>A downed unit's frame: "downed", or "&lt;facing&gt;_dead".</summary>
+    private static PropSprites.Frame? DeadFrame(string section, string id, SVec facing) =>
+        Props.First(section, id, "downed", PropSprites.AimName(facing) + "_dead");
 
     private void DrawCorpse(Corpse c, double now)
     {
         float age = (float)(now - c.Start);
-        if (Props.Get("enemies", c.Sprite, PropSprites.AimName(c.Facing) + "_dead") is not { } f) return;
+        if (DeadFrame("enemies", c.Sprite, c.Facing) is not { } f) return;
         float fade = Math.Clamp((float)(CorpseSeconds - age) / 1.5f, 0, 1);
         PropSprites.Draw(this, f, Iso.ToScreen(c.Pos), 1, Colors.White with { A = fade });
     }
@@ -900,7 +1149,7 @@ public partial class WorldView : Node2D
         if (_poses.TryGetValue(e.Id, out var pose))
         {
             var target = e.AttackingId is int id ? _world!.BuildingById(id) : null;
-            if (UnitFrame("enemies", e.Def.Id, pose, Now, e.AttackingId != null, target?.Center - e.Pos) is { } frame)
+            if (UnitFrame("enemies", e.Def.Id, pose, Now, e.AttackingId != null, target?.Center - e.Pos, e.Id) is { } frame)
             {
                 // Shadows are baked into the sprite; only the overlays go on top.
                 PropSprites.Draw(this, frame, ground);
@@ -943,13 +1192,16 @@ public partial class WorldView : Node2D
         if (!eng.Alive)
         {
             // Lying where it fell until it respawns.
-            if (pose != null && Props.Get("units", EngineerSprite(eng), PropSprites.AimName(pose.Facing) + "_dead") is { } dead)
+            if (pose != null && EngineerArt(eng) is { } downedArt && DeadFrame(downedArt.Section, downedArt.Id, pose.Facing) is { } dead)
                 PropSprites.Draw(this, dead, Iso.ToScreen(pose.Pos), 1, Colors.White with { A = 0.8f });
             return;
         }
         var ground = Iso.ToScreen(eng.Pos);
         var workTarget = eng.WorkingOn is int wid ? _world!.BuildingById(wid) : null;
-        var frame = pose != null ? UnitFrame("units", EngineerSprite(eng), pose, Now, workTarget != null, workTarget?.Center - eng.Pos) : null;
+        var art = EngineerArt(eng);
+        var frame = pose != null && art is { } a
+            ? UnitFrame(a.Section, a.Id, pose, Now, workTarget != null, workTarget?.Center - eng.Pos, eng.PlayerId * 5)
+            : null;
         DrawSetTransform(ground, 0, new Vector2(1, 0.5f));
         DrawArc(Vector2.Zero, 15, 0, Mathf.Tau, 32, eng.PlayerId == GameSession.LocalPlayer ? Selected : color, 2f, true);
         if (frame == null) DrawCircle(Vector2.Zero, 10, new Color(0, 0, 0, 0.35f));
