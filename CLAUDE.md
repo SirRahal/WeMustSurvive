@@ -11,6 +11,20 @@ Personal, uncommitted notes go in `CLAUDE.local.md` (gitignored).
 **Belt & Barricade** (repo: `SirRahal/WeMustSurvive`, public) is a post-apocalyptic factory-defense game for
 1–2 players: Factorio-style logistics plus wave-based tower defense, defending a Nexus from alien waves.
 
+**One game, two names.** "We Must Survive" is only the repo/folder name (`C:\Coding\We Must Survive`); everywhere
+else the game is **Belt & Barricade**, shortened to `belt_barricade` or `bb`. Look under those names, not "we must
+survive", when searching other projects. In particular, its art in Prop Studio (`C:\Coding\Prop Studio`) lives at:
+
+| What | Where (in Prop Studio) |
+|------|------------------------|
+| Generators, palette, sprite renderer, loading notes | `providers/belt_barricade/` (`bb_kit.gd`, `bb_sprites.gd`, `README.md`) |
+| Prop / generator ids | `bb_*` (e.g. `bb_belt`, `bb_wall`); the game's own building ids map onto them in `BBKit.GAME` |
+| Exports (models, sprites, `sprites.json`) | `exports/belt_barricade/` (not committed; regenerate with Prop Studio's export tool) |
+| Work in progress | `.claude/worktrees/<task>/` on a branch per task (e.g. `bb-polish`), until merged to Prop Studio's `main` |
+
+When asking where Belt & Barricade art is, or whether Prop Studio is done, check those paths and that repo's branches
+and worktrees, not just its `main`.
+
 - Design doc: `Init Instructions.txt` (the original design, treat it as the source of intent).
 - What's implemented vs. the design: `docs/DESIGN_STATUS.md`. **Read this before starting a feature**, and update it
   in the same change when a feature lands or changes.
@@ -51,7 +65,14 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40
   clock time, no iteration over unordered collections where order affects state, no Godot types. Game state changes
   only through `Commands` so both co-op peers apply them on the same tick.
 - Gameplay numbers belong in `game/data/*.json`, not hard-coded in C#.
-- UI is built in code from Godot controls using `UI/UiKit.cs` styles; don't add `.tscn` scenes for menus.
+- UI is built in code from Godot controls using `UI/UiKit.cs` styles; don't add `.tscn` scenes for menus. The in-game
+  HUD (`UI/Hud.cs`) is drawn directly in 1920x1080 design units (scaled to 80%) with `UI/HudTheme.cs` colours and
+  fonts and `UI/Icons.cs` icons.
+- Keys and mouse buttons are InputMap actions registered in `Input/Bindings.cs`; check actions, not raw keys, so the
+  Controls panel stays in sync.
+- Building art comes from Prop Studio (`C:\Coding\Prop Studio`, provider `bb_*`), never made here: export there, then
+  `tools\sync-art.bat` copies the sprites into `game/art/buildings`. `View/BuildingSprites.cs` draws them (frames picked
+  for the view angle); anything without a sprite falls back to the coded boxes in `WorldView`.
 - New sim behaviour gets a test in `sim.tests/`. GIT PUSH runs `dotnet test sim.tests` before it touches `main`.
 - Match the existing style: file-scoped namespaces, nullable enabled, `/// <summary>` on public types.
 

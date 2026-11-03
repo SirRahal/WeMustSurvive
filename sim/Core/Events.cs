@@ -28,3 +28,9 @@ public sealed record PingEvent(int PlayerId, PingKind Kind, Vector2 Pos) : SimEv
 public sealed record DrawEvent(int PlayerId, Vector2[] Points) : SimEvent;
 
 public sealed record ClearDrawingsEvent(int PlayerId) : SimEvent;
+
+/// <summary>An item went into the storage network (Nexus or a depot at <paramref name="Storage"/>) from <paramref name="From"/>.</summary>
+public sealed record ItemStoredEvent(Vector2 From, Int2 Storage, string Item) : SimEvent;
+
+/// <summary>An inserter at <paramref name="To"/> took an item out of the storage network (Nexus or a depot at <paramref name="Storage"/>).</summary>
+public sealed record ItemTakenEvent(Int2 Storage, Vector2 To, string Item) : SimEvent;

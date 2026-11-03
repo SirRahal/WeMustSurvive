@@ -25,6 +25,8 @@ public partial class GameSession : Node2D
     private Tutorial? _tutorial;
     private int _focusedStep = -1;
     private bool _resultRecorded;
+    /// <summary>Speed control's pause: the sim stops stepping, but the camera, HUD and orders keep working.</summary>
+    private bool _simPaused;
 
     private TerrainView _terrain = null!;
     private WorldView _view = null!;
@@ -54,6 +56,10 @@ public partial class GameSession : Node2D
         _input.Hud = _hud;
         _hud.TutorialNextRequested += () => _tutorial?.Next(_world);
         _hud.TutorialSkipRequested += SkipTutorial;
+        _hud.SpeedRequested += SetSpeed;
+        _hud.MenuRequested += Pause;
+        _hud.FollowHeroRequested += FollowHero;
+        _hud.CanChangeSpeed = !IsCoop || IsHost;
 
         var menuLayer = new CanvasLayer { Name = "MenuLayer", Layer = 10 };
         AddChild(menuLayer);
@@ -96,6 +102,7 @@ public partial class GameSession : Node2D
         _tutorial = _cfg.Tutorial && !IsCoop ? new Tutorial(_app.Tutorial, _world, LocalPlayer) : null;
         _focusedStep = -1;
         _resultRecorded = false;
+        _hud.SimPaused = _simPaused = false;
 
         _terrain.Bind(_world);
         _input.Bind(_world);
@@ -104,6 +111,7 @@ public partial class GameSession : Node2D
         _input.Tutorial = _view.Tutorial = _hud.Tutorial = _tutorial;
         _camera.SetMapSize(_world.Map.Width, _world.Map.Height);
         _camera.CenterOn(Iso.ToScreen(_world.Engineers[LocalPlayer].Pos));
+        if (_app.HudPanels != "") _hud.OpenPanels(_app.HudPanels);
     }
 
     private LockstepPeer CreatePeer()
@@ -133,7 +141,7 @@ public partial class GameSession : Node2D
         _input.Poll();
         SmokeCommands();
         int steps = 0;
-        while (_peer.CanStep && steps < (IsHost ? 1 : MaxCatchUpSteps))
+        while (!_simPaused && _peer.CanStep && steps < (IsHost ? 1 : MaxCatchUpSteps))
         {
             _peer.Step();
             if (_world.Tick % 15 == 0) _view.Issues = _hud.Issues = LogisticsCheck.Analyze(_world);
@@ -201,6 +209,13 @@ public partial class GameSession : Node2D
         At("tunnel_exit", -6, 3);
         At("inserter", -3, 1, Direction.North);
         At("fast_inserter", -3, 2, Direction.South);
+        // Belt loop on the Nexus's north face: an inserter takes plates out, they ride around a corner and back in
+        // (shows belt corners and the storage in/out animations).
+        var loop = (Inserter)w.PlaceDirect("inserter", new Int2(n.X + 1, n.Y - 1), Direction.North);
+        loop.Filter = "iron_plate";
+        At("belt", 1, -2, Direction.West);
+        At("belt", 0, -2, Direction.South);
+        At("belt", 0, -1, Direction.South);
         w.PlaceDirect("satellite_uplink", new Int2(n.X + 5, n.Y + 1));
         w.PlaceDirect("nuclear_silo", new Int2(n.X + 8, n.Y + 1));
         foreach (var e in new[] { "grunt", "runner", "brute", "spitter", "sapper" })
@@ -310,6 +325,23 @@ public partial class GameSession : Node2D
         GetTree().Paused = false;
     }
 
+    /// <summary>Top-bar speed control: 0 pauses the sim, anything else is a speed from <see cref="Settings.Speeds"/>.</summary>
+    private void SetSpeed(float speed)
+    {
+        if (IsCoop && !IsHost) return; // the client follows the host's batches
+        _hud.SimPaused = _simPaused = speed <= 0;
+        if (_simPaused) return;
+        _app.Settings.GameSpeed = speed;
+        _app.Settings.Save();
+        ApplySettings();
+    }
+
+    /// <summary>C, or double-clicking the hero portrait: the camera tracks the local engineer until the player pans.</summary>
+    private void FollowHero() => _camera.Follow(() => Iso.ToScreen(_world.Engineers[LocalPlayer].Pos));
+
+    /// <summary>Space: pause, or resume at the last speed.</summary>
+    private void TogglePause() => SetSpeed(_simPaused ? _app.Settings.GameSpeed : 0);
+
     private void ApplySettings()
     {
         // In co-op only the host's speed matters (the client follows the host's batches).
@@ -320,28 +352,16 @@ public partial class GameSession : Node2D
 
     public override void _UnhandledInput(InputEvent e)
     {
-        switch (e)
-        {
-            // Reaches here only if nothing (blueprint, selection, panel) consumed Esc first.
-            case InputEventKey { Pressed: true, Echo: false, Keycode: Key.Escape }:
-                Pause();
-                break;
-            case InputEventKey { Pressed: true, Echo: false, Keycode: Key.C }:
-                _camera.CenterOn(Iso.ToScreen(_world.Engineers[LocalPlayer].Pos));
-                break;
-            case InputEventKey { Pressed: true, Echo: false, Keycode: Key.H }:
-                _app.Settings.ShowHelp = !_app.Settings.ShowHelp;
-                _app.Settings.Save();
-                break;
-            case InputEventKey { Pressed: true, Echo: false, Keycode: Key.Enter or Key.KpEnter } when _world.Outcome != Outcome.Playing && IsHost:
-                Restart();
-                break;
-            case InputEventKey { Pressed: true, Echo: false, Keycode: Key.Enter or Key.KpEnter } when _tutorial is { NeedsNext: true }:
-                _tutorial.Next(_world);
-                break;
-            default:
-                return;
-        }
+        if (e is not InputEventKey { Pressed: true, Echo: false } key) return;
+        // Menu reaches here only if nothing (blueprint, selection, panel) consumed Esc first.
+        if (key.IsActionPressed(Bindings.Menu)) Pause();
+        else if (key.IsActionPressed(Bindings.JumpToEngineer)) FollowHero();
+        else if (key.IsActionPressed(Bindings.Controls)) _hud.ToggleControls();
+        else if (key.IsActionPressed(Bindings.ToggleMap)) _hud.ToggleMap();
+        else if (key.IsActionPressed(Bindings.Pause)) TogglePause();
+        else if (key.Keycode is Key.Enter or Key.KpEnter && _world.Outcome != Outcome.Playing && IsHost) Restart();
+        else if (key.Keycode is Key.Enter or Key.KpEnter && _tutorial is { NeedsNext: true }) _tutorial.Next(_world);
+        else return;
         GetViewport().SetInputAsHandled();
     }
 }

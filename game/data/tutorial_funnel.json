@@ -27,7 +27,7 @@
     {
       "id": "coal_drill",
       "title": "Mine coal",
-      "body": "Coal is fuel for drills, furnaces and generators.\n\nOn the command card (bottom right) open Production (or press 2), then pick Burner Drill (1) and left-click the marked coal tile. Drills aim themselves at the best neighbour; the arrow shows where it will drop what it mines (R to rotate). Your engineer walks over and builds it.",
+      "body": "Coal is fuel for drills, furnaces and generators.\n\nIn the build panel (bottom) open the Production tab (or press 2), then pick Burner Drill (1) and left-click the marked coal tile. Drills aim themselves at the best neighbour; the arrow shows where it will drop what it mines (R to rotate). Your engineer walks over and builds it.",
       "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
       "goal": "hintsBuilt", "button": "drill",
       "hints": [ { "building": "drill", "x": 44, "y": 60, "dir": "East" } ]
@@ -43,7 +43,7 @@
     {
       "id": "furnace",
       "title": "Smelt iron",
-      "body": "A Furnace turns ore into plates. Build one (Production > Furnace, keys 2 then 4) on the marked tile.\n\nThe iron drill feeds it ore and the coal drill feeds it fuel. You'll see it glow when it starts smelting.",
+      "body": "A Furnace turns ore into plates. Build one (Production > Furnace, keys 2 then 2) on the marked tile.\n\nThe iron drill feeds it ore and the coal drill feeds it fuel. You'll see it glow when it starts smelting.",
       "focus": { "x": 45, "y": 61 }, "zoom": 1.9,
       "goal": "furnaceSmelting", "button": "furnace",
       "hints": [ { "building": "furnace", "x": 45, "y": 60 } ]
@@ -51,7 +51,7 @@
     {
       "id": "inserter_out",
       "title": "Grab the plates",
-      "body": "Plates pile up inside the furnace. An Inserter grabs items from the tile behind it and drops them on the tile in front.\n\nPlace one (Logistics > Inserter, keys 1 then 7) on the marked tile below the furnace, facing south.",
+      "body": "Plates pile up inside the furnace. An Inserter grabs items from the tile behind it and drops them on the tile in front.\n\nPlace one (Logistics > Inserter, keys 1 then 2) on the marked tile below the furnace, facing south.",
       "focus": { "x": 43.5, "y": 62 }, "zoom": 1.7,
       "goal": "hintsBuilt", "button": "inserter",
       "hints": [ { "building": "inserter", "x": 45, "y": 61, "dir": "South" } ]
@@ -84,7 +84,7 @@
     {
       "id": "factory_info",
       "title": "Your first factory",
-      "body": "Iron plates and coal are flowing into the Nexus. Watch the counts in the top right. Everything you build is paid from that storage, so a growing factory means more defenses.\n\nLeft-click any building to select it. Its actions (rotate, repair, deconstruct) appear on the command card.",
+      "body": "Iron plates and coal are flowing into the Nexus. Watch the counts in the top right; click them for the full storage list. Everything you build is paid from that storage, so a growing factory means more defenses.\n\nLeft-click any building to select it. Its details and actions (rotate, repair, deconstruct) replace the build panel. Back returns to the tabs.",
       "focus": { "x": 43, "y": 62 }, "zoom": 1.4
     },
     {
@@ -98,7 +98,7 @@
     {
       "id": "workshop",
       "title": "Build an ammo workshop",
-      "body": "The Munitions Works turns 2 iron plates into an ammo magazine. Build one (Production > Munitions Works, keys 2 then 6) on the marked tile, two tiles below the turret.\n\nThen hold Shift and place an Inserter (Logistics > Inserter, keys 1 then 7) on the marked tile between the Nexus and the workshop, facing west. It carries iron plates out of the Nexus into the workshop.\n\nShift chains orders: your engineer builds the workshop first, then the inserter. Without Shift, a new order replaces the engineer's plan.",
+      "body": "The Munitions Works turns 2 iron plates into an ammo magazine. Build one (Production > Munitions Works, keys 2 then 3) on the marked tile, two tiles below the turret.\n\nThen hold Shift and place an Inserter (Logistics > Inserter, keys 1 then 2) on the marked tile between the Nexus and the workshop, facing west. It carries iron plates out of the Nexus into the workshop.\n\nShift chains orders: your engineer builds the workshop first, then the inserter. Without Shift, a new order replaces the engineer's plan.",
       "focus": { "x": 38, "y": 64.5 }, "zoom": 1.8,
       "goal": "hintsBuilt", "button": "workshop",
       "hints": [
@@ -139,9 +139,9 @@
     {
       "id": "release",
       "title": "Here they come",
-      "body": "That's the basics! The wave timer is now running (top left). Press Space to call the first wave now, or use the time to keep building.\n\nDuring a fight, right-click damaged buildings to repair them.",
+      "body": "That's the basics! The wave timer is now running (top left). Click the call-wave button next to it to start the first wave now, or use the time to keep building.\n\nDuring a fight, right-click damaged buildings to repair them.",
       "focus": { "x": 40.5, "y": 58 }, "zoom": 1.0,
-      "goal": "waveStarted", "releaseWaves": true
+      "goal": "waveStarted", "releaseWaves": true, "button": "call_wave"
     },
     {
       "id": "good_luck",

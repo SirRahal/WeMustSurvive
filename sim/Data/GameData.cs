@@ -36,6 +36,8 @@ public sealed class BuildingDef
     public BuildingKind Kind { get; init; }
     /// <summary>Command-card category: logistics, production, power, defense, special. Empty = not player-buildable.</summary>
     public string Category { get; init; } = "";
+    /// <summary>Build-menu group: upgrade tiers name their base building here and share its slot. Empty = its own id.</summary>
+    public string Family { get; init; } = "";
     /// <summary>Research that unlocks this building; null = available from the start.</summary>
     public string? Tech { get; init; }
     public Dictionary<string, int> Cost { get; init; } = new();
@@ -263,4 +265,8 @@ public sealed class GameData
 
     /// <summary>Buildings players can place, in a command-card category.</summary>
     public IEnumerable<BuildingDef> InCategory(string category) => BuildingList.Where(b => b.Category == category);
+
+    /// <summary>Build-menu slots for a category: one list per family, members in data order (lowest tier first).</summary>
+    public List<List<BuildingDef>> FamiliesIn(string category) =>
+        InCategory(category).GroupBy(b => b.Family == "" ? b.Id : b.Family).Select(g => g.ToList()).ToList();
 }

@@ -3,7 +3,10 @@ using Godot;
 
 namespace BeltAndBarricade.View;
 
-/// <summary>Draws the ground, impassable rock, ore, and claim zones. Redrawn occasionally as ore depletes.</summary>
+/// <summary>
+/// Draws the ground, impassable rock, ore, and claim zones. Redrawn occasionally as ore depletes, and every frame
+/// while the view is turning.
+/// </summary>
 public partial class TerrainView : Node2D
 {
     private static readonly Color Ground = new(0.24f, 0.23f, 0.20f);
@@ -14,6 +17,7 @@ public partial class TerrainView : Node2D
 
     private World? _world;
     private double _redrawTimer;
+    private float _drawnAngle;
 
     public void Bind(World world)
     {
@@ -23,6 +27,11 @@ public partial class TerrainView : Node2D
 
     public override void _Process(double delta)
     {
+        if (Iso.Angle != _drawnAngle)
+        {
+            QueueRedraw();
+            return;
+        }
         _redrawTimer -= delta;
         if (_redrawTimer > 0) return;
         _redrawTimer = 2.0;
@@ -33,6 +42,8 @@ public partial class TerrainView : Node2D
     {
         if (_world == null) return;
         var map = _world.Map;
+        _drawnAngle = Iso.Angle;
+        var rocks = new List<Int2>();
 
         for (int y = 0; y < map.Height; y++)
         for (int x = 0; x < map.Width; x++)
@@ -41,9 +52,8 @@ public partial class TerrainView : Node2D
             var terrain = map.TerrainAt(t);
             if (terrain == Terrain.Blocked)
             {
-                // Only draw rock that borders playable space; the rest is void.
-                if (!TouchesOpen(map, t)) continue;
-                Iso.DrawBox(this, x, y, 1, 14, Rock, 0);
+                // Only draw rock that borders playable space; the rest is void. Drawn last, back to front.
+                if (TouchesOpen(map, t)) rocks.Add(t);
                 continue;
             }
 
@@ -70,6 +80,9 @@ public partial class TerrainView : Node2D
                 DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, ClaimOutline, 1.5f);
             }
         }
+
+        rocks.Sort((a, b) => Iso.Depth(a.X + 0.5f, a.Y + 0.5f).CompareTo(Iso.Depth(b.X + 0.5f, b.Y + 0.5f)));
+        foreach (var r in rocks) Iso.DrawBox(this, r.X, r.Y, 1, 14, Rock, 0);
     }
 
     private static bool TouchesOpen(GameMap map, Int2 t)

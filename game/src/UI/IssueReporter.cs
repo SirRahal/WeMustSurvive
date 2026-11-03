@@ -70,8 +70,9 @@ public partial class IssueReporter : CanvasLayer
             Text = "Report issue (F8)",
             FocusMode = Control.FocusModeEnum.None,
             TooltipText = "File a GitHub issue (dev builds only)",
-            AnchorLeft = 0.5f, AnchorRight = 0.5f,
-            OffsetLeft = -75, OffsetRight = 75, OffsetTop = 4, OffsetBottom = 30,
+            // Right edge, halfway down: clear of the HUD's bars, minimap and pop-ups.
+            AnchorLeft = 1, AnchorRight = 1, AnchorTop = 0.5f, AnchorBottom = 0.5f,
+            OffsetLeft = -162, OffsetRight = -12, OffsetTop = -13, OffsetBottom = 13,
         };
         _openButton.AddThemeFontSizeOverride("font_size", 13);
         _openButton.AddThemeStyleboxOverride("normal", UiKit.Box(new Color(0.08f, 0.09f, 0.12f, 0.75f), UiKit.Dim with { A = 0.5f }, 1, 4));

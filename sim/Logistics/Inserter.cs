@@ -55,6 +55,7 @@ public sealed class Inserter : Building
                 foreach (var d in SourceDirs(Dir, Input))
                 {
                     if (w.BuildingAt(Origin + d.Offset()) is not { } source || !TryTakeFrom(w, source, target, out string item)) continue;
+                    if (source is Nexus or Depot) w.Events.Add(new ItemTakenEvent(source.Origin, Center, item));
                     Held = item;
                     TookFrom = d;
                     State = Phase.Swinging;
@@ -69,6 +70,7 @@ public sealed class Inserter : Building
                 if (Progress < Def.SwingTicks) { Progress += speed; return; }
                 if (target != null && Drop(target, Held!))
                 {
+                    if (target is Nexus or Depot) w.Events.Add(new ItemStoredEvent(Center, target.Origin, Held!));
                     Held = null;
                     State = Phase.Returning;
                     Progress = 0;
