@@ -105,13 +105,24 @@ public partial class TerrainView : Node2D
 
     /// <summary>
     /// The tile's Prop Studio ground: an ore deposit (by the item's first word: iron_ore -> iron_deposit) or plain
-    /// ground, tinted for the enemy spawn area. False if there's no sprite for it.
+    /// ground, tinted for the enemy spawn area. False if there's no sprite for it. A deposit picks "mask_&lt;n&gt;_v&lt;k&gt;":
+    /// a bit for each side whose neighbour is the same ore (N 1, E 2, S 4, W 8, turned for the view), so a patch reads
+    /// as one field that fades to dirt only at its border.
     /// </summary>
     private bool GroundSprite(Int2 t, Terrain terrain, string? ore)
     {
         var props = PropSprites.Shared;
         string variant = PropSprites.Variant(t);
-        var frame = ore != null ? props.Get("ground", ore.Split('_')[0] + "_deposit", variant) : null;
+        PropSprites.Frame? frame = null;
+        if (ore != null)
+        {
+            string id = ore.Split('_')[0] + "_deposit";
+            int mask = 0;
+            foreach (var dir in new[] { Direction.North, Direction.East, Direction.South, Direction.West })
+                if (_world!.Map.OreAt(t + dir.Offset()) == ore)
+                    mask |= PropSprites.ViewTurn(dir) switch { Direction.North => 1, Direction.East => 2, Direction.South => 4, _ => 8 };
+            frame = props.Get("ground", id, $"mask_{mask}_{variant}") ?? props.Get("ground", id, variant);
+        }
         frame ??= props.Get("ground", "ground", variant);
         if (frame == null) return false;
         PropSprites.Draw(this, frame, Iso.ToScreen(t.X + 0.5f, t.Y + 0.5f), 1, terrain == Terrain.NoBuild ? SpawnTint : Colors.White);
