@@ -2,7 +2,7 @@
 
 Shared instructions for every Claude Code session on this repo. Two developers work on it, **both on every part of
 the project**, each with their own Claude. This file is how both Claudes stay in sync, so keep it current: when you
-correct Claude about something that should apply to both of you, add it here in the same PR.
+correct Claude about something that should apply to both of you, add it here in the same change.
 
 Personal, uncommitted notes go in `CLAUDE.local.md` (gitignored).
 
@@ -13,7 +13,7 @@ Personal, uncommitted notes go in `CLAUDE.local.md` (gitignored).
 
 - Design doc: `Init Instructions.txt` (the original design, treat it as the source of intent).
 - What's implemented vs. the design: `docs/DESIGN_STATUS.md`. **Read this before starting a feature**, and update it
-  in the same PR when a feature lands or changes.
+  in the same change when a feature lands or changes.
 - Steam shipping notes: `docs/STEAM.md`.
 - Player-facing overview, controls and command-line switches: `README.md`.
 
@@ -52,7 +52,7 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40
   only through `Commands` so both co-op peers apply them on the same tick.
 - Gameplay numbers belong in `game/data/*.json`, not hard-coded in C#.
 - UI is built in code from Godot controls using `UI/UiKit.cs` styles; don't add `.tscn` scenes for menus.
-- New sim behaviour gets a test in `sim.tests/`. Run `dotnet test sim.tests` before opening a PR.
+- New sim behaviour gets a test in `sim.tests/`. GIT PUSH runs `dotnet test sim.tests` before it touches `main`.
 - Match the existing style: file-scoped namespaces, nullable enabled, `/// <summary>` on public types.
 
 ## How we work together (both of us, both Claudes)
@@ -64,13 +64,18 @@ We don't split the codebase by owner, so **GitHub Issues are how we avoid collid
 2. **Claim it before you start:** assign yourself on the issue. If someone else is assigned, ask them before touching it.
    Claude: before starting work, check open issues (`gh issue list`) for anything overlapping the same files or
    system, and warn the user if there is one.
-3. **One branch per issue**, named `<name>/<issue#>-short-desc` (e.g. `sari/14-belt-jam`). Never commit straight to `main`.
-4. **Sync first:** `git pull --rebase origin main` before starting a session and again before opening a PR.
-5. **Small PRs, merged quickly.** Put `Closes #<issue>` in the PR description. The other person reviews before merge.
+3. **One branch per issue**, named `<name>/<issue#>-short-desc` (e.g. `sari/14-belt-jam`). Do your work there.
+4. **Sync first:** `git pull origin main` into your branch before starting a session.
+5. **"GIT PUSH" ships your work.** When anyone says **GIT PUSH**, Claude runs the `git-push` skill
+   (`.claude/skills/git-push/SKILL.md`): commit everything, merge `origin/main` into the branch and resolve conflicts
+   (picking the best version), build and run the tests, merge the branch into `main` with a merge commit, push `main`,
+   then switch back to the branch. It stops without touching `main` if the build or tests fail. The feature branch
+   itself is not pushed. **No code reviews for now**; pull requests are optional. Put `Closes #<issue>` in the commit
+   message to close the issue.
 6. **Conflict hotspots:** `game/project.godot`, `*.csproj`, `game/scenes/Main.tscn`, the big JSON files in
    `game/data/`, `UI/Hud.cs`, and `GameSession.cs`. Keep edits to these minimal and focused, and say in the issue
    when you'll be changing one of them.
-7. If a change alters these rules, the architecture, or the commands above, update this file in the same PR.
+7. If a change alters these rules, the architecture, or the commands above, update this file in the same change.
 
 ## Dev tools
 
