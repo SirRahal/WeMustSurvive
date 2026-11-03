@@ -45,6 +45,7 @@ public partial class CameraController : Camera2D
 
     public override void _Process(double delta)
     {
+        if (UI.IssueReporter.IsOpen) return; // typing a report: don't pan on WASD or the screen edge
         var dir = Vector2.Zero;
         if (Godot.Input.IsKeyPressed(Key.W) || Godot.Input.IsKeyPressed(Key.Up)) dir.Y -= 1;
         if (Godot.Input.IsKeyPressed(Key.S) || Godot.Input.IsKeyPressed(Key.Down)) dir.Y += 1;

@@ -37,6 +37,7 @@ public partial class App : Node
         Tree = SkillTree.Load(ReadData);
         Tutorial = TutorialDef.Load(ReadData, "funnel");
         AddChild(Net = new NetSession { Name = "Net" });
+        if (OS.IsDebugBuild()) AddChild(new IssueReporter { Name = "IssueReporter", Context = DescribeScreen });
         ApplyDisplaySettings();
         ShowMainMenu();
         RunCommandLine();
@@ -73,6 +74,10 @@ public partial class App : Node
         else if (args.TryGetValue("--autohost", out var hostMap)) Switch(new LobbyScreen(this, true, "", autoStartMap: hostMap) { Name = "Lobby" });
         else if (args.TryGetValue("--autojoin", out var address)) ShowLobby(host: false, address);
     }
+
+    /// <summary>Current screen and, in a game, its state summary (attached to in-game issue reports).</summary>
+    public string DescribeScreen() =>
+        _screen is GameSession g ? $"screen={_screen.Name} {g.DebugSummary()}" : $"screen={_screen?.Name ?? "none"}";
 
     public void ApplyDisplaySettings()
     {
