@@ -10,6 +10,9 @@ public sealed class Splitter : Building, IBeltInput
     private readonly List<string> _buffer = new();
     private int _next;
 
+    /// <summary>Holding items to pass on (the view plays its working loop).</summary>
+    public bool Busy => _buffer.Count > 0;
+
     public bool CanAccept(string item) => _buffer.Count < BufferSize;
 
     public bool TryInsert(string item)
@@ -56,6 +59,9 @@ public sealed class TunnelEntrance : Building, IBeltInput
     private const int TicksPerTile = 8;
     private readonly Queue<(string Item, long Arrive)> _queue = new();
     private long _lastTick;
+
+    /// <summary>Items are travelling underground from here (the view plays its working loop).</summary>
+    public bool Busy => _queue.Count > 0;
 
     public TunnelExit? FindExit(World w)
     {
@@ -104,6 +110,9 @@ public sealed class TunnelExit : Building, IItemAcceptor
 {
     private const int Capacity = 4;
     private readonly List<string> _buffer = new();
+
+    /// <summary>Holding items to put out (the view plays its working loop).</summary>
+    public bool Busy => _buffer.Count > 0;
 
     public bool CanAccept(string item) => _buffer.Count < Capacity;
 
