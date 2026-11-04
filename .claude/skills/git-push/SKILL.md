@@ -45,6 +45,9 @@ If it reports conflicts, resolve every conflicted file (`git diff --name-only --
 
 ## 3. Check it builds and passes
 
+**Skip this step** if the merge in step 2 said "Already up to date" (BRANCH already had all of `origin/main`, so
+nothing new came in): go straight to step 4 and say in the report that the build and tests were skipped.
+
 ```
 dotnet build game/BeltAndBarricade.sln -nologo -v q
 dotnet test sim.tests -nologo -v q
@@ -85,5 +88,6 @@ If the user says GIT PUSH while on `main`:
 
 1. Commit everything (step 1).
 2. `git pull --no-rebase origin main` and resolve conflicts as in step 2.
-3. Build and test (step 3). If it fails and you can't fix it, stop without pushing.
+3. Build and test (step 3), unless the pull said "Already up to date". If it fails and you can't fix it, stop
+   without pushing.
 4. `git push origin main`.
