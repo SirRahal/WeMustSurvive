@@ -36,7 +36,7 @@ public class EasyFuelTests
         var w = TestWorld.Create();
         int coal = w.Storage.Count("coal");
         w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(0, -1), Direction.North);
-        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.NexusOrigin + new Int2(0, -2));
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.NexusOrigin + new Int2(0, -4)); // 3x3, bottom row just above the inserter
         for (int i = 0; i < 5; i++) furnace.TryInsert("iron_ore");
         w.Run(900);
         Assert.True(furnace.Output.Count("iron_plate") > 0, $"made {furnace.Output.Count("iron_plate")}");

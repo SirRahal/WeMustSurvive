@@ -119,7 +119,7 @@ public sealed record SetInserterFilterCommand(int PlayerId, Int2 Tile, string? I
     {
         if (w.BuildingAt(Tile) is not Inserter ins) return "Not an inserter";
         ins.AutoFilter = Auto;
-        ins.Filter = Auto ? Inserter.SuggestFilter(w, Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input), w.BuildingAt(ins.Front)) : Item;
+        ins.Filter = Auto ? Inserter.SuggestFilter(w, Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input, ins.Reach), w.BuildingAt(ins.Front)) : Item;
         return null;
     }
 }

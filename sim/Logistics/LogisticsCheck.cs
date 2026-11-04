@@ -76,11 +76,16 @@ public static class LogisticsCheck
         return issue;
     }
 
+    /// <summary>The longest sorter reach in the game (fast inserter).</summary>
+    private const int MaxSorterReach = 3;
+
     private static bool PickedUpByWorkingInserter(World w, Building belt, Dictionary<int, LogisticsIssue?> memo, HashSet<int> path, int depth)
     {
+        // Sorters reach over other belts, so look a few tiles out in each direction.
         foreach (var d in new[] { Direction.North, Direction.East, Direction.South, Direction.West })
-            if (w.BuildingAt(belt.Origin + d.Offset()) is Inserter ins && ins.SourceTiles.Contains(belt.Origin) && !path.Contains(ins.Id)
-                && Trace(w, ins, memo, path, depth + 1) == null)
+        for (int k = 1; k <= MaxSorterReach; k++)
+            if (w.BuildingAt(belt.Origin + new Int2(d.Offset().X * k, d.Offset().Y * k)) is Inserter ins && ins.SourceTiles.Contains(belt.Origin)
+                && !path.Contains(ins.Id) && Trace(w, ins, memo, path, depth + 1) == null)
                 return true;
         return false;
     }

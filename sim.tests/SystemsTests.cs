@@ -31,7 +31,7 @@ public class SystemsTests
     {
         var w = TestWorld.Create();
         // Three busy electric furnaces (540 kW) on the Nexus' 200 kW.
-        var furnaces = new[] { new Int2(36, 61), new Int2(37, 61), new Int2(38, 61) }
+        var furnaces = new[] { new Int2(33, 60), new Int2(36, 60), new Int2(39, 60) }
             .Select(t => (Crafter)w.PlaceDirect("electric_furnace", t)).ToList();
         foreach (var f in furnaces) for (int i = 0; i < 5; i++) f.TryInsert("iron_ore");
         w.Run(5);
@@ -39,7 +39,7 @@ public class SystemsTests
         Assert.InRange(grid.Satisfaction, 0.3f, 0.45f);
         Assert.All(furnaces, f => Assert.Equal(grid.Satisfaction, f.Power));
 
-        var gen = (Generator)w.PlaceDirect("generator", new Int2(36, 59));
+        var gen = (Generator)w.PlaceDirect("generator", new Int2(42, 60));
         for (int i = 0; i < 5; i++) gen.TryInsert("coal");
         w.Run(5);
         Assert.Equal(1f, w.Power.GridOf(w.Nexus)!.Satisfaction);
@@ -81,8 +81,8 @@ public class SystemsTests
         Assert.Equal(iron - 40, w.Storage.Count("iron_plate"));
         Assert.Equal(0, w.Research.Progress); // no labs yet
 
-        w.PlaceDirect("lab", new Int2(35, 60));
-        w.PlaceDirect("lab", new Int2(35, 62));
+        w.PlaceDirect("lab", new Int2(33, 60));
+        w.PlaceDirect("lab", new Int2(36, 60));
         w.Run(601); // 1200 lab-ticks at 2 labs
         Assert.True(w.Research.IsDone("logistics"));
 
@@ -238,7 +238,7 @@ public class SystemsTests
     {
         var w = TestWorld.Create();
         var uplink = (SuperWeapon)w.PlaceDirect("satellite_uplink", new Int2(35, 63));
-        var gen = (Generator)w.PlaceDirect("generator", new Int2(35, 61));
+        var gen = (Generator)w.PlaceDirect("generator", new Int2(35, 60));
         for (int i = 0; i < 10; i++) gen.TryInsert("coal");
 
         w.Enqueue(new FireSuperWeaponCommand(0, uplink.Id, new Vector2(40.5f, 30.5f)));

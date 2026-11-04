@@ -10,11 +10,11 @@ public class AmmoAndChainTests
         var w = TestWorld.Create();
         // workshop -> inserter -> belt, belt -> inserter -> turret (belt points at the second inserter).
         w.PlaceDirect("workshop", new Int2(30, 60));
-        w.PlaceDirect("inserter", new Int2(31, 60), Direction.East);
-        var belt1 = w.PlaceDirect("belt", new Int2(32, 60), Direction.East);
-        var belt2 = w.PlaceDirect("belt", new Int2(33, 60), Direction.East);
-        var feeder = w.PlaceDirect("inserter", new Int2(34, 60), Direction.East);
-        w.PlaceDirect("gun_turret", new Int2(35, 60));
+        w.PlaceDirect("inserter", new Int2(33, 60), Direction.East); // workshop covers 30-32
+        var belt1 = w.PlaceDirect("belt", new Int2(34, 60), Direction.East);
+        var belt2 = w.PlaceDirect("belt", new Int2(35, 60), Direction.East);
+        var feeder = w.PlaceDirect("inserter", new Int2(36, 60), Direction.East);
+        w.PlaceDirect("gun_turret", new Int2(37, 60));
         w.Step();
 
         var issues = LogisticsCheck.Analyze(w);

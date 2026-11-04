@@ -4,11 +4,11 @@ namespace BeltAndBarricade.Sim.Tests;
 
 public class FurnaceToNexusTests
 {
-    /// <summary>Furnace at (33,64) -> inserter (34,64) facing east -> belts (35..38,64) east -> Nexus west face (39,64).</summary>
+    /// <summary>Furnace (3x3) at (31..33,64..66) -> inserter (34,64) facing east -> belts (35..38,64) east -> Nexus west face (39,64).</summary>
     private static (World W, Crafter Furnace, Inserter Ins) Build(bool startEmpty)
     {
         var w = TestWorld.Create();
-        var furnace = (Crafter)w.PlaceDirect("furnace", new Int2(33, 64));
+        var furnace = (Crafter)w.PlaceDirect("furnace", new Int2(31, 64));
         var ins = (Inserter)w.PlaceDirect("inserter", new Int2(34, 64), Direction.East);
         for (int x = 35; x <= 38; x++) w.PlaceDirect("belt", new Int2(x, 64), Direction.East);
         if (!startEmpty)

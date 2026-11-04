@@ -84,7 +84,7 @@ public class LogisticsCheckTests
     {
         var w = TestWorld.Create();
         w.PlaceDirect("gun_turret", new Int2(37, 63));
-        w.PlaceDirect("workshop", new Int2(37, 65));
+        w.PlaceDirect("workshop", new Int2(35, 65)); // 3x3: 35..37 x 65..67
         var intoWorkshop = (Inserter)w.PlaceDirect("inserter", new Int2(38, 65), Direction.West);
         var intoTurret = (Inserter)w.PlaceDirect("inserter", new Int2(37, 64), Direction.North);
         w.Step();
@@ -113,7 +113,7 @@ public class LogisticsCheckTests
     {
         var w = TestWorld.Create();
         w.PlaceDirect("gun_turret", new Int2(37, 63));
-        w.PlaceDirect("workshop", new Int2(37, 65));
+        w.PlaceDirect("workshop", new Int2(35, 65)); // 3x3: 35..37 x 65..67
         var ins = w.PlaceDirect("inserter", new Int2(37, 64), Direction.South); // takes from the turret, gives to the workshop
         var issue = LogisticsCheck.Analyze(w)[ins.Id];
         Assert.Equal("WRONG WAY", issue.Short);

@@ -61,6 +61,8 @@ public sealed class BuildingDef
     public int BeltSpeed { get; init; }
     // Inserter
     public int SwingTicks { get; init; }
+    /// <summary>Inserters: tiles reached behind it, over belts in between (1 = only the neighbour).</summary>
+    public int Reach { get; init; } = 1;
     // Drill
     public int MineTicks { get; init; }
     // Drill / Crafter / Generator

@@ -17,7 +17,7 @@ public class SupplyTraceTests
         w.PlaceDirect("belt", new Int2(47, 55), Direction.South);
         w.PlaceDirect("inserter", new Int2(47, 56), Direction.South);
         // Not connected: a drill pointing elsewhere.
-        w.PlaceDirect("drill", new Int2(49, 58), Direction.East);
+        w.PlaceDirect("drill", new Int2(51, 58), Direction.East); // east of the 3x3 furnace, facing away
 
         var drills = SupplyTrace.DrillsFeeding(w, furnace);
         Assert.Equal(2, drills.Count);

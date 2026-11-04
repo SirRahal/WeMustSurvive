@@ -311,8 +311,16 @@ public sealed class World
     }
 
     /// <summary>Places a finished building instantly, with no cost. For scenario setup, tests, and debug tools.</summary>
-    public Building PlaceDirect(string defId, Int2 origin, Direction dir = Direction.North) =>
-        AddBuilding(Data.Buildings[defId], origin, dir);
+    public Building PlaceDirect(string defId, Int2 origin, Direction dir = Direction.North)
+    {
+        var def = Data.Buildings[defId];
+        // Overlaps are always a setup mistake (tests, the showcase); fail loudly rather than stack buildings.
+        for (int y = 0; y < def.Size; y++)
+        for (int x = 0; x < def.Size; x++)
+            if (BuildingAt(new Int2(origin.X + x, origin.Y + y)) is { } there)
+                throw new InvalidOperationException($"{defId} at {origin} overlaps {there.Def.Id} at {there.Origin}");
+        return AddBuilding(def, origin, dir);
+    }
 
     public void Message(int playerId, string text) => Events.Add(new MessageEvent(playerId, text));
 

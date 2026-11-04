@@ -190,13 +190,15 @@ public partial class GameSession : Node2D
         var w = _world;
         var n = w.Nexus.Origin; // Funnel: (39,63)
         void At(string id, int dx, int dy, Direction d = Direction.East) => w.PlaceDirect(id, new Int2(n.X + dx, n.Y + dy), d);
-        At("pole", 4, -3);
-        At("pole", -4, -3);
+        // Machines are 3x3: generators either side, a row of machines above them, poles in the gaps.
+        At("pole", -2, -4);
+        At("pole", 3, -4);
+        At("pole", 9, -4);
         var gen = (Generator)w.PlaceDirect("generator", new Int2(n.X + 6, n.Y - 4));
         for (int i = 0; i < 10; i++) gen.TryInsert("coal");
         At("generator", -6, -4);
-        string[] row1 = { "electric_furnace", "furnace", "workshop", "lab", "depot", "electric_drill", "advanced_drill" };
-        for (int i = 0; i < row1.Length; i++) if (row1[i].Contains("drill")) { } else At(row1[i], -6 + i * 2, -6);
+        string[] row1 = { "electric_furnace", "furnace", "workshop", "lab", "depot" };
+        for (int i = 0; i < row1.Length; i++) At(row1[i], -8 + i * 4, -7);
         string[] walls = { "wall", "reinforced_wall", "heavy_wall", "fortress_wall" };
         for (int i = 0; i < walls.Length; i++) At(walls[i], -3 + i, -12);
         string[] turrets = { "gun_turret", "laser_turret", "rocket_turret", "flame_turret", "heavy_turret" };

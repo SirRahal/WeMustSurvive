@@ -23,6 +23,8 @@ public sealed class PropSprites
 
     private readonly Dictionary<string, Dictionary<string, Dictionary<string, Frame>>> _sections = new();
     private readonly Dictionary<string, Texture2D?> _pages = new();
+    /// <summary>Footprint (tiles per side) each building was rendered for, by id.</summary>
+    private readonly Dictionary<string, int> _footprints = new();
 
     /// <summary>Metres per tile in the renders (belt slats are spaced in metres).</summary>
     public float MetresPerTile { get; private set; } = 2f;
@@ -52,6 +54,7 @@ public sealed class PropSprites
                     if (sprites.ReadFrame(f.AsGodotDictionary(), scales) is { } frame)
                         frames[(string)name] = frame;
                 if (frames.Count > 0) ids[(string)id] = frames;
+                if (section == "buildings" && entry.AsGodotDictionary().TryGetValue("size", out var fp)) sprites._footprints[(string)id] = fp.AsInt32();
                 sprites.ReadFps(section, (string)id, entry.AsGodotDictionary());
             }
         }
@@ -190,6 +193,12 @@ public sealed class PropSprites
     }
 
     /// <summary>Draws <paramref name="f"/> with its anchor on <paramref name="at"/>.</summary>
+    /// <summary>
+    /// Scale to draw building <paramref name="id"/> at for a <paramref name="size"/>-tile footprint: 1 when the
+    /// render matches, larger while a building has grown (e.g. 1x1 art on a 3x3 machine) until it is re-rendered.
+    /// </summary>
+    public float FootprintScale(string id, int size) => _footprints.TryGetValue(id, out int fp) && fp > 0 ? size / (float)fp : 1f;
+
     public static void Draw(CanvasItem ci, Frame f, Vector2 at, float scale = 1, Color? modulate = null) =>
         ci.DrawTextureRectRegion(f.Page, new Rect2(at - f.Anchor * scale, f.Size * scale), f.Region, modulate ?? Colors.White);
 
