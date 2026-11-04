@@ -50,7 +50,7 @@ public class LogisticsTests
     {
         var w = TestWorld.Create();
         w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
-        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(1, 0));
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(2, 0));
         int oreBefore = w.Map.OreAmount(TestWorld.CoalTile);
 
         w.Run(600); // mineTicks = 120 -> 5 coal
@@ -64,8 +64,11 @@ public class LogisticsTests
     {
         var w = TestWorld.Create();
         w.Map.SetOre(TestWorld.CoalTile, "coal", 3, claimZone: false);
+        // The 2x2 drill covers three more coal tiles; empty them so only the 3 coal above is under it.
+        foreach (var off in new[] { new Int2(1, 0), new Int2(0, 1), new Int2(1, 1) })
+            w.Map.SetOre(TestWorld.CoalTile + off, "coal", 0, claimZone: false);
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
-        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(1, 0));
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(2, 0));
 
         w.Run(150); // mineTicks = 120 -> 1 coal mined
         Assert.Equal(2, drill.OreLeft);
@@ -96,7 +99,7 @@ public class LogisticsTests
         var w = TestWorld.Create();
         int coal = w.Storage.Count("coal");
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
-        var depot = (Depot)w.PlaceDirect("depot", TestWorld.IronTile + new Int2(1, 0));
+        var depot = (Depot)w.PlaceDirect("depot", TestWorld.IronTile + new Int2(2, 0));
         w.Run(600);
         Assert.Equal(0, depot.Storage.Count("iron_ore")); // storage has coal, but nobody delivered any
         Assert.Equal(coal, w.Storage.Count("coal"));
@@ -121,9 +124,9 @@ public class LogisticsTests
     {
         var w = TestWorld.Create();
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
-        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(1, 0));
-        w.PlaceDirect("inserter", TestWorld.IronTile + new Int2(4, 0), Direction.East); // furnace is 3 wide
-        var belt = (Belt)w.PlaceDirect("belt", TestWorld.IronTile + new Int2(5, 0), Direction.North);
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(2, 0));
+        w.PlaceDirect("inserter", TestWorld.IronTile + new Int2(5, 0), Direction.East); // drill is 2 wide, furnace 3
+        var belt = (Belt)w.PlaceDirect("belt", TestWorld.IronTile + new Int2(6, 0), Direction.North);
         drill.TryInsert("coal");
         furnace.TryInsert("coal");
 
@@ -142,15 +145,15 @@ public class LogisticsTests
         var w = TestWorld.Create();
         // Inserter directly above the Nexus, facing north, feeding a turret: "any item" takes only the ammo it uses.
         var ins = (Inserter)w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(0, -1), Direction.North);
-        var turret = (Turret)w.PlaceDirect("gun_turret", TestWorld.NexusOrigin + new Int2(0, -2));
+        var turret = (Turret)w.PlaceDirect("gun_turret", TestWorld.NexusOrigin + new Int2(0, -3)); // 2x2, bottom row just above the inserter
         w.Run(120);
         Assert.Null(ins.Filter);
         Assert.True(turret.Ammo >= 2);
         Assert.Equal(20, w.Storage.Count("coal")); // nothing else was taken
 
         // Onto a belt, "any item" would drain storage, so it waits for a filter.
-        var toBelt = (Inserter)w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(1, -1), Direction.North);
-        var belt = (Belt)w.PlaceDirect("belt", TestWorld.NexusOrigin + new Int2(1, -2), Direction.North);
+        var toBelt = (Inserter)w.PlaceDirect("inserter", TestWorld.NexusOrigin + new Int2(2, -1), Direction.North);
+        var belt = (Belt)w.PlaceDirect("belt", TestWorld.NexusOrigin + new Int2(2, -2), Direction.North);
         w.Run(120);
         Assert.Empty(belt.Items);
         w.Enqueue(new SetInserterFilterCommand(0, toBelt.Origin, "iron_plate"));

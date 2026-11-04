@@ -38,7 +38,7 @@ public static class SupplyTrace
         {
             var n = w.BuildingAt(t + d.Offset());
             if (n == null || n == b || n is ConstructionSite) continue;
-            bool pointsHere = n.Size == 1 && n.Front == t;
+            bool pointsHere = (n.Size == 1 || n is Drill) && n.Front == t;
             switch (n)
             {
                 case Drill or Inserter or TunnelExit when pointsHere:

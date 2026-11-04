@@ -34,7 +34,7 @@ public class FurnaceToNexusTests
         var w = TestWorld.Create();
         // Two drills side by side on the coal patch; the left one points into the right one.
         var feeder = (Drill)w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
-        w.PlaceDirect("drill", TestWorld.CoalTile + new Int2(1, 0), Direction.North);
+        w.PlaceDirect("drill", TestWorld.CoalTile + new Int2(2, 0), Direction.North);
         w.Run(300);
 
         Assert.Equal("CAN'T USE", LogisticsCheck.Analyze(w)[feeder.Id].Short);
@@ -46,7 +46,7 @@ public class FurnaceToNexusTests
     {
         var w = TestWorld.Create();
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
-        w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(1, 0));
+        w.PlaceDirect("furnace", TestWorld.CoalTile + new Int2(2, 0));
         w.Run(1000); // 5 coal fills the furnace's fuel; with no ore it never burns any
 
         Assert.Contains("only burns coal while smelting", drill.Status);

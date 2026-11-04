@@ -1,7 +1,7 @@
 namespace BeltAndBarricade.Sim;
 
 /// <summary>
-/// Mines the ore under it and outputs to the tile it faces. Burner drills burn coal (drills sitting on coal
+/// Mines the ore under it (every ore tile of its footprint, one tile at a time) and outputs to the tile it faces. Burner drills burn coal (drills sitting on coal
 /// fuel themselves); electric drills run on grid power. Claim zones mine faster and yield double.
 /// </summary>
 public sealed class Drill : Building, IItemAcceptor, IBurner
@@ -17,12 +17,12 @@ public sealed class Drill : Building, IItemAcceptor, IBurner
     public string? Ore { get; private set; }
     /// <summary>The ore this drill has been mining; kept after the tile runs dry (for the empty icon).</summary>
     public string? LastOre { get; private set; }
-    /// <summary>Ore left under the drill, and how much the tile started with (refreshed every tick).</summary>
+    /// <summary>Ore left under the drill, and how much its tiles started with (refreshed every tick).</summary>
     public int OreLeft { get; private set; }
     public int OreStart { get; private set; }
-    /// <summary>0..1 share of the tile's ore still in the ground.</summary>
+    /// <summary>0..1 share of the ore under it still in the ground.</summary>
     public float OreFraction => OreStart <= 0 ? 0 : (float)OreLeft / OreStart;
-    /// <summary>The tile had ore and it is all mined out.</summary>
+    /// <summary>There was ore under it and it is all mined out.</summary>
     public bool Depleted => OreStart > 0 && OreLeft == 0;
     /// <summary>Ore mined per minute (UI only).</summary>
     public RateMeter Mined { get; } = new();
@@ -36,10 +36,28 @@ public sealed class Drill : Building, IItemAcceptor, IBurner
 
     protected override bool IsBusy => Ore != null && _outputCount == 0;
 
+    /// <summary>The ore tile under a footprint it mines next (row by row), or null when none is left.</summary>
+    public static Int2? MiningTile(World w, Int2 origin, int size)
+    {
+        for (int y = 0; y < size; y++)
+        for (int x = 0; x < size; x++)
+        {
+            var t = new Int2(origin.X + x, origin.Y + y);
+            if (w.Map.OreAt(t) != null) return t;
+        }
+        return null;
+    }
+
+    /// <summary>The ore a drill on this footprint mines (next), or null if there's none under it.</summary>
+    public static string? OreUnder(World w, Int2 origin, int size) => MiningTile(w, origin, size) is { } t ? w.Map.OreAt(t) : null;
+
+    /// <summary>The ore this drill mines next, read from the map (null when there's none left).</summary>
+    public string? OreHere(World w) => OreUnder(w, Origin, Size);
+
     public override void Tick(World w)
     {
-        OreLeft = w.Map.OreAmount(Origin);
-        OreStart = w.Map.OreStartAmount(Origin);
+        OreLeft = Tiles.Sum(w.Map.OreAmount);
+        OreStart = Tiles.Sum(w.Map.OreStartAmount);
         if (_outputCount > 0)
         {
             if (!PushInto(w, Front, _output!))
@@ -53,12 +71,13 @@ public sealed class Drill : Building, IItemAcceptor, IBurner
         }
 
         Mined.Start(w.Tick);
-        Ore = w.Map.OreAt(Origin);
+        var tile = MiningTile(w, Origin, Size);
+        Ore = tile is { } at ? w.Map.OreAt(at) : null;
         if (Ore == null) return;
         LastOre = Ore;
         float speed = PowerFactor * w.Mods.Mult(Stat.MiningSpeed);
         if (speed <= 0) return;
-        bool claim = w.Map.IsClaimZone(Origin);
+        bool claim = w.Map.IsClaimZone(tile!.Value);
         if (claim) speed *= ClaimZoneSpeedMultiplier;
         if (NeedsFuel && !_fuel.Burn(w)) return;
 
@@ -66,9 +85,9 @@ public sealed class Drill : Building, IItemAcceptor, IBurner
         if (_progress < Def.MineTicks) return;
         _progress -= Def.MineTicks;
 
-        _output = w.Map.Mine(Origin);
+        _output = w.Map.Mine(tile.Value);
         if (_output == null) return;
-        OreLeft = w.Map.OreAmount(Origin);
+        OreLeft = Tiles.Sum(w.Map.OreAmount);
         if (OreLeft == 0)
             for (int p = 0; p < w.Engineers.Count; p++)
                 w.Message(p, $"A {Def.Name} ran out of {w.Data.Items[_output].Name.ToLowerInvariant()}");
@@ -89,7 +108,7 @@ public sealed class Drill : Building, IItemAcceptor, IBurner
             Belt => "the belt in front is full",
             Crafter { Def.UsesFuel: true } c when item == "coal" && !c.Recipes.Any(r => r.Inputs.ContainsKey("coal")) =>
                 $"the {c.Def.Name} is full of coal; it only burns coal while smelting ore, so feed it ore too",
-            Drill d when item == "coal" && w.Map.OreAt(d.Origin) == "coal" => $"the {d.Def.Name} in front is on coal and fuels itself, so it won't take coal",
+            Drill d when item == "coal" && d.OreHere(w) == "coal" => $"the {d.Def.Name} in front is on coal and fuels itself, so it won't take coal",
             Drill d when item == "coal" => $"the {d.Def.Name} in front is full of coal",
             Drill d => $"a {d.Def.Name} only takes coal, not {name}",
             { } b when b is IItemAcceptor && !LogisticsCheck.AcceptsType(w, b, item) => $"the {b.Def.Name} can't use {name}",
@@ -101,30 +120,31 @@ public sealed class Drill : Building, IItemAcceptor, IBurner
     public float MaxPerMinute(World w)
     {
         float perTick = w.Mods.Mult(Stat.MiningSpeed) / Def.MineTicks;
-        if (w.Map.IsClaimZone(Origin)) perTick *= ClaimZoneSpeedMultiplier * MathF.Round(ClaimZoneYield * w.Mods.Mult(Stat.ClaimYield));
+        if (MiningTile(w, Origin, Size) is { } t && w.Map.IsClaimZone(t)) perTick *= ClaimZoneSpeedMultiplier * MathF.Round(ClaimZoneYield * w.Mods.Mult(Stat.ClaimYield));
         return perTick * 60 * World.TicksPerSecond;
     }
 
     /// <summary>
-    /// Best way for a drill placed on <paramref name="tile"/> to face: a furnace that smelts its ore first, then
+    /// Best way for a <paramref name="size"/>-tile drill placed at <paramref name="tile"/> to face: a furnace that smelts its ore first, then
     /// something that burns coal (for coal), a belt, then storage. Null if no neighbour can take the ore.
     /// Used to aim drills automatically while placing them.
     /// </summary>
-    public static Direction? BestOutputDir(World w, Int2 tile)
+    public static Direction? BestOutputDir(World w, Int2 tile, int size = 1)
     {
-        if (w.Map.OreAt(tile) is not { } ore) return null;
+        if (OreUnder(w, tile, size) is not { } ore) return null;
         Direction? best = null;
         int bestScore = 0;
         foreach (var d in new[] { Direction.North, Direction.East, Direction.South, Direction.West })
         {
-            var b = w.BuildingAt(tile + d.Offset());
+            var b = w.BuildingAt(FrontOf(tile, size, d));
             var def = b?.Def;
             int score = b switch
             {
                 null => 0,
-                Belt belt when belt.Front == tile => 0, // would feed straight back into the drill
+                Belt belt when belt.Front.X >= tile.X && belt.Front.X < tile.X + size
+                               && belt.Front.Y >= tile.Y && belt.Front.Y < tile.Y + size => 0, // would feed straight back into the drill
                 _ when def!.Kind == BuildingKind.Crafter && def.Recipes.Any(r => w.Data.Recipes[r].Inputs.ContainsKey(ore)) => 4,
-                _ when ore == "coal" && (def!.UsesFuel || def.Kind == BuildingKind.Generator) && w.Map.OreAt(b.Origin) != "coal" => 3,
+                _ when ore == "coal" && (def!.UsesFuel || def.Kind == BuildingKind.Generator) && !(b is Drill bd && bd.OreHere(w) == "coal") => 3,
                 _ when def!.Kind is BuildingKind.Belt or BuildingKind.Splitter or BuildingKind.TunnelEntrance => 3,
                 _ when def!.Kind is BuildingKind.Nexus or BuildingKind.Depot => 2,
                 _ => 0,

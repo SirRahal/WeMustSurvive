@@ -162,7 +162,7 @@ public sealed class World
             if (def.BlocksEnemies && _enemies.Any(e => Int2.Floor(e.Pos) == t)) return "Enemy in the way";
         }
 
-        if (def.Kind == BuildingKind.Drill && Map.OreAt(origin) == null) return "Drills must be placed on ore";
+        if (def.Kind == BuildingKind.Drill && Drill.OreUnder(this, origin, def.Size) == null) return "Drills must be placed on ore";
         return null;
     }
 

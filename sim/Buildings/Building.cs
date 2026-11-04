@@ -49,9 +49,25 @@ public abstract class Building
     protected virtual bool IsBusy => true;
 
     public Vector2 Center => new(Origin.X + Size / 2f, Origin.Y + Size / 2f);
-    /// <summary>The tile this building faces (outputs into), measured from its origin. Only meaningful for 1x1 buildings.</summary>
-    public Int2 Front => Origin + Dir.Offset();
-    public Int2 Back => Origin + Dir.Opposite().Offset();
+    /// <summary>The tile this building faces (outputs into): just outside the middle of its facing edge.</summary>
+    public Int2 Front => FrontOf(Origin, Size, Dir);
+    public Int2 Back => FrontOf(Origin, Size, Dir.Opposite());
+
+    /// <summary>
+    /// The tile just outside the middle of the <paramref name="dir"/> edge of a <paramref name="size"/>-tile footprint
+    /// at <paramref name="origin"/> (for an even size, the middle pair's first tile). For 1x1 it is the neighbour.
+    /// </summary>
+    public static Int2 FrontOf(Int2 origin, int size, Direction dir)
+    {
+        int mid = (size - 1) / 2;
+        return dir switch
+        {
+            Direction.North => new Int2(origin.X + mid, origin.Y - 1),
+            Direction.South => new Int2(origin.X + mid, origin.Y + size),
+            Direction.West => new Int2(origin.X - 1, origin.Y + mid),
+            _ => new Int2(origin.X + size, origin.Y + mid),
+        };
+    }
 
     public IEnumerable<Int2> Tiles
     {

@@ -12,7 +12,7 @@ public class EasyFuelTests
         var w = TestWorld.Create();
         int coal = w.Storage.Count("coal");
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
-        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(1, 0));
+        var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(2, 0));
         w.Run(1200);
         Assert.Equal(0, furnace.Output.Count("iron_plate"));
         Assert.Equal(coal, w.Storage.Count("coal"));
@@ -57,10 +57,11 @@ public class EasyFuelTests
     {
         var w = TestWorld.Create();
         var tile = TestWorld.IronTile;
-        w.PlaceDirect("belt", tile + new Int2(1, 0), Direction.West); // points back into the drill tile
-        w.PlaceDirect("drill", tile + new Int2(0, -1), Direction.North); // another iron drill: can't take ore
-        Assert.Null(Drill.BestOutputDir(w, tile));
+        // A 2x2 drill at tile faces East onto tile+(2,0), North onto tile+(0,-1), West onto tile+(-1,0).
+        w.PlaceDirect("belt", tile + new Int2(2, 0), Direction.West); // points back into the drill's footprint
+        w.PlaceDirect("drill", tile + new Int2(0, -2), Direction.North); // another iron drill: can't take ore
+        Assert.Null(Drill.BestOutputDir(w, tile, 2));
         w.PlaceDirect("depot", tile + new Int2(-1, 0));
-        Assert.Equal(Direction.West, Drill.BestOutputDir(w, tile));
+        Assert.Equal(Direction.West, Drill.BestOutputDir(w, tile, 2));
     }
 }

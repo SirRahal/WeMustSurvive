@@ -106,7 +106,7 @@ public sealed record RotateBuildingCommand(int PlayerId, Int2 Tile) : ICommand
     public string? Apply(World w)
     {
         var b = w.BuildingAt(Tile);
-        if (b == null || b.Size != 1 || b.Def.Kind is BuildingKind.Wall or BuildingKind.Pole) return "Nothing to rotate";
+        if (b == null || b.Size != 1 && b is not Drill || b.Def.Kind is BuildingKind.Wall or BuildingKind.Pole) return "Nothing to rotate";
         b.Dir = b.Dir.RotateCw();
         return null;
     }

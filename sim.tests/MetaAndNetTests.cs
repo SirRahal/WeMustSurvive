@@ -147,7 +147,7 @@ public class MetaAndNetTests
             switch (step)
             {
                 case 5: host.Submit(new PlaceBuildingCommand(0, "drill", TestWorld.CoalTile, Direction.East)); break;
-                case 6: client.Submit(new PlaceBuildingCommand(1, "furnace", TestWorld.CoalTile + new Int2(1, 0), Direction.North)); break;
+                case 6: client.Submit(new PlaceBuildingCommand(1, "furnace", TestWorld.CoalTile + new Int2(2, 0), Direction.North)); break;
                 case 30: client.Submit(new MoveCommand(1, new Vector2(45.5f, 55.5f), Queue: true)); break;
                 case 40: host.Submit(new EndPrepCommand(0)); break;
                 case 50: client.Submit(new PingCommand(1, PingKind.Danger, new Vector2(40, 10))); break;
@@ -174,7 +174,7 @@ public class MetaAndNetTests
         Assert.Equal(hw.Tick, cw.Tick);
         Assert.Equal(hw.ComputeHash(), cw.ComputeHash());
         Assert.Null(client.DesyncTick);
-        Assert.IsType<Crafter>(hw.BuildingAt(TestWorld.CoalTile + new Int2(1, 0)));
+        Assert.IsType<Crafter>(hw.BuildingAt(TestWorld.CoalTile + new Int2(2, 0)));
         Assert.Equal(1, hw.Waves.WavesStarted);
     }
 

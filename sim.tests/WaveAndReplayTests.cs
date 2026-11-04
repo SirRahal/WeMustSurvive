@@ -103,7 +103,7 @@ public class WaveAndReplayTests
     private static readonly ICommand[] Script =
     {
         new PlaceBuildingCommand(0, "drill", TestWorld.CoalTile, Direction.East),
-        new PlaceBuildingCommand(0, "furnace", TestWorld.CoalTile + new Int2(1, 0), Direction.North, Queue: true),
+        new PlaceBuildingCommand(0, "furnace", TestWorld.CoalTile + new Int2(2, 0), Direction.North, Queue: true),
         new PlaceBuildingCommand(0, "gun_turret", new Int2(40, 58), Direction.North, Queue: true),
         new MoveCommand(0, new Vector2(45.5f, 52.5f), Queue: true),
         new EndPrepCommand(0),
