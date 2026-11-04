@@ -75,7 +75,8 @@ godot --path game --headless -- --autojoin=127.0.0.1 --smoke=40
   into `game/art/props`. `View/PropSprites.cs` loads them (frames turned for the view angle, animation strips
   `<name>_0..N` with an optional `fps`); `WorldView`/`TerrainView` pick frames from game state, and anything without a
   sprite or strip keeps its coded drawing or motion.
-- New sim behaviour gets a test in `sim.tests/`. GIT PUSH runs `dotnet test sim.tests` before it touches `main`.
+- New sim behaviour gets a test in `sim.tests/`. GIT PUSH runs `dotnet test sim.tests` before it touches `main`,
+  except when the branch already had all of `origin/main` merged in (nothing new came in), then it just pushes.
 - Match the existing style: file-scoped namespaces, nullable enabled, `/// <summary>` on public types.
 
 ## How we work together (both of us, both Claudes)
@@ -94,7 +95,8 @@ We don't split the codebase by owner, so **GitHub Issues are how we avoid collid
    It never pushes. Do this before starting a session.
 5. **"GIT PUSH" ships your work.** When anyone says **GIT PUSH**, Claude runs the `git-push` skill
    (`.claude/skills/git-push/SKILL.md`): commit everything, merge `origin/main` into the branch and resolve conflicts
-   (picking the best version), build and run the tests, merge the branch into `main` with a merge commit, push `main`,
+   (picking the best version), build and run the tests (skipped when the branch already had everything from
+   `origin/main`), merge the branch into `main` with a merge commit, push `main`,
    then switch back to the branch. It stops without touching `main` if the build or tests fail. The feature branch
    itself is not pushed. **No code reviews for now**; pull requests are optional. Put `Closes #<issue>` in the commit
    message to close the issue.

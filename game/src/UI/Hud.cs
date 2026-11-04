@@ -969,6 +969,7 @@ public partial class Hud : Control
                 body.Add("Locked. Unlock it in Research.");
                 if (def.Tech != null) body.Add($"Needs {w.Data.Techs[def.Tech].Name}");
             }
+            body.AddRange(DeliveryNeeds(def));
             // Locked families stay enabled so they can be hovered (picking one says what to research).
             _toolButtons.Add(new Button(rect, def.Name, unlocked ? "slot" : "locked", true, input.BuildTool != null && family.Contains(input.BuildTool), () =>
             {
@@ -976,6 +977,18 @@ public partial class Hud : Control
                 input.PickSlot(family);
             }, familyId, new Tip(def.Name, body, TipAnchor.Above), def.Id));
         }
+    }
+
+    /// <summary>What has to be delivered to a building to keep it working: turret ammo, burner fuel.</summary>
+    private IEnumerable<string> DeliveryNeeds(BuildingDef def)
+    {
+        var items = _world!.Data.Items;
+        string Name(string id) => items.TryGetValue(id, out var it) ? it.Name : id;
+        if (def.AmmoItem is { } ammo) yield return $"Requires {Name(ammo)} delivered as ammo.";
+        if (def.UsesFuel)
+            yield return def.Kind == BuildingKind.Drill
+                ? $"Requires {Name("coal")} delivered as fuel (unless it mines coal)."
+                : $"Requires {Name("coal")} delivered as fuel.";
     }
 
     // ------------------------------------------------------------------ tier picker
