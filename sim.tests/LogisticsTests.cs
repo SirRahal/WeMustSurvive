@@ -122,8 +122,8 @@ public class LogisticsTests
         var w = TestWorld.Create();
         var drill = (Drill)w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
         var furnace = (Crafter)w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(1, 0));
-        w.PlaceDirect("inserter", TestWorld.IronTile + new Int2(2, 0), Direction.East);
-        var belt = (Belt)w.PlaceDirect("belt", TestWorld.IronTile + new Int2(3, 0), Direction.North);
+        w.PlaceDirect("inserter", TestWorld.IronTile + new Int2(4, 0), Direction.East); // furnace is 3 wide
+        var belt = (Belt)w.PlaceDirect("belt", TestWorld.IronTile + new Int2(5, 0), Direction.North);
         drill.TryInsert("coal");
         furnace.TryInsert("coal");
 

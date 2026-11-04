@@ -700,8 +700,9 @@ public partial class WorldView : Node2D
         bool working = IsWorking(b);
         if (frame != null)
         {
-            PropSprites.Draw(this, frame, ground);
-            height = SpriteHeight(frame);
+            float scale = Props.FootprintScale(b.Def.Id, b.Size);
+            PropSprites.Draw(this, frame, ground, scale);
+            height = SpriteHeight(frame) * scale;
             bool damaged = DamageState(b) != null;
             if (frame.Smoke.Length > 0 && (working && b is not (Nexus or SuperWeapon) || damaged)) DrawSmoke(frame, ground, t, b.Id);
             if (damaged) DrawDamageSparks(ground + new Vector2(0, -height * 0.6f), t, b.Id);
@@ -934,8 +935,8 @@ public partial class WorldView : Node2D
     /// <summary>How far an inserter's hand is through its swing: 0 at the pickup side, 1 at the drop side.</summary>
     private static float InserterSwing(Inserter ins) => Math.Clamp(ins.State switch
     {
-        Inserter.Phase.Swinging => ins.Progress / ins.Def.SwingTicks,
-        Inserter.Phase.Returning => 1f - ins.Progress / ins.Def.SwingTicks,
+        Inserter.Phase.Swinging => ins.Progress / ins.SwingTicksFor(ins.TookDistance),
+        Inserter.Phase.Returning => 1f - ins.Progress / ins.SwingTicksFor(ins.TookDistance),
         _ => 0f,
     }, 0f, 1f);
 
@@ -945,14 +946,17 @@ public partial class WorldView : Node2D
         float t = InserterSwing(ins);
         var c = ins.Origin.Center;
         // The arm sweeps around the base from the side it took from to the side it drops on: a straight
-        // half-turn for back-to-front, a quarter-turn for side inputs.
+        // half-turn for back-to-front, a quarter-turn for side inputs. Reaching over a belt, it starts stretched out
+        // to the far tile and pulls in as it swings.
         var from = ins.State == Inserter.Phase.Idle ? Inserter.SideDir(ins.Dir, ins.Input) : ins.TookFrom;
         float a0 = Angle(from), a1 = Angle(ins.Dir);
         float delta = Mathf.Wrap(a1 - a0, -Mathf.Pi, Mathf.Pi);
         if (Mathf.Abs(Mathf.Abs(delta) - Mathf.Pi) < 0.01f) delta = Mathf.Pi; // straight through: always swing the same way
         float a = a0 + delta * t;
         var basePt = Iso.ToScreen(c) + new Vector2(0, -height);
-        var hand = Iso.ToScreen(c.X + MathF.Cos(a) * 0.45f, c.Y + MathF.Sin(a) * 0.45f) + new Vector2(0, -height - 6);
+        float far = ins.State == Inserter.Phase.Idle ? 0 : ins.TookDistance - 1;
+        float len = 0.45f + far * (1 - Math.Min(1, t * 2));
+        var hand = Iso.ToScreen(c.X + MathF.Cos(a) * len, c.Y + MathF.Sin(a) * len) + new Vector2(0, -height - 6);
         if (arm) DrawLine(basePt, hand, Iso.ParseColor(ins.Def.Color).Lightened(0.3f), 3f);
         if (ins.Held != null) DrawItem(hand, ins.Held, 4.5f);
         if (ins.Filter != null) DrawCircle(basePt, 3f, Iso.ParseColor(_world!.Data.Items[ins.Filter].Color));
@@ -1106,7 +1110,7 @@ public partial class WorldView : Node2D
             // Inserters: the source (cyan) and the drop tile (amber), like the arrows in their own UI.
             if (issue.End is Inserter ins)
             {
-                if (Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input) is { } source)
+                if (Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input, ins.Reach) is { } source)
                 {
                     DashedFootprint(source, Core);
                     DrawDashedLine(Iso.ToScreen(source.Center) + new Vector2(0, -HeightOf(source.Def) * 0.5f), Iso.ToScreen(ins.Center) + new Vector2(0, -8), Core, 2f, 5f);
@@ -1677,7 +1681,7 @@ public partial class WorldView : Node2D
         DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, Selected, 2.5f, true);
         if (b is Turret tu) Iso.DrawGroundEllipse(this, b.Center, tu.Range(_world!), Selected with { A = 0.35f });
         else if (b is Nexus) Iso.DrawGroundEllipse(this, b.Center, b.Def.Range, Selected with { A = 0.35f });
-        else if (b is Inserter ins) DrawInserterLinks(ins.Origin, ins.Dir, ins.Input);
+        else if (b is Inserter ins) DrawInserterLinks(ins.Origin, ins.Dir, ins.Input, ins.Reach);
 
         // Who works with it: drills and inserters handing items into it, and whatever a drill hands its output to.
         void Outline(Building n)
@@ -1836,7 +1840,7 @@ public partial class WorldView : Node2D
             var d = new[] { Iso.ToScreen(c.X - r, c.Y - r), Iso.ToScreen(c.X + r, c.Y - r), Iso.ToScreen(c.X + r, c.Y + r), Iso.ToScreen(c.X - r, c.Y + r) };
             DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, tint, 1.5f);
         }
-        if (def.Kind == BuildingKind.Inserter) DrawInserterPreview(t, _input.GhostDir);
+        if (def.Kind == BuildingKind.Inserter) DrawInserterPreview(t, _input.GhostDir, Math.Max(1, def.Reach));
         if (def.Kind == BuildingKind.Drill) DrawDrillPreview(t, _input.GhostDir);
     }
 
@@ -1864,19 +1868,19 @@ public partial class WorldView : Node2D
     /// Placing an inserter: mark the tile it takes from (blue, behind) and gives to (green, in front), with what's
     /// there and the filter it will pick, so a backwards inserter is obvious before it's built.
     /// </summary>
-    private void DrawInserterPreview(Int2 t, Direction dir) => DrawInserterLinks(t, dir, InputSide.Auto);
+    private void DrawInserterPreview(Int2 t, Direction dir, int reach) => DrawInserterLinks(t, dir, InputSide.Auto, reach);
 
     /// <summary>
-    /// Inserter at <paramref name="t"/>: outline the tile it gives to (green, where the arrow points) and the tile it will
-    /// take from (blue: behind, or a side for a 90° move), with names and the filter it will pick, so a backwards or
-    /// sideways mistake is obvious.
+    /// Inserter at <paramref name="t"/>: outline the tile it gives to (green, where the arrow points) and the tiles it can
+    /// take from (blue: behind it out to its reach, or a side for a 90° move), with names and the filter it will pick,
+    /// so a backwards or sideways mistake is obvious.
     /// </summary>
-    private void DrawInserterLinks(Int2 t, Direction dir, InputSide input)
+    private void DrawInserterLinks(Int2 t, Direction dir, InputSide input, int reach)
     {
         var world = _world!;
         var frontTile = t + dir.Offset();
         var target = world.BuildingAt(frontTile);
-        var source = Inserter.LikelySource(world, t, dir, input);
+        var source = Inserter.LikelySource(world, t, dir, input, reach);
         var take = new Color(0.4f, 0.7f, 1f);
         var give = new Color(0.4f, 1f, 0.5f);
 
@@ -1887,12 +1891,13 @@ public partial class WorldView : Node2D
             if (text != "") DrawString(_font, Iso.ToScreen(tile.Center) + new Vector2(-90, 26), text, HorizontalAlignment.Center, 180, 13, c);
         }
 
-        // Every side it could take from, faintly; the one it will actually use, strongly.
-        foreach (var d in Inserter.SourceDirs(dir, input))
+        // Every tile it could take from, faintly; the building it will actually use, strongly (labelled once).
+        bool labelled = false;
+        foreach (var (tile, _, _) in Inserter.Sources(t, dir, input, reach))
         {
-            var tile = t + d.Offset();
             bool chosen = source != null && world.BuildingAt(tile) == source;
-            Mark(tile, chosen ? take : take with { A = 0.35f }, chosen ? $"takes from: {source!.Def.Name}" : "", chosen ? 2f : 1f);
+            Mark(tile, chosen ? take : take with { A = 0.35f }, chosen && !labelled ? $"takes from: {source!.Def.Name}" : "", chosen ? 2f : 1f);
+            labelled |= chosen;
         }
         if (source == null)
             DrawString(_font, Iso.ToScreen(t.Center) + new Vector2(-90, 40), "nothing to take from yet", HorizontalAlignment.Center, 180, 13, take);

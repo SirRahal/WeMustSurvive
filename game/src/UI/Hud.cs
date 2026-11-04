@@ -1422,7 +1422,7 @@ public partial class Hud : Control
 
         // Mode column.
         float mh = (b.Size.Y - 2 * 6) / 3;
-        var source = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input);
+        var source = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input, ins.Reach);
         var stocked = SourceStock(source);
         string? firstItem = stocked.Select(s => s.Item).FirstOrDefault() ?? PlayerInput.FilterChoices.FirstOrDefault(f => f != null);
         (string Label, bool Active, Action Click, string Key, string Tip)[] modes =
@@ -1517,7 +1517,7 @@ public partial class Hud : Control
         float cy = s.Position.Y + 33;
         if (b is Inserter ins)
         {
-            var source = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input);
+            var source = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input, ins.Reach);
             var target = w.BuildingAt(ins.Front);
             float x = tx;
             x = FlowChip(x, cy, source?.Def.Name ?? "Nothing", source != null ? Icons.Get(Icons.ForBuilding(source.Def), HudTheme.AccentLight, 28) : null, HudTheme.Accent);
@@ -2314,7 +2314,7 @@ public partial class Hud : Control
                 yield return "Main storage and a little power. Defend it!";
                 break;
             case Inserter ins:
-                var from = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input);
+                var from = Inserter.LikelySource(w, ins.Origin, ins.Dir, ins.Input, ins.Reach);
                 var to = w.BuildingAt(ins.Front);
                 string side = ins.Input == InputSide.Auto ? "auto" : ins.Input.ToString().ToLowerInvariant();
                 yield return $"Takes from: {from?.Def.Name ?? "nothing"} ({side})   Gives to: {to?.Def.Name ?? "nothing"}";

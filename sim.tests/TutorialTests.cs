@@ -114,7 +114,7 @@ public class TutorialTests
         var only = new TutorialDef { Steps = Def.Steps.Where(s => s.Id == "workshop").ToList() };
         var tut = new Tutorial(only, w);
         Assert.Equal("workshop", tut.CurrentButton(w));
-        w.PlaceDirect("workshop", new Int2(37, 65));
+        w.PlaceDirect("workshop", new Int2(35, 65));
         Assert.Equal("inserter", tut.CurrentButton(w));
     }
 
