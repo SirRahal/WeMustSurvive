@@ -29,7 +29,9 @@ public partial class WorldView : Node2D
     private static readonly Color DeconstructTint = new(1f, 0.25f, 0.2f, 0.45f);
     private static readonly Color HintColor = new(1f, 0.85f, 0.25f);
     private static readonly Color PowerArea = new(0.3f, 0.7f, 1f, 0.10f);
-    private static readonly Color Wire = new(0.85f, 0.65f, 0.3f, 0.7f);
+    /// <summary>Power cable: dark and thin so it stays out of the way; brighter while placing or selecting power.</summary>
+    private static readonly Color Wire = new(0.05f, 0.05f, 0.06f, 0.55f);
+    private static readonly Color WireLit = new(0.35f, 0.75f, 1f, 0.8f);
     private static readonly Color NoPower = new(1f, 0.25f, 0.2f);
 
     private sealed record Shot(Vector2 From, Vector2 To, SVec Dir, string Kind, int Frames, int Total);
@@ -255,6 +257,10 @@ public partial class WorldView : Node2D
         Generator g => g.HasFuel && g.Load > 0,
         Crafter c => c.Active != null,
         Lab lab => lab.Working,
+        Splitter s => s.Busy,
+        TunnelEntrance t => t.Busy,
+        TunnelExit t => t.Busy,
+        Depot d => d.Storage.Total > 0,
         Nexus => true,
         SuperWeapon => true,
         _ => false,
@@ -976,10 +982,7 @@ public partial class WorldView : Node2D
     /// <summary>When placing anything electrical, show every pole's supply area.</summary>
     private void DrawPowerCoverage()
     {
-        var tool = _input!.BuildTool;
-        bool show = tool != null && (tool.PowerDraw > 0 || tool.Kind is BuildingKind.Pole or BuildingKind.Generator)
-                    || _input.SelectedBuilding is { } sel && (sel.NeedsPower || sel is PowerPole or Generator);
-        if (!show) return;
+        if (!ShowingPower()) return;
         foreach (var n in _world!.Buildings.Where(b => b.Def.SupplyRadius > 0 && b is not ConstructionSite))
         {
             float r = n.Def.SupplyRadius;
@@ -994,19 +997,69 @@ public partial class WorldView : Node2D
         }
     }
 
+    /// <summary>Placing or selecting anything electrical: show supply areas and light up the cables.</summary>
+    private bool ShowingPower()
+    {
+        var tool = _input!.BuildTool;
+        return tool != null && (tool.PowerDraw > 0 || tool.Kind is BuildingKind.Pole or BuildingKind.Generator)
+               || _input.SelectedBuilding is { } sel && (sel.NeedsPower || sel is PowerPole or Generator);
+    }
+
+    /// <summary>
+    /// Cables between power nodes. The grid links every pair in reach, but drawing all of them makes a web; only the
+    /// shortest links that join each grid (a minimum spanning tree, Prim's) are drawn, as thin sagging cable.
+    /// </summary>
     private void DrawPowerWires()
     {
         var nodes = _world!.Buildings.Where(b => b.Def.SupplyRadius > 0 && b is not ConstructionSite).ToList();
-        for (int i = 0; i < nodes.Count; i++)
-        for (int j = i + 1; j < nodes.Count; j++)
+        int n = nodes.Count;
+        if (n < 2) return;
+        var color = ShowingPower() ? WireLit : Wire;
+        var inTree = new bool[n];
+        var best = new float[n];
+        var from = new int[n];
+        for (int start = 0; start < n; start++)
         {
-            float reach = MathF.Min(nodes[i].Def.WireReach, nodes[j].Def.WireReach);
-            if (SVec.Distance(nodes[i].Center, nodes[j].Center) > reach) continue;
-            var a = Iso.ToScreen(nodes[i].Center) + new Vector2(0, nodes[i] is Nexus ? -40 : -30);
-            var b = Iso.ToScreen(nodes[j].Center) + new Vector2(0, nodes[j] is Nexus ? -40 : -30);
-            var mid = (a + b) / 2 + new Vector2(0, 8);
-            DrawPolyline(new[] { a, mid, b }, Wire, 1.2f, true);
+            if (inTree[start]) continue;
+            // Grow one grid's tree from here.
+            Array.Fill(best, float.MaxValue);
+            best[start] = 0;
+            from[start] = -1;
+            while (true)
+            {
+                int k = -1;
+                for (int i = 0; i < n; i++)
+                    if (!inTree[i] && best[i] < float.MaxValue && (k < 0 || best[i] < best[k])) k = i;
+                if (k < 0) break;
+                inTree[k] = true;
+                if (from[k] >= 0) DrawCable(nodes[from[k]], nodes[k], color);
+                for (int i = 0; i < n; i++)
+                {
+                    if (inTree[i]) continue;
+                    float d = SVec.Distance(nodes[k].Center, nodes[i].Center);
+                    if (d <= MathF.Min(nodes[k].Def.WireReach, nodes[i].Def.WireReach) && d < best[i])
+                    {
+                        best[i] = d;
+                        from[i] = k;
+                    }
+                }
+            }
         }
+    }
+
+    /// <summary>One cable between two power nodes' tops, sagging in the middle.</summary>
+    private void DrawCable(Building x, Building y, Color color)
+    {
+        var a = Iso.ToScreen(x.Center) + new Vector2(0, x is Nexus ? -40 : -30);
+        var b = Iso.ToScreen(y.Center) + new Vector2(0, y is Nexus ? -40 : -30);
+        float sag = 4 + a.DistanceTo(b) * 0.04f;
+        var pts = new Vector2[9];
+        for (int i = 0; i < pts.Length; i++)
+        {
+            float t = i / (float)(pts.Length - 1);
+            pts[i] = a.Lerp(b, t) + new Vector2(0, sag * 4 * t * (1 - t));
+        }
+        DrawPolyline(pts, color, 1f, true);
     }
 
     // ------------------------------------------------------------------ logistics warnings
@@ -1025,7 +1078,7 @@ public partial class WorldView : Node2D
 
     /// <summary>
     /// Logistics problems stay quiet: one round icon badge over the building where each broken chain ends (red =
-    /// broken, amber = needs something). Hovering the badge or any piece of the chain traces the flow and outlines
+    /// broken, amber = needs something), none for dead ends. Hovering the badge or any piece of the chain traces the flow and outlines
     /// what's involved; the HUD shows the explanation in a pop-up.
     /// </summary>
     private void DrawLogisticsIssues()
@@ -1037,7 +1090,8 @@ public partial class WorldView : Node2D
         var mouse = GetGlobalMousePosition();
 
         // Which chain is hovered: its badge first, then any building in it.
-        var ends = Issues.Values.GroupBy(i => i.End).Where(g => !g.Key.Dead).ToList();
+        // Dead ends get no badge (items piling up already shows it); hovering the belt still explains it.
+        var ends = Issues.Values.GroupBy(i => i.End).Where(g => !g.Key.Dead && !IssueLook.Quiet(g.First())).ToList();
         foreach (var g in ends)
             if (mouse.DistanceTo(BadgePoint(g.Key)) <= BadgeR + 3) HoveredIssue = (g.Key, g.First());
         if (HoveredIssue == null && w.BuildingAt(_input!.HoverTile) is { } over && Issues.TryGetValue(over.Id, out var overIssue))

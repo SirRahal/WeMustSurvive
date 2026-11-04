@@ -28,6 +28,9 @@ public static class IssueLook
         _ => ("block", HudTheme.Danger, issue.Short[..1] + issue.Short[1..].ToLowerInvariant()),
     };
 
+    /// <summary>Problems shown only on hover, with no badge on the map: a dead end is normal and shows itself as items pile up.</summary>
+    public static bool Quiet(LogisticsIssue issue) => issue.Short == "DEAD END";
+
     /// <summary>The reason split into what's wrong (first sentence) and what to do about it (the rest).</summary>
     public static (string What, string Fix) Explain(LogisticsIssue issue)
     {
