@@ -238,9 +238,13 @@ public partial class Hud : Control
         _controlsOpen = names.Contains("controls");
         if (names.Contains("research") && _input != null) _input.ResearchOpen = true;
         if (names.Contains("hero")) _engineerSelected = true;
-        // select:ID selects the first building of that kind.
-        if (names.FirstOrDefault(n => n.StartsWith("select:")) is { } select && _world!.Buildings.FirstOrDefault(b => b.Def.Id == select[7..]) is { } chosen)
-            _input!.Select(chosen);
+        // select:ID selects the first building of that kind; select:ID#N the Nth (1-based).
+        if (names.FirstOrDefault(n => n.StartsWith("select:")) is { } select)
+        {
+            var parts = select[7..].Split('#');
+            int nth = parts.Length > 1 && int.TryParse(parts[1], out var k) ? k - 1 : 0;
+            if (_world!.Buildings.Where(b => b.Def.Id == parts[0]).Skip(nth).FirstOrDefault() is { } chosen) _input!.Select(chosen);
+        }
         // picker:FAMILY holds the tier picker open over that family's slot.
         if (names.FirstOrDefault(n => n.StartsWith("picker:")) is { } picker) _pickerForce = picker[7..];
         // turn:N turns the view N quarter turns.
@@ -1372,7 +1376,7 @@ public partial class Hud : Control
 
     // ================================================================== selection (replaces the slots; the dock stays)
 
-    private const float SelBlockMaxW = 500, ModeW = 140, CardW2 = 100, LowStock = 5;
+    private const float SelBlockMaxW = 500, ModeW = 140, CardW2 = 100, CardMinW = 44, CardIconOnlyW = 72, LowStock = 5;
     private Rect2 _selBlock, _sideBlock;
     private readonly List<(string Label, float X)> _cardGroups = new();
     private readonly Dictionary<string, int> _cardCounts = new();
@@ -1434,29 +1438,40 @@ public partial class Hud : Control
                 new Tip(m.Label, new[] { m.Tip }, TipAnchor.Above, 260)));
         }
 
-        // Item cards: stocked at the source (with counts), then items it could carry that the source doesn't hold.
+        // Item cards: stocked at the source (with counts), then items it could carry that the source doesn't hold. Every
+        // card fits: they narrow (icon only below CardIconOnlyW) before anything is left out, and the picked one never is.
         float x = b.Position.X + ModeW + 16, top = b.Position.Y + 18, ch = b.End.Y - top, right = b.End.X;
+        string? picked = one ? ins.Filter : autoItem;
+        var missing = WantedItems(ins, source).Where(i => stocked.All(s => s.Item != i)).ToList();
+        float GroupGap() => stocked.Count > 0 && missing.Count > 0 ? 16 : 0;
+        int n = stocked.Count + missing.Count;
+        float cw = n == 0 ? CardW2 : Mathf.Clamp((right - x - GroupGap() - 8 * (n - 1)) / n, CardMinW, CardW2);
+        int room = (int)((right - x - GroupGap() + 8) / (cw + 8));
+        if (n > room)
+        {
+            // Still too many at the narrowest: drop items the source doesn't hold (keeping the picked one), then stock.
+            missing = missing.Where(i => i == picked).Concat(missing.Where(i => i != picked)).Take(Math.Max(0, room - stocked.Count)).ToList();
+            if (stocked.Count > room)
+                stocked = stocked.Where(s => s.Item == picked).Concat(stocked.Where(s => s.Item != picked)).Take(room).ToList();
+        }
         void Card(string item, int count, bool inStock)
         {
-            if (x + CardW2 > right) return;
             _cardCounts[item] = inStock ? count : -1;
-            bool picked = one && ins.Filter == item || ins.AutoFilter && autoItem == item;
-            _toolButtons.Add(new Button(new Rect2(x, top, CardW2, ch), w.Data.Items[item].Name, "card", true, picked, () => input.SetSelectedFilter(item), $"filter:{item}",
+            _toolButtons.Add(new Button(new Rect2(x, top, cw, ch), w.Data.Items[item].Name, "card", true, item == picked, () => input.SetSelectedFilter(item), $"filter:{item}",
                 new Tip(w.Data.Items[item].Name, new[] { inStock ? $"{count} here. Click to move only this." : "None here right now. Click to move only this." }, TipAnchor.Above, 240)));
-            x += CardW2 + 8;
+            x += cw + 8;
         }
         if (stocked.Count > 0) _cardGroups.Add(($"In {source!.Def.Name}", x));
         foreach (var (item, count) in stocked) Card(item, count, true);
-        var missing = WantedItems(ins, source).Where(i => stocked.All(s => s.Item != i)).ToList();
         if (missing.Count > 0)
         {
-            if (stocked.Count > 0) x += 16;
-            if (x + CardW2 <= right) _cardGroups.Add((stocked.Count > 0 ? "Not stocked here" : source == null ? "Nothing to take from" : $"Not in {source.Def.Name}", x));
+            x += GroupGap();
+            _cardGroups.Add((stocked.Count > 0 ? "Not stocked here" : source == null ? "Nothing to take from" : $"Not in {source.Def.Name}", x));
             foreach (var item in missing) Card(item, 0, false);
         }
     }
 
-    /// <summary>What the inserter's source holds right now, most first.</summary>
+    /// <summary>What the inserter's source holds right now, by name so cards don't jump around as counts change.</summary>
     private List<(string Item, int Count)> SourceStock(Building? source)
     {
         var counts = new Dictionary<string, int>();
@@ -1468,7 +1483,7 @@ public partial class Hud : Control
             case Crafter c: foreach (var (item, n) in c.Output.Entries) Add(item, n); break;
             case Belt belt: foreach (var it in belt.Items) Add(it.Item, 1); break;
         }
-        return counts.Where(kv => kv.Value > 0).OrderByDescending(kv => kv.Value).Select(kv => (kv.Key, kv.Value)).ToList();
+        return counts.Where(kv => kv.Value > 0).OrderBy(kv => _world!.Data.Items[kv.Key].Name, StringComparer.Ordinal).Select(kv => (kv.Key, kv.Value)).ToList();
     }
 
     /// <summary>Items worth offering as a filter: what the target uses, else the usual filter choices.</summary>
@@ -1622,6 +1637,12 @@ public partial class Hud : Control
                 count < LowStock ? HudTheme.DangerLight : HudTheme.TextMuted);
         var c = r.GetCenter();
         var alpha = inStock || b.Active ? 1f : 0.45f;
+        if (r.Size.X < CardIconOnlyW)
+        {
+            // Narrow: just the picture (the name is in the tooltip).
+            C.DrawTextureRect(Icons.Item(_world!.Data.Items[item], 32), new Rect2(c - new Vector2(14, 10), new Vector2(28, 28)), false, Colors.White with { A = alpha });
+            return;
+        }
         C.DrawTextureRect(Icons.Item(_world!.Data.Items[item], 32), new Rect2(c - new Vector2(14, 22), new Vector2(28, 28)), false, Colors.White with { A = alpha });
         var lines = WrapPx(HudTheme.BodySemi, b.Label, 12, r.Size.X - 10).Take(2).ToList();
         float ly = c.Y + 18 - (lines.Count - 1) * 7;
