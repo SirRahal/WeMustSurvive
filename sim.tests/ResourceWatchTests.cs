@@ -34,7 +34,7 @@ public class ResourceWatchTests
     {
         var w = TestWorld.Create();
         w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
-        w.PlaceDirect("depot", TestWorld.CoalTile + new Int2(1, 0));
+        w.PlaceDirect("depot", TestWorld.CoalTile + new Int2(2, 0));
         var watch = new ResourceWatch();
         RunWatched(w, watch, 30);
 

@@ -236,7 +236,7 @@ public partial class WorldView : Node2D
                 return _world!.NearestEnemy(tu.Center, tu.Range(_world)) is { } foe ? PropSprites.AimName(foe.Pos - tu.Center) : "s";
             case Drill drill:
                 // Its own ore's rig even once mined out, with the red lamp.
-                string? ore = drill.Ore ?? _world!.Map.OreAt(drill.Origin);
+                string? ore = drill.Ore ?? drill.OreHere(_world!);
                 string name = (ore ?? drill.LastOre ?? "iron_ore").Split('_')[0];
                 return ore == null ? $"{name}_{d}_empty" : $"{name}_{d}";
             case Inserter ins:
@@ -677,7 +677,7 @@ public partial class WorldView : Node2D
         string d = PropSprites.DirName(dir);
         string main = def.Kind switch
         {
-            BuildingKind.Drill => $"{(_world!.Map.OreAt(origin) ?? "iron_ore").Split('_')[0]}_{d}",
+            BuildingKind.Drill => $"{(Drill.OreUnder(_world!, origin, def.Size) ?? "iron_ore").Split('_')[0]}_{d}",
             BuildingKind.Inserter => d + "_pickup",
             BuildingKind.Belt => d + "_0",
             BuildingKind.Wall => WallJoins(origin, def.Id),
@@ -1841,15 +1841,15 @@ public partial class WorldView : Node2D
             DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, tint, 1.5f);
         }
         if (def.Kind == BuildingKind.Inserter) DrawInserterPreview(t, _input.GhostDir, Math.Max(1, def.Reach));
-        if (def.Kind == BuildingKind.Drill) DrawDrillPreview(t, _input.GhostDir);
+        if (def.Kind == BuildingKind.Drill) DrawDrillPreview(t, _input.GhostDir, def.Size);
     }
 
     /// <summary>Placing a drill: show what it will drop its ore into, in red if that can't take it.</summary>
-    private void DrawDrillPreview(Int2 t, Direction dir)
+    private void DrawDrillPreview(Int2 t, Direction dir, int size)
     {
         var world = _world!;
-        if (world.Map.OreAt(t) is not { } ore) return;
-        var front = t + dir.Offset();
+        if (Drill.OreUnder(world, t, size) is not { } ore) return;
+        var front = Building.FrontOf(t, size, dir);
         var target = world.BuildingAt(front);
         string oreName = world.Data.Items[ore].Name.ToLowerInvariant();
         (string text, Color color) = target switch
@@ -1861,7 +1861,7 @@ public partial class WorldView : Node2D
         };
         var d = Iso.Diamond(front.X, front.Y, 1, 0, 0.1f);
         DrawPolyline(new[] { d[0], d[1], d[2], d[3], d[0] }, color, 2f, true);
-        DrawString(_font, Iso.ToScreen(t.Center) + new Vector2(-110, -34), text, HorizontalAlignment.Center, 220, 13, color);
+        DrawString(_font, Iso.ToScreen(t.X + size / 2f, t.Y + size / 2f) + new Vector2(-110, -34), text, HorizontalAlignment.Center, 220, 13, color);
     }
 
     /// <summary>

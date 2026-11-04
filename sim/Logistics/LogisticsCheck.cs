@@ -34,7 +34,7 @@ public static class LogisticsCheck
     {
         Nexus or Depot or Splitter or TunnelEntrance or TunnelExit or Belt => true,
         // Only burner drills on non-coal ore take coal (a drill sitting on coal fuels itself).
-        Drill d => item == "coal" && d.Def.UsesFuel && w.Map.OreAt(d.Origin) != "coal",
+        Drill d => item == "coal" && d.Def.UsesFuel && d.OreHere(w) != "coal",
         Crafter c => c.Recipes.Any(r => r.Inputs.ContainsKey(item)) || c.Def.UsesFuel && item == "coal",
         Turret t => t.Def.AmmoItem == item,
         Generator => item == "coal",
@@ -190,10 +190,10 @@ public static class LogisticsCheck
                 return null;
             case Belt:
                 return Trace(w, target, memo, path, depth + 1);
-            case IItemAcceptor when w.Map.OreAt(d.Origin) is not { } ore || AcceptsType(w, target, ore):
+            case IItemAcceptor when d.OreHere(w) is not { } ore || AcceptsType(w, target, ore):
                 return null;
             case IItemAcceptor:
-                string mined = w.Map.OreAt(d.Origin)!.Replace('_', ' ');
+                string mined = d.OreHere(w)!.Replace('_', ' ');
                 string why = target is Drill
                     ? $"The {target.Def.Name} in front sits on coal and fuels itself, so it won't take {mined}. Point this drill at a furnace, a belt, or a drill on iron."
                     : $"This drill mines {mined}, but the {target.Def.Name} in front can't use it. Point it at a belt or something that uses {mined}.";
@@ -201,8 +201,8 @@ public static class LogisticsCheck
         }
         // Pointing at nothing (or a wall) while something useful sits on another side: just rotate it.
         var better = new[] { d.Dir.RotateCw(), d.Dir.Opposite(), d.Dir.RotateCw().Opposite() }
-            .Select(dir => w.BuildingAt(d.Origin + dir.Offset()))
-            .FirstOrDefault(b => b is Belt or IItemAcceptor && b is not ConstructionSite);
+            .Select(dir => w.BuildingAt(Building.FrontOf(d.Origin, d.Size, dir)))
+            .FirstOrDefault(b => b != null && b != d && b is Belt or IItemAcceptor && b is not ConstructionSite);
         if (better != null)
             return new LogisticsIssue("ROTATE", $"This drill's output (the arrow) points away from the {better.Def.Name} next to it. Select the drill and press R until the arrow points at it.", d);
         return target == null

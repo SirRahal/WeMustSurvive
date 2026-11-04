@@ -15,7 +15,7 @@ public class SystemsTests
     {
         var w = TestWorld.Create();
         var drill = (Drill)w.PlaceDirect("electric_drill", TestWorld.IronTile, Direction.East);
-        var depot = (Depot)w.PlaceDirect("depot", TestWorld.IronTile + new Int2(1, 0));
+        var depot = (Depot)w.PlaceDirect("depot", TestWorld.IronTile + new Int2(2, 0));
         w.Run(300);
         Assert.Equal("No power", drill.Status);
         Assert.Equal(0, depot.Storage.Total);
@@ -176,7 +176,7 @@ public class SystemsTests
         var silver = new Int2(40, 13);
         Assert.True(w.Map.IsClaimZone(silver));
         var drill = (Drill)w.PlaceDirect("drill", silver, Direction.East);
-        var depot = (Depot)w.PlaceDirect("depot", silver + new Int2(1, 0));
+        var depot = (Depot)w.PlaceDirect("depot", silver + new Int2(2, 0));
         for (int i = 0; i < 5; i++) drill.TryInsert("coal");
 
         w.Run(780); // 120 / 1.6 = 75 (76 with float rounding) ticks per cycle -> 10 cycles
@@ -268,7 +268,7 @@ public class SystemsTests
         Assert.Equal(600, w.PlaceDirect("wall", new Int2(40, 59)).MaxHp);
 
         w.PlaceDirect("drill", TestWorld.CoalTile, Direction.East);
-        var depot = (Depot)w.PlaceDirect("depot", TestWorld.CoalTile + new Int2(1, 0));
+        var depot = (Depot)w.PlaceDirect("depot", TestWorld.CoalTile + new Int2(2, 0));
         w.Run(600);
         Assert.Equal(10, depot.Storage.Count("coal")); // double speed: 60 ticks per coal
     }

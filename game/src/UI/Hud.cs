@@ -1672,7 +1672,7 @@ public partial class Hud : Control
         var input = _input!;
         var w = _world!;
         var list = new List<Button?>();
-        bool rotatable = b.Size == 1 && b.Def.Kind is BuildingKind.Belt or BuildingKind.Inserter or BuildingKind.Drill
+        bool rotatable = (b.Size == 1 || b is Drill) && b.Def.Kind is BuildingKind.Belt or BuildingKind.Inserter or BuildingKind.Drill
             or BuildingKind.Splitter or BuildingKind.TunnelEntrance or BuildingKind.TunnelExit;
         var rotate = new Button(default, "Rotate", $"Facing {b.Dir.ToString().ToLowerInvariant()}", true, false, input.RotateSelected);
 
@@ -2381,7 +2381,7 @@ public partial class Hud : Control
         }
         else
         {
-            var byOre = drills.GroupBy(d => w.Map.OreAt(d.Origin) ?? "nothing")
+            var byOre = drills.GroupBy(d => d.OreHere(w) ?? "nothing")
                 .Select(g => $"{g.Count()} {(g.Key == "nothing" ? "empty" : ShortName(g.Key))}");
             yield return $"Fed by {drills.Count} drill{(drills.Count == 1 ? "" : "s")}: {string.Join(", ", byOre)}";
         }
@@ -2392,12 +2392,12 @@ public partial class Hud : Control
                    + "   Out: " + (outRates.Count == 0 ? "nothing yet" : string.Join(", ", outRates.Select(r => $"{RateText(r.PerMinute)} {ShortName(r.Item)}/min")));
 
         // Bottleneck: compare what the feeding drills can mine of an input with how fast this machine can use it.
-        var oreDrills = drills.Where(d => w.Map.OreAt(d.Origin) is { } ore && ore != "coal").ToList();
-        var recipe = c.Active ?? c.Recipes.FirstOrDefault(r => oreDrills.Any(d => r.Inputs.ContainsKey(w.Map.OreAt(d.Origin)!)));
+        var oreDrills = drills.Where(d => d.OreHere(w) is { } ore && ore != "coal").ToList();
+        var recipe = c.Active ?? c.Recipes.FirstOrDefault(r => oreDrills.Any(d => r.Inputs.ContainsKey(d.OreHere(w)!)));
         if (recipe != null)
         {
             string input = recipe.Inputs.Keys.First();
-            float supply = oreDrills.Where(d => w.Map.OreAt(d.Origin) == input).Sum(d => d.MaxPerMinute(w)) / recipe.Inputs[input];
+            float supply = oreDrills.Where(d => d.OreHere(w) == input).Sum(d => d.MaxPerMinute(w)) / recipe.Inputs[input];
             float capacity = c.MaxPerMinute(w, recipe);
             string verdict = supply > capacity * 1.05f ? " - drills outpace it: add another furnace"
                 : supply < capacity * 0.95f ? " - add drills to keep it busy" : " - balanced";

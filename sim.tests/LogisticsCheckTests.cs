@@ -44,7 +44,7 @@ public class LogisticsCheckTests
         w.PlaceDirect("depot", new Int2(36, 65));
         // ...but Nexus -> machine with "any item" only takes what the machine uses, so it's fine.
         var intoTurret = (Inserter)w.PlaceDirect("inserter", new Int2(38, 63), Direction.West);
-        w.PlaceDirect("gun_turret", new Int2(37, 63));
+        w.PlaceDirect("gun_turret", new Int2(36, 62)); // 2x2: 36..37 x 62..63, the inserter drops on (37,63)
         var issues = LogisticsCheck.Analyze(w);
 
         Assert.Contains("nothing behind", issues[lonely.Id].Reason);
@@ -60,7 +60,7 @@ public class LogisticsCheckTests
     {
         var w = TestWorld.Create();
         var fed = w.PlaceDirect("drill", TestWorld.IronTile, Direction.East);
-        w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(1, 0));
+        w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(2, 0));
         var stray = w.PlaceDirect("drill", TestWorld.CoalTile, Direction.North);
         var issues = LogisticsCheck.Analyze(w);
 
@@ -83,7 +83,7 @@ public class LogisticsCheckTests
     public void Inserters_pick_their_filter_from_their_neighbours()
     {
         var w = TestWorld.Create();
-        w.PlaceDirect("gun_turret", new Int2(37, 63));
+        w.PlaceDirect("gun_turret", new Int2(36, 62)); // 2x2: 36..37 x 62..63, the inserter drops on (37,63)
         w.PlaceDirect("workshop", new Int2(35, 65)); // 3x3: 35..37 x 65..67
         var intoWorkshop = (Inserter)w.PlaceDirect("inserter", new Int2(38, 65), Direction.West);
         var intoTurret = (Inserter)w.PlaceDirect("inserter", new Int2(37, 64), Direction.North);
@@ -112,7 +112,7 @@ public class LogisticsCheckTests
     public void Backwards_inserter_is_called_out()
     {
         var w = TestWorld.Create();
-        w.PlaceDirect("gun_turret", new Int2(37, 63));
+        w.PlaceDirect("gun_turret", new Int2(36, 62)); // 2x2: 36..37 x 62..63, the inserter drops on (37,63)
         w.PlaceDirect("workshop", new Int2(35, 65)); // 3x3: 35..37 x 65..67
         var ins = w.PlaceDirect("inserter", new Int2(37, 64), Direction.South); // takes from the turret, gives to the workshop
         var issue = LogisticsCheck.Analyze(w)[ins.Id];
@@ -136,7 +136,7 @@ public class LogisticsCheckTests
     {
         var w = TestWorld.Create();
         var drill = w.PlaceDirect("drill", TestWorld.IronTile, Direction.North);
-        w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(1, 0));
+        w.PlaceDirect("furnace", TestWorld.IronTile + new Int2(2, 0));
         Assert.Equal("ROTATE", LogisticsCheck.Analyze(w)[drill.Id].Short);
     }
 

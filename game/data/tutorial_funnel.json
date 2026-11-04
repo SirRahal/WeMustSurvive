@@ -27,20 +27,20 @@
     {
       "id": "coal_drill",
       "title": "Mine coal",
-      "body": "Coal is fuel for burner drills, furnaces and generators. They only burn coal that is delivered to them.\n\nIn the build panel (bottom) open the Production tab (or press 2), then pick Burner Drill (1) and left-click the marked coal tile, facing east. Drills aim themselves at the best neighbour; the arrow shows where it will drop what it mines (R to rotate). Your engineer walks over and builds it.",
+      "body": "Coal is fuel for burner drills, furnaces and generators. They only burn coal that is delivered to them.\n\nIn the build panel (bottom) open the Production tab (or press 2), then pick Burner Drill (1) and left-click the marked coal patch, facing east. Drills are 2x2 and mine every ore tile under them. Drills aim themselves at the best neighbour; the arrow shows where it will drop what it mines (R to rotate). Your engineer walks over and builds it.",
       "focus": { "x": 47.5, "y": 61.5 }, "zoom": 1.9,
       "goal": "hintsBuilt", "button": "drill",
-      "hints": [ { "building": "drill", "x": 46, "y": 61, "dir": "East" } ]
+      "hints": [ { "building": "drill", "x": 45, "y": 61, "dir": "East" } ]
     },
     {
       "id": "iron_drill",
       "title": "Mine iron",
-      "body": "Iron is your main building material. Place another Burner Drill on the marked iron tile, facing south, toward the open ground below it. That's where the furnace will go.\n\nA drill on iron needs coal delivered to it. Hold Shift and place a third Burner Drill on the small coal seam just to its right, facing west: it mines coal straight into the iron drill. (Drills on coal fuel themselves.)",
+      "body": "Iron is your main building material. Place another Burner Drill on the marked iron, facing south, toward the open ground below it. That's where the furnace will go.\n\nA drill on iron needs coal delivered to it. Hold Shift and place a third Burner Drill on the small coal patch just to its right, facing west: it mines coal straight into the iron drill. (Drills on coal fuel themselves.)",
       "focus": { "x": 47.5, "y": 61.5 }, "zoom": 1.9,
       "goal": "hintsBuilt", "button": "drill",
       "hints": [
-        { "building": "drill", "x": 48, "y": 60, "dir": "South" },
-        { "building": "drill", "x": 49, "y": 60, "dir": "West" }
+        { "building": "drill", "x": 47, "y": 59, "dir": "South" },
+        { "building": "drill", "x": 49, "y": 59, "dir": "West" }
       ]
     },
     {
@@ -84,7 +84,7 @@
       "body": "Gun Turrets shoot aliens automatically, but only while they have ammo. Build one (Turrets > Gun Turret, keys 5 then 1) on the marked tile beside the Nexus.\n\nNext you'll set up a little ammo factory to keep it loaded.",
       "focus": { "x": 38, "y": 64.5 }, "zoom": 1.8,
       "goal": "hintsBuilt", "button": "gun_turret",
-      "hints": [ { "building": "gun_turret", "x": 37, "y": 63 } ]
+      "hints": [ { "building": "gun_turret", "x": 36, "y": 62 } ]
     },
     {
       "id": "workshop",

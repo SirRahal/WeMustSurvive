@@ -25,7 +25,7 @@ public class ConstructionTests
         var drill = Assert.IsType<Drill>(w.BuildingAt(TestWorld.CoalTile));
         Assert.Equal(Direction.East, drill.Dir);
         Assert.Empty(Eng(w).Orders);
-        Assert.True(Vector2.Distance(Eng(w).Pos, drill.Center) < 2.5f);
+        Assert.True(drill.DistanceTo(Eng(w).Pos) < 2f); // stood within reach of the 2x2 footprint
     }
 
     [Fact]

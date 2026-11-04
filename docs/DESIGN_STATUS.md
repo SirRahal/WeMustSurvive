@@ -35,7 +35,8 @@ the document left things open. All balance numbers live in `game/data/*.json`.
 - **Sorters and 3x3 machines (issue #7, Dyson Sphere-style):** inserters reach behind them over belts (Inserter 2
   tiles, Fast Inserter 3, nearest first, plus either side), so one sorter can pull from several parallel belts; longer
   reaches swing a little slower. Furnaces, the Munitions Works, labs and generators are 3x3, so each side takes three
-  sorters. Drills stay 1x1 and feed any tile of a machine they face.
+  sorters. Drills and turrets are 2x2 (issue #8): a drill mines every ore tile under it (one tile at a time) and outputs
+  from the middle of its facing edge; turrets take ammo from sorters on any side.
 - **Coal must be delivered (issue #4):** burner drills, furnaces and generators only burn coal that reaches them
   (a coal drill pointed at them, a belt + inserter, or an inserter from the Nexus/a depot). They never pull it from
   storage on their own. The tutorial fuels its iron drill with a second coal drill.

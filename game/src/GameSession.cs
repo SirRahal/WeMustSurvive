@@ -199,6 +199,13 @@ public partial class GameSession : Node2D
         At("generator", -6, -4);
         string[] row1 = { "electric_furnace", "furnace", "workshop", "lab", "depot" };
         for (int i = 0; i < row1.Length; i++) At(row1[i], -8 + i * 4, -7);
+        // One of each drill (2x2) on the iron field east of the machines, where the ground allows.
+        string[] drills = { "drill", "electric_drill", "advanced_drill" };
+        for (int i = 0; i < drills.Length; i++)
+        {
+            var o = new Int2(n.X + 10 + i * 3, n.Y - 9);
+            if (w.CheckPlacement(0, w.Data.Buildings[drills[i]], o) == null) w.PlaceDirect(drills[i], o, Direction.South);
+        }
         string[] walls = { "wall", "reinforced_wall", "heavy_wall", "fortress_wall" };
         for (int i = 0; i < walls.Length; i++) At(walls[i], -3 + i, -12);
         string[] turrets = { "gun_turret", "laser_turret", "rocket_turret", "flame_turret", "heavy_turret" };

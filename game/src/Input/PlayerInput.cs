@@ -538,7 +538,7 @@ public partial class PlayerInput : Node2D
 
     /// <summary>Drills aim themselves at the best neighbour for their ore until the player rotates with R.</summary>
     private Direction? AutoDir(Int2 t) =>
-        BuildTool is { Kind: BuildingKind.Drill } && !_manualRotate ? Drill.BestOutputDir(_world!, t) : null;
+        BuildTool is { Kind: BuildingKind.Drill } && !_manualRotate ? Drill.BestOutputDir(_world!, t, BuildTool.Size) : null;
 
     /// <summary>The facing a tutorial hint asks for at <paramref name="t"/>, if the current blueprint matches it.</summary>
     private Direction? HintDirAt(Int2 t)
